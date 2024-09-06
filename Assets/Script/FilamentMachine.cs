@@ -7,6 +7,8 @@ public class FilamentMachine : MonoBehaviour
     public Transform spawnFilament; // Unity 에디터에서 설정 가능
     float rotSpeed = 200;
     private GameObject currentFilament; // 현재 생성된 filament 저장
+    MeshRenderer filamentMesh;
+
 
     void Start()
     {
@@ -37,6 +39,8 @@ public class FilamentMachine : MonoBehaviour
             if (currentFilament == null) // 기존 filament가 없을 경우에만 생성
             {
                 currentFilament = Instantiate(filamentPrefab, spawnFilament.position, Quaternion.Euler(90, 0, 0));
+                filamentMesh = currentFilament.GetComponent<MeshRenderer>();
+                filamentMesh.material.color = Color.red;
             }
             else
             {
