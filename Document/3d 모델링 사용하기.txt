@@ -1,5 +1,0 @@
-<CATIA 모든 파츠를 유니티에서 그대로 사용하기 CATIA -> Unity>
-1. STEP파일로 export(CATIA)
-2. GLTF로 export(FreeCAD)
-3. FBX로 export(Blender)
-4. Unity에서 FBX를 사용
