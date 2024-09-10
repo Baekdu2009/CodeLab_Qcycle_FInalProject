@@ -111,11 +111,10 @@ public class PrinterTest : MonoBehaviour
         while (true) // 무한 루프를 통해 계속 생성
         {
             powderItem = Instantiate(powderPrefab, nozzleTip);
+            powderItem.transform.position = nozzleTip.position;
             powderItem.transform.parent = null;
 
-            yield return new WaitForSeconds(0.2f); // 1초 대기
+            yield return new WaitForSeconds(0.1f); // 1초 대기
         }
     }
-
-
 }

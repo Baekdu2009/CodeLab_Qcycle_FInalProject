@@ -4,7 +4,7 @@ public class Powder : MonoBehaviour
 {
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Plate") || collision.gameObject.CompareTag("Powder"))
+/*        if (collision.gameObject.CompareTag("Plate") || collision.gameObject.CompareTag("Powder"))
         {
             Rigidbody rb = GetComponent<Rigidbody>();
             if (rb != null)
@@ -13,6 +13,10 @@ public class Powder : MonoBehaviour
                 rb.constraints = RigidbodyConstraints.FreezeAll; // 위치 고정
                 //rb.isKinematic = true;
             }
+        }*/
+        if (collision.gameObject.CompareTag("PrintingObj"))
+        {
+            Destroy(gameObject);
         }
     }
 }

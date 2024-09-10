@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Plate
   - Powder
+  - PrintingObj
   layers:
   - Default
   - TransparentFX
