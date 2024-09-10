@@ -48,7 +48,7 @@ public class Filament_Rotate_Scale_Up : MonoBehaviour
         }
     }
 
-    // 회전이 멈추고 2초 뒤에 삭제
+    // 2초 뒤에 삭제
     IEnumerator delayTime(float waitTime) // 
     {
         if (!isRotating)   
