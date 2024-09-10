@@ -5,7 +5,7 @@ using UnityEngine.VFX;
 
 public class PrinterTest : MonoBehaviour
 {
-    // 움직임 제한 범위 (x, y, z) = (-0.5 ~ 0.5, 0.6 ~ 1.15, -0.4 ~ 0.4)
+    // 움직임 제한 범위 (x, y, z) = (-0.5 ~ 0.5, 0.6 ~ 1.2, -0.4 ~ 0.4)
     public GameObject nozzle;
     public Transform nozzleTip;
     public GameObject powderPrefab;
@@ -16,7 +16,7 @@ public class PrinterTest : MonoBehaviour
     public float nozzleSpeed;
     float xRange = 0.5f;
     float yMin = 0.6f;
-    float yMax = 1.15f;
+    float yMax = 1.2f;
     float zRange = 0.4f;
     Coroutine itemCreationCoroutine;
 
