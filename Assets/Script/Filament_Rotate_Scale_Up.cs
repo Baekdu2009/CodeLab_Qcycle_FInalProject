@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using UnityEngine;
 
 public class Filament_Rotate_Scale_Up : MonoBehaviour
@@ -12,6 +14,7 @@ public class Filament_Rotate_Scale_Up : MonoBehaviour
     void Start()
     {
         initialScale = transform.localScale; // 초기 스케일 저장
+        
     }
 
     void Update()
@@ -36,11 +39,24 @@ public class Filament_Rotate_Scale_Up : MonoBehaviour
                 transform.localScale += new Vector3(scaleIncreaseAmount, 0, scaleIncreaseAmount); // 스케일 증가
             }
 
-            // 크기가 3배로 커지면 멈춤
+            // 크기가 커지면 멈춤후 없어짐
             if (transform.localScale.x >= initialScale.x * 3f)
             {
                 isRotating = false; // 회전 중지
-            }
+                StartCoroutine(delayTime(2.0f)); // 지연 시간 2초
+            }           
         }
     }
+
+    // 회전이 멈추고 2초 뒤에 삭제
+    IEnumerator delayTime(float waitTime) // 
+    {
+        if (!isRotating)   
+        {
+            yield return new WaitForSeconds(waitTime);  // 2초 기다림
+            Destroy(gameObject);
+        }
+
+    }
 }
+
