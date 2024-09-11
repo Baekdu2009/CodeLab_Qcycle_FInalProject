@@ -117,4 +117,6 @@ public class PrinterTest : MonoBehaviour
             yield return new WaitForSeconds(0.1f); // 1√  ¥Î±‚
         }
     }
+
+
 }

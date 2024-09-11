@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Powder : MonoBehaviour
 {
-    private void OnCollisionEnter(Collision collision)
+    public void OnCollisionEnter(Collision collision)
     {
 /*        if (collision.gameObject.CompareTag("Plate") || collision.gameObject.CompareTag("Powder"))
         {
@@ -14,7 +14,15 @@ public class Powder : MonoBehaviour
                 //rb.isKinematic = true;
             }
         }*/
-        if (collision.gameObject.CompareTag("PrintingObj"))
+        if (collision.gameObject.CompareTag("PrintingObj") || collision.gameObject.CompareTag("PrintingPart"))
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("PrintingObj") || other.gameObject.CompareTag("PrintingPart"))
         {
             Destroy(gameObject);
         }
