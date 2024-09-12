@@ -201,7 +201,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 76735779}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: AutoPrinter, Assembly-CSharp
         m_MethodName: TogglePowderCreation
         m_Mode: 1
@@ -369,7 +369,6 @@ GameObject:
   m_Component:
   - component: {fileID: 76735777}
   - component: {fileID: 76735778}
-  - component: {fileID: 76735779}
   m_Layer: 0
   m_Name: PrintManager
   m_TagString: Untagged
@@ -399,33 +398,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 76735775}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da848248b3b55b641a0249c59ac1abe9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  nozzle: {fileID: 1042350125}
-  nozzleTip: {fileID: 117725511}
-  powderPrefab: {fileID: 8291806982738046392, guid: fa68c606ed05a9c41b907fed212ffa60, type: 3}
-  nozzleSpeed: 1
-  objTrigger: {fileID: 1928287731}
-  printingPos: {fileID: 817813707}
---- !u!114 &76735779
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 76735775}
   m_Enabled: 0
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 357b406f9b9880f46bba0fc47d1c127b, type: 3}
+  m_Script: {fileID: 11500000, guid: 785784687d9781a4fabd1443095b5085, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   nozzle: {fileID: 1042350125}
-  nozzleTip: {fileID: 117725511}
-  nozzleSpeed: 1
-  powderPrefab: {fileID: 8291806982738046392, guid: fa68c606ed05a9c41b907fed212ffa60, type: 3}
 --- !u!1 &117725510
 GameObject:
   m_ObjectHideFlags: 0
@@ -1264,6 +1242,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1042350126}
+  - component: {fileID: 1042350127}
   m_Layer: 0
   m_Name: Nozzle
   m_TagString: Untagged
@@ -1288,6 +1267,24 @@ Transform:
   - {fileID: 1316261041}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1042350127
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1042350125}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 357b406f9b9880f46bba0fc47d1c127b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  xStart: -0.5
+  xEnd: 0.5
+  zStart: -0.4
+  zEnd: 0.4
+  stepX: 0.1
+  speed: 0.1
 --- !u!1 &1160234425
 GameObject:
   m_ObjectHideFlags: 0
