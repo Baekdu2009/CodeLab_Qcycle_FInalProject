@@ -11,6 +11,9 @@ public class GCodeSimulator : MonoBehaviour
     private float moveSpeed = 1.0f; // 이동 속도
     private bool isMoving = false;
 
+    public GameObject filament;
+    float rotationSpeed = 200;
+
     void Start()
     {
         // G코드 생성
@@ -24,6 +27,8 @@ public class GCodeSimulator : MonoBehaviour
             string gcode = gcodeQueue.Dequeue();
             StartCoroutine(MoveNozzle(gcode));
         }
+
+        RotateFilament();
     }
 
     public void PositionCheck()
@@ -76,5 +81,17 @@ public class GCodeSimulator : MonoBehaviour
 
         currentPosition = targetPosition;
         isMoving = false;
+    }
+
+    private void RotateFilament()
+    {
+        // 현재 회전 상태를 가져옴
+        Quaternion currentRotation = filament.transform.localRotation;
+
+        // Y축을 기준으로 회전할 각도 계산
+        Quaternion deltaRotation = Quaternion.Euler(0, rotationSpeed * Time.deltaTime, 0);
+
+        // 새로운 회전 상태 계산
+        filament.transform.localRotation = currentRotation * deltaRotation;
     }
 }
