@@ -6,7 +6,6 @@ using UnityEngine.SocialPlatforms;
 
 public class PrinterMoving : MonoBehaviour
 {
-    public GameObject printer;
     public Transform nozzle;
     public Transform rod;
     public Transform plate;
