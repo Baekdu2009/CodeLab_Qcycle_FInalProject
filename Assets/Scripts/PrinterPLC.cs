@@ -36,7 +36,10 @@ public class PrinterPLC : MonoBehaviour
 
         pointY = ReadDeviceBlock("Y0");
 
-        
+        for (int i = 0; i < 10; i++)
+        {
+            print($"pointY[0{i}] : { pointY[0][i]}");
+        }
     }
 
     private int[][] ReadDeviceBlock(string deviceName)
@@ -78,7 +81,11 @@ public class PrinterPLC : MonoBehaviour
 
     public void WriteDeviceBlock(string devicename, int[][] nowPoint)
     {
-        
+        int[] data = new int[blockNum];
+        data[0] = devices[0];
+        data[1] = devices[1];
+
+        mxComponent.WriteDeviceBlock(devicename, blockNum, ref data[0]);
     }
 
     private static int[] ConvertStringToIntArray(string binary)
