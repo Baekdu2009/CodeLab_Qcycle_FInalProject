@@ -1,97 +1,105 @@
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
-public class GCodeSimulator : MonoBehaviour
+public class PrinterGcode : MonoBehaviour
 {
-    public GameObject nozzle; // 노즐 오브젝트
-    public GameObject nozzleRod;
-    private Vector3 currentPosition;
+    public Transform nozzle;    // 노즐
+    public Transform rod;       // 로드
+    public Transform plate;     // 플레이트
+
+    public float Xmin;
+    public float Ymin;
+    public float Zmin;
+    public float Xmax;
+    public float Ymax;
+    public float Zmax;
+
     private Queue<string> gcodeQueue = new Queue<string>();
-    private float moveSpeed = 1.0f; // 이동 속도
-    private bool isMoving = false;
 
-    public GameObject filament;
-    float rotationSpeed = 200;
+    private bool isMovingNozzle = false;
+    private bool isMovingRod = false;
+    private bool isMovingPlate = false;
+    public float moveSpeed = 1.0f;  // 이동속도
 
-    void Start()
+    private void Start()
     {
-        // G코드 생성
-        GenerateGCode();
+        
     }
 
-    void Update()
+    private void Update()
     {
-        if (!isMoving && gcodeQueue.Count > 0)
+        
+    }
+    // G코드에서 G0: 재료공급 없는 빠른 이동, G1: 재료공급 있는 선형 이동
+    void GenerateGcode(string gcommand, float x, float y, float z)
+    {
+        gcodeQueue.Enqueue($"{gcommand} X{x} Y{y} Z{z}");
+    }
+
+    void GenerateGcode(string gcommand, Vector3 vector)
+    {
+        gcodeQueue.Enqueue($"{gcommand} X{vector.x} Y{vector.y} Z{vector.z}");
+    }
+    void GenerateGcode(string gcommand, Transform transform)
+    {
+        gcodeQueue.Enqueue($"{gcommand} X{transform.position.x} Y{transform.position.y} Z{transform.position.z}");
+    }
+
+    // x축 움직임 -> 플레이트
+    // y축 움직임 -> 노즐
+    private IEnumerator PlateMoving(string gcode)
+    {
+        isMovingPlate = true;
+
+        Vector3 targetPosition = ParseGCode(gcode, plate.localPosition);
+
+        while (Vector3.Distance(plate.localPosition, targetPosition) > 0.01f)
         {
-            string gcode = gcodeQueue.Dequeue();
-            StartCoroutine(MoveNozzle(gcode));
+            plate.localPosition = Vector3.MoveTowards(plate.localPosition, targetPosition, moveSpeed * Time.deltaTime);
+            yield return new WaitForEndOfFrame();
         }
 
-        RotateFilament();
+        isMovingPlate = false;
     }
 
-    public void PositionCheck()
+    private IEnumerator NozzleMoving(string gcode)
     {
-        print(nozzle.transform.position);
-    }
+        isMovingNozzle = true;
 
-    private void GenerateGCode()
-    {
-        // Z축을 -0.4에서 0.4까지 왕복하며 G코드를 생성
-        for (float z = -2.8f; z <= -0.35f; z += 0.01f)
+        Vector3 targetPosition = ParseGCode(gcode, nozzle.localPosition);
+
+        while (Vector3.Distance(nozzle.localPosition, targetPosition) > 0.01f)
         {
-            gcodeQueue.Enqueue($"G1 X0 Y1.75 Z{z}");
+            nozzle.localPosition = Vector3.MoveTowards(nozzle.localPosition, targetPosition, moveSpeed * Time.deltaTime);
+            yield return new WaitForEndOfFrame();
         }
-        for (float z = -0.35f; z >= -2.8f; z -= 0.01f)
-        {
-            gcodeQueue.Enqueue($"G1 X0 Y1.75 Z{z}");
-        }
+
+        isMovingNozzle = false;
     }
 
-    private IEnumerator MoveNozzle(string gcode)
+    private Vector3 ParseGCode(string gcode, Vector3 position)
     {
-        isMoving = true;
-
         string[] parts = gcode.Split(' ');
-        Vector3 targetPosition = currentPosition;
+        float x = position.x;
+        float y = position.y;
+        float z = position.z;
 
         foreach (string part in parts)
         {
             if (part.StartsWith("X"))
             {
-                targetPosition.x = float.Parse(part.Substring(1));
+                x = Mathf.Clamp(float.Parse(part.Substring(1)), Xmin, Xmax);
             }
             else if (part.StartsWith("Y"))
             {
-                targetPosition.y = float.Parse(part.Substring(1));
+                y = Mathf.Clamp(float.Parse(part.Substring(1)), Ymin, Ymax);
             }
             else if (part.StartsWith("Z"))
             {
-                targetPosition.z = float.Parse(part.Substring(1));
+                z = Mathf.Clamp(float.Parse(part.Substring(1)), Zmin, Zmax);
             }
         }
-
-        // 노즐을 목표 위치로 부드럽게 이동
-        while (Vector3.Distance(nozzle.transform.position, targetPosition) > 0.01f)
-        {
-            nozzle.transform.position = Vector3.MoveTowards(nozzle.transform.position, targetPosition, moveSpeed * Time.deltaTime);
-            yield return new WaitForEndOfFrame(); // 다음 프레임까지 대기
-        }
-
-        currentPosition = targetPosition;
-        isMoving = false;
-    }
-
-    private void RotateFilament()
-    {
-        // 현재 회전 상태를 가져옴
-        Quaternion currentRotation = filament.transform.localRotation;
-
-        // Y축을 기준으로 회전할 각도 계산
-        Quaternion deltaRotation = Quaternion.Euler(0, rotationSpeed * Time.deltaTime, 0);
-
-        // 새로운 회전 상태 계산
-        filament.transform.localRotation = currentRotation * deltaRotation;
+        return new Vector3(x, y, z);
     }
 }
