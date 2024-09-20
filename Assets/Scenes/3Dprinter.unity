@@ -688,37 +688,33 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 4247681383163820192, guid: efaa2eb014cbca34b9d266d680795aa6, type: 3}
   m_PrefabInstance: {fileID: 957052880}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &360825024
+--- !u!4 &360825025 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8245823950428315175, guid: efaa2eb014cbca34b9d266d680795aa6, type: 3}
+  m_PrefabInstance: {fileID: 957052880}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &360825026
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 360825023}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 699709411fc758e45a041c837baab9ea, type: 3}
+  m_Script: {fileID: 11500000, guid: 785784687d9781a4fabd1443095b5085, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   nozzle: {fileID: 1488376840}
   rod: {fileID: 1256907737}
   plate: {fileID: 1137585974}
-  filament: {fileID: 1283993306}
   Xmin: -0.3
   Xmax: 0.18
   Ymin: -0.25
   Ymax: 0.23
   Zmin: 0.13
   Zmax: 0.6
-  nozzleSpeed: 0.1
-  rodSpeed: 0.1
-  plateSpeed: 0.1
-  filamentRotSpeed: 200
---- !u!4 &360825025 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 8245823950428315175, guid: efaa2eb014cbca34b9d266d680795aa6, type: 3}
-  m_PrefabInstance: {fileID: 957052880}
-  m_PrefabAsset: {fileID: 0}
+  moveSpeed: 1
 --- !u!1 &422027686
 GameObject:
   m_ObjectHideFlags: 0
@@ -984,11 +980,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1870242654187012850, guid: efaa2eb014cbca34b9d266d680795aa6, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 1870242654187012850, guid: efaa2eb014cbca34b9d266d680795aa6, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.132
+      value: 0.223
       objectReference: {fileID: 0}
     - target: {fileID: 1901721717929314879, guid: efaa2eb014cbca34b9d266d680795aa6, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1047,7 +1043,7 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 4247681383163820192, guid: efaa2eb014cbca34b9d266d680795aa6, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 360825024}
+      addedObject: {fileID: 360825026}
   m_SourcePrefab: {fileID: 100100000, guid: efaa2eb014cbca34b9d266d680795aa6, type: 3}
 --- !u!1 &961739749
 GameObject:
@@ -1570,11 +1566,6 @@ Transform:
 Transform:
   m_CorrespondingSourceObject: {fileID: 1870242654187012850, guid: efaa2eb014cbca34b9d266d680795aa6, type: 3}
   m_PrefabInstance: {fileID: 957052880}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &1283993306 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8049891782186329833, guid: d75e5482c3162aa4c936f8f823d331aa, type: 3}
-  m_PrefabInstance: {fileID: 1525515212}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &1283993307 stripped
 Transform:
