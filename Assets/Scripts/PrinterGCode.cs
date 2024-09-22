@@ -8,9 +8,6 @@ public class PrinterGcode : MonoBehaviour
     public Transform rod;       // 로드
     public Transform plate;     // 플레이트
     public GameObject filament; // 필라멘트
-    public GameObject cubePrefab;
-    public Transform ObjectPos;
-    GameObject cube;
 
     public float Xmin;
     public float Ymin;
@@ -19,30 +16,49 @@ public class PrinterGcode : MonoBehaviour
     public float Ymax;
     public float Zmax;
 
-    private Queue<Vector3> nozzleQueue = new Queue<Vector3>();
-    private Queue<Vector3> plateQueue = new Queue<Vector3>();
-    private Queue<Vector3> rodQueue = new Queue<Vector3>();
-
-    private bool isMovingNozzle = false;
-    private bool isMovingPlate = false;
-    private bool isMovingRod = false;
-    private bool isObject = false;
+    private Queue<string> nozzleQueue = new Queue<string>();
+    private Queue<string> plateQueue = new Queue<string>();
+    private Queue<string> rodQueue = new Queue<string>();
 
     public float moveSpeed = 0.1f;  // 이동속도
-    public float filamentRotSpeed = 200; // 필라멘트 회전 속도
     public float printingResolution = 0.02f;
+    public float rotSpeed = 200;
 
-    private void Start()
+    public void OriginBtnEvent()
     {
-        plate.localPosition = new Vector3(Xmin, 0, 0);
+        Coroutine coroutine = null;
 
-        StartCoroutine(PrintProcess());
+        if (coroutine == null)
+        {
+            coroutine = StartCoroutine(OriginPosition());
+        }
+        else
+        {
+            StopCoroutine(coroutine);
+            coroutine = null;
+        }
     }
 
-    private void Update()
+    private IEnumerator OriginPosition()
     {
-        RotateFilament();
-        CubeControl();
+        GenerateGcode("G0", 0, Ymin, 0, nozzleQueue);
+        GenerateGcode("G0", 0, 0, Zmin, rodQueue);
+        GenerateGcode("G0", Xmin, 0, 0, plateQueue);
+
+        yield return MoveNozzle(nozzleQueue.Dequeue());
+        yield return MoveRod(rodQueue.Dequeue());
+        yield return MovePlate(plateQueue.Dequeue());
+    }
+
+    public void StartProcess()
+    {
+        StartCoroutine(PrintProcess());
+        StartCoroutine(RotateFilament());
+    }
+
+    public void StopProcess()
+    {
+        StopAllCoroutines();
     }
 
     private IEnumerator PrintProcess()
@@ -50,106 +66,72 @@ public class PrinterGcode : MonoBehaviour
         while (true) // 무한 루프
         {
             // 노즐 Y축으로 왕복 운동
-            yield return StartCoroutine(NozzleYMovement());
+            yield return StartCoroutine(NozzleMovement());
 
             // 플레이트 X축으로 이동
-            yield return StartCoroutine(PlateXMovement());
+            yield return StartCoroutine(PlateRodMovement());
 
             // 로드 Z축으로 이동
             // yield return StartCoroutine(RodZMovement());
-
-            // 플레이트가 Xmax에 도달하면 노즐과 플레이트를 초기 위치로 이동
-            yield return StartCoroutine(ResetPositions());
         }
     }
 
-    private IEnumerator NozzleYMovement()
+    private IEnumerator NozzleMovement()
     {
-        isMovingNozzle = true;
-
         // Y축 왕복
         for (float y = Ymin; y <= Ymax; y += printingResolution)
         {
-            Vector3 targetPosition = new Vector3(0, y, 0);
-            nozzleQueue.Enqueue(targetPosition);
+            GenerateGcode("G1", 0, y, 0, nozzleQueue);
             yield return MoveNozzle(nozzleQueue.Dequeue());
         }
+
         for (float y = Ymax; y >= Ymin; y -= printingResolution)
         {
-            Vector3 targetPosition = new Vector3(0, y, 0);
-            nozzleQueue.Enqueue(targetPosition);
+            GenerateGcode("G1", 0, y, 0, nozzleQueue);
             yield return MoveNozzle(nozzleQueue.Dequeue());
         }
-
-        isMovingNozzle = false;
     }
 
-    private IEnumerator PlateXMovement()
+    private IEnumerator PlateRodMovement()
     {
-        isMovingPlate = true;
-
         if (plate.localPosition.x >= Xmax - printingResolution)
         {
-            Vector3 targetPosition = new Vector3(Xmin, 0, 0);
-            plateQueue.Enqueue(targetPosition);
+            GenerateGcode("G1", Xmin + printingResolution, 0, 0, plateQueue);
+            GenerateGcode("G1", 0, 0, rod.localPosition.z + printingResolution, rodQueue);
         }
         else
         {
-            Vector3 targetPosition = new Vector3(plate.localPosition.x + printingResolution, 0, 0);
-            plateQueue.Enqueue(targetPosition);
+            GenerateGcode("G1", plate.localPosition.x + printingResolution, 0, 0, plateQueue);
+            GenerateGcode("G1", 0, 0, rod.localPosition.z, rodQueue);
         }
 
         yield return MovePlate(plateQueue.Dequeue());
-
-        isMovingPlate = false;
+        yield return MoveRod(rodQueue.Dequeue());
     }
 
     //private IEnumerator RodZMovement()
     //{
-    //    isMovingRod = true;
-
-    //    // Z축으로 이동
-    //    for (float z = Zmin; z <= Zmax; z += 0.01f)
+    //    if (plate.localPosition.x >= Xmax - printingResolution)
     //    {
-    //        Vector3 targetPosition = new Vector3(0, 0, z);
-    //        rodQueue.Enqueue(targetPosition);
-    //        yield return MoveRod(rodQueue.Dequeue());
+    //        GenerateGcode("G1", 0, 0, rod.localPosition.z + printingResolution, rodQueue);
+    //    }
+    //    else
+    //    {
+    //        GenerateGcode("G1", 0, 0, rod.localPosition.z, rodQueue);
     //    }
 
-    //    isMovingRod = false;
+    //    yield return MoveRod(rodQueue.Dequeue());
     //}
 
-    private IEnumerator ResetPositions()
+    private void GenerateGcode(string gcommand, float x, float y, float z, Queue<string> queue)
     {
-        // 플레이트를 초기 위치로 이동
-        Vector3 plateResetPosition = new Vector3(plate.localPosition.x, 0, 0);
-        plateQueue.Enqueue(plateResetPosition);
-        yield return MovePlate(plateQueue.Dequeue());
-
-        // 노즐을 Ymin으로 이동
-        Vector3 nozzleResetPosition = new Vector3(0, Ymin, 0);
-        nozzleQueue.Enqueue(nozzleResetPosition);
-        yield return MoveNozzle(nozzleQueue.Dequeue());
-
-        // 로드를 Z축으로 printingResolution만큼 이동
-        if (plate.localPosition.x >= Xmax - printingResolution)
-        {
-            Vector3 rodResetPosition = new Vector3(0, 0, rod.localPosition.z + printingResolution);
-            rodQueue.Enqueue(rodResetPosition);
-        }
-        else
-        {
-            Vector3 rodResetPosition = new Vector3(0, 0, rod.localPosition.z);
-            rodQueue.Enqueue(rodResetPosition);
-
-        }
-        yield return MoveRod(rodQueue.Dequeue());
-
-        yield return null; // 다음 프레임으로 넘어가기
+        queue.Enqueue($"{gcommand} X{x} Y{y} Z{z}");
     }
 
-    private IEnumerator MoveNozzle(Vector3 targetPosition)
+    private IEnumerator MoveNozzle(string gcode)
     {
+        Vector3 targetPosition = ParseGCode(gcode, nozzle.localPosition);
+
         while (Vector3.Distance(nozzle.localPosition, targetPosition) > 0.01f)
         {
             nozzle.localPosition = Vector3.MoveTowards(nozzle.localPosition, targetPosition, moveSpeed * Time.deltaTime);
@@ -157,8 +139,10 @@ public class PrinterGcode : MonoBehaviour
         }
     }
 
-    private IEnumerator MovePlate(Vector3 targetPosition)
+    private IEnumerator MovePlate(string gcode)
     {
+        Vector3 targetPosition = ParseGCode(gcode, plate.localPosition);
+
         while (Vector3.Distance(plate.localPosition, targetPosition) > 0.01f)
         {
             plate.localPosition = Vector3.MoveTowards(plate.localPosition, targetPosition, moveSpeed * Time.deltaTime);
@@ -166,8 +150,10 @@ public class PrinterGcode : MonoBehaviour
         }
     }
 
-    private IEnumerator MoveRod(Vector3 targetPosition)
+    private IEnumerator MoveRod(string gcode)
     {
+        Vector3 targetPosition = ParseGCode(gcode, rod.localPosition);
+
         while (Vector3.Distance(rod.localPosition, targetPosition) > 0.01f)
         {
             rod.localPosition = Vector3.MoveTowards(rod.localPosition, targetPosition, moveSpeed * Time.deltaTime);
@@ -175,27 +161,49 @@ public class PrinterGcode : MonoBehaviour
         }
     }
 
-    private void RotateFilament()
+    private Vector3 ParseGCode(string gcode, Vector3 position)
     {
-        if (filament != null)
+        string[] parts = gcode.Split(' ');
+        float x = position.x;
+        float y = position.y;
+        float z = position.z;
+
+        foreach (string part in parts)
         {
-            // 현재 회전 상태를 가져옴
-            Quaternion currentRotation = filament.transform.localRotation;
-
-            // Y축을 기준으로 회전할 각도 계산
-            Quaternion deltaRotation = Quaternion.Euler(0, filamentRotSpeed * Time.deltaTime, 0);
-
-            // 새로운 회전 상태 계산
-            filament.transform.localRotation = currentRotation * deltaRotation;
+            if (part.StartsWith("X"))
+            {
+                x = float.Parse(part.Substring(1));
+            }
+            else if (part.StartsWith("Y"))
+            {
+                y =float.Parse(part.Substring(1));
+            }
+            else if (part.StartsWith("Z"))
+            {
+                z = float.Parse(part.Substring(1));
+            }
         }
+
+        return new Vector3(x, y, z);
     }
 
-    public void CubeControl()
+    private IEnumerator RotateFilament()
     {
-        if (cube == null)
+        while (true)
         {
-            cube = Instantiate(cubePrefab, ObjectPos);
-            
+            if (filament != null)
+            {
+                // 현재 회전 상태를 가져옴
+                Quaternion currentRotation = filament.transform.localRotation;
+
+                // Y축을 기준으로 회전할 각도 계산
+                Quaternion deltaRotation = Quaternion.Euler(0, rotSpeed * Time.deltaTime, 0);
+
+                // 새로운 회전 상태 계산
+                filament.transform.localRotation = currentRotation * deltaRotation;
+            }
+
+            yield return new WaitForEndOfFrame();
         }
     }
 }
