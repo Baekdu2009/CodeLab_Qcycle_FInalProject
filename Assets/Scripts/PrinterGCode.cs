@@ -8,6 +8,8 @@ public class PrinterGcode : MonoBehaviour
     public Transform rod;       // 로드
     public Transform plate;     // 플레이트
     public GameObject filament; // 필라멘트
+    public GameObject cubePrefab; // 큐브 프리팹
+    public Transform objPos;
 
     public float Xmin;
     public float Ymin;
@@ -24,20 +26,23 @@ public class PrinterGcode : MonoBehaviour
     public float printingResolution = 0.02f;
     public float rotSpeed = 200;
 
+    private GameObject currentCube; // 현재 큐브 오브젝트
+    private Coroutine originCoroutine; // 클래스 필드로 선언
+
+
     public void OriginBtnEvent()
     {
-        Coroutine coroutine = null;
-
-        if (coroutine == null)
+        if (originCoroutine == null)
         {
-            coroutine = StartCoroutine(OriginPosition());
+            originCoroutine = StartCoroutine(OriginPosition());
         }
         else
         {
-            StopCoroutine(coroutine);
-            coroutine = null;
+            StopCoroutine(originCoroutine);
+            originCoroutine = null;
         }
     }
+
 
     private IEnumerator OriginPosition()
     {
@@ -78,6 +83,15 @@ public class PrinterGcode : MonoBehaviour
 
     private IEnumerator NozzleMovement()
     {
+        // 큐브가 없으면 추가
+        if (currentCube == null)
+        {
+            // 노즐의 X축과 동일한 위치에 큐브 생성
+            Vector3 cubePosition = new Vector3(nozzle.position.x, objPos.position.y, objPos.position.z);
+            currentCube = Instantiate(cubePrefab, cubePosition, Quaternion.identity);
+            currentCube.transform.localScale = new Vector3(0, currentCube.transform.localScale.y, currentCube.transform.localScale.z); // 초기 스케일을 0으로 설정
+        }
+
         // Y축 왕복
         for (float y = Ymin; y <= Ymax; y += printingResolution)
         {
@@ -89,7 +103,17 @@ public class PrinterGcode : MonoBehaviour
         {
             GenerateGcode("G1", 0, y, 0, nozzleQueue);
             yield return MoveNozzle(nozzleQueue.Dequeue());
+
         }
+        // 큐브의 스케일을 조정하여 출력하는 모습 만들기
+        Vector3 newScale = currentCube.transform.localScale;
+        newScale.x += printingResolution; // X축 방향으로 추가
+        currentCube.transform.localScale = newScale;
+
+        // 큐브 위치를 플레이트의 X축을 따라 이동
+        Vector3 newPosition = currentCube.transform.localPosition;
+        newPosition.x -= printingResolution / 2; // half of the printing resolution
+        currentCube.transform.localPosition = newPosition;
     }
 
     private IEnumerator PlateRodMovement()
