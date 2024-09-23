@@ -1,15 +1,28 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
+using UnityEngine.UI;
 
 public class PrinterGcode : MonoBehaviour
 {
+    public enum PrinterSize
+    {
+        Large,
+        Small
+    }
+
+    public PrinterSize size;
     public Transform nozzle;    // 노즐
     public Transform rod;       // 로드
     public Transform plate;     // 플레이트
     public GameObject filament; // 필라멘트
-    public GameObject cubePrefab; // 큐브 프리팹
-    public Transform objPos;
+
+    public TMP_Text printerInformation;
+    public TMP_Text printerWorkingTime;
+    public TMP_Text printerExpectTime;
+    public TMP_Text printingStatus;
+    public GameObject resetBtn;
 
     public float Xmin;
     public float Ymin;
@@ -26,9 +39,42 @@ public class PrinterGcode : MonoBehaviour
     public float printingResolution = 0.02f;
     public float rotSpeed = 200;
 
-    private GameObject currentCube; // 현재 큐브 오브젝트
     private Coroutine originCoroutine; // 클래스 필드로 선언
+    private float workingTime; // 작업 시간
+    private float expectedTime; // 잔여 예상 시간
+    private float totalExpectedTime; // 전체 예상 시간
+    private bool isPrinting; // 인쇄 중 여부
 
+
+    private void Start()
+    {
+        PrinterInformationNotice();
+        SetExpectedTime(); // 예상 작업 시간 설정
+        resetBtn.SetActive(false); // 초기화 버튼 비활성화
+    }
+
+    private void SetExpectedTime()
+    {
+        if (size == PrinterSize.Large)
+        {
+            expectedTime = 60; // 4시간
+        }
+        else if (size == PrinterSize.Small)
+        {
+            expectedTime = 60; // 2시간
+        }
+
+        totalExpectedTime = expectedTime;
+        UpdateExpectTimeText(); // 예상 작업 시간 표시
+    }
+    private void UpdateExpectTimeText()
+    {
+        int hours = Mathf.FloorToInt(expectedTime / 3600);
+        int minutes = Mathf.FloorToInt((expectedTime % 3600) / 60);
+        int seconds = Mathf.FloorToInt(expectedTime % 60);
+
+        printerExpectTime.text = $"Expected Time \n{hours:D2}:{minutes:D2}:{seconds:D2}"; // 형식 지정
+    }
 
     public void OriginBtnEvent()
     {
@@ -39,16 +85,16 @@ public class PrinterGcode : MonoBehaviour
         else
         {
             StopCoroutine(originCoroutine);
+            StopCoroutine(RotateFilament());
             originCoroutine = null;
         }
     }
 
-
     private IEnumerator OriginPosition()
     {
+        GenerateGcode("G0", Xmin, 0, 0, plateQueue);
         GenerateGcode("G0", 0, Ymin, 0, nozzleQueue);
         GenerateGcode("G0", 0, 0, Zmin, rodQueue);
-        GenerateGcode("G0", Xmin, 0, 0, plateQueue);
 
         yield return MoveNozzle(nozzleQueue.Dequeue());
         yield return MoveRod(rodQueue.Dequeue());
@@ -57,13 +103,19 @@ public class PrinterGcode : MonoBehaviour
 
     public void StartProcess()
     {
+        isPrinting = true; // 인쇄 시작
+        workingTime = 0f; // 작업 시간 초기화
         StartCoroutine(PrintProcess());
         StartCoroutine(RotateFilament());
+        StartCoroutine(UpdateWorkingTime());
+        StartCoroutine(UpdateExpectedTime());
     }
 
     public void StopProcess()
     {
         StopAllCoroutines();
+        isPrinting = false; // 인쇄 중지
+        UpdateExpectedTime();
     }
 
     private IEnumerator PrintProcess()
@@ -75,23 +127,11 @@ public class PrinterGcode : MonoBehaviour
 
             // 플레이트 X축으로 이동
             yield return StartCoroutine(PlateRodMovement());
-
-            // 로드 Z축으로 이동
-            // yield return StartCoroutine(RodZMovement());
         }
     }
 
     private IEnumerator NozzleMovement()
     {
-        // 큐브가 없으면 추가
-        if (currentCube == null)
-        {
-            // 노즐의 X축과 동일한 위치에 큐브 생성
-            Vector3 cubePosition = new Vector3(nozzle.position.x, objPos.position.y, objPos.position.z);
-            currentCube = Instantiate(cubePrefab, cubePosition, Quaternion.identity);
-            currentCube.transform.localScale = new Vector3(0, currentCube.transform.localScale.y, currentCube.transform.localScale.z); // 초기 스케일을 0으로 설정
-        }
-
         // Y축 왕복
         for (float y = Ymin; y <= Ymax; y += printingResolution)
         {
@@ -103,17 +143,7 @@ public class PrinterGcode : MonoBehaviour
         {
             GenerateGcode("G1", 0, y, 0, nozzleQueue);
             yield return MoveNozzle(nozzleQueue.Dequeue());
-
         }
-        // 큐브의 스케일을 조정하여 출력하는 모습 만들기
-        Vector3 newScale = currentCube.transform.localScale;
-        newScale.x += printingResolution; // X축 방향으로 추가
-        currentCube.transform.localScale = newScale;
-
-        // 큐브 위치를 플레이트의 X축을 따라 이동
-        Vector3 newPosition = currentCube.transform.localPosition;
-        newPosition.x -= printingResolution / 2; // half of the printing resolution
-        currentCube.transform.localPosition = newPosition;
     }
 
     private IEnumerator PlateRodMovement()
@@ -132,20 +162,6 @@ public class PrinterGcode : MonoBehaviour
         yield return MovePlate(plateQueue.Dequeue());
         yield return MoveRod(rodQueue.Dequeue());
     }
-
-    //private IEnumerator RodZMovement()
-    //{
-    //    if (plate.localPosition.x >= Xmax - printingResolution)
-    //    {
-    //        GenerateGcode("G1", 0, 0, rod.localPosition.z + printingResolution, rodQueue);
-    //    }
-    //    else
-    //    {
-    //        GenerateGcode("G1", 0, 0, rod.localPosition.z, rodQueue);
-    //    }
-
-    //    yield return MoveRod(rodQueue.Dequeue());
-    //}
 
     private void GenerateGcode(string gcommand, float x, float y, float z, Queue<string> queue)
     {
@@ -200,7 +216,7 @@ public class PrinterGcode : MonoBehaviour
             }
             else if (part.StartsWith("Y"))
             {
-                y =float.Parse(part.Substring(1));
+                y = float.Parse(part.Substring(1));
             }
             else if (part.StartsWith("Z"))
             {
@@ -217,17 +233,98 @@ public class PrinterGcode : MonoBehaviour
         {
             if (filament != null)
             {
-                // 현재 회전 상태를 가져옴
                 Quaternion currentRotation = filament.transform.localRotation;
-
-                // Y축을 기준으로 회전할 각도 계산
                 Quaternion deltaRotation = Quaternion.Euler(0, rotSpeed * Time.deltaTime, 0);
-
-                // 새로운 회전 상태 계산
                 filament.transform.localRotation = currentRotation * deltaRotation;
             }
 
             yield return new WaitForEndOfFrame();
         }
+    }
+
+    public void PrinterInformationNotice()
+    {
+        float x = (Xmax - Xmin) * 1000;
+        float y = (Ymax - Ymin) * 1000;
+        float z = (Zmax - Zmin) * 1000;
+        string information = $"W{y} * B{x} * H{z}";
+        printerInformation.text = "Working Space \n" + information + " (mm)";
+    }
+
+    private IEnumerator UpdateWorkingTime()
+    {
+        while (isPrinting)
+        {
+            
+            workingTime += Time.deltaTime; // 흐른 시간 업데이트
+
+            // 시간을 hh:mm:ss 형식으로 변환
+            int hours = Mathf.FloorToInt(workingTime / 3600);
+            int minutes = Mathf.FloorToInt((workingTime % 3600) / 60);
+            int seconds = Mathf.FloorToInt(workingTime % 60);
+
+            // 텍스트 업데이트
+            printerWorkingTime.text = $"Working Time \n{hours:D2}:{minutes:D2}:{seconds:D2}"; // 형식 지정
+            printerWorkingTime.color = Color.yellow;
+
+            yield return null; // 다음 프레임까지 대기
+        }
+    }
+    private IEnumerator UpdateExpectedTime()
+    {
+        while (isPrinting && expectedTime > 0)
+        {
+            expectedTime -= Time.deltaTime;
+
+            // 시간을 hh:mm:ss 형식으로 변환
+            int hours = Mathf.FloorToInt(expectedTime / 3600);
+            int minutes = Mathf.FloorToInt((expectedTime % 3600) / 60);
+            int seconds = Mathf.FloorToInt(expectedTime % 60);
+
+            // 텍스트 업데이트
+            printerExpectTime.text = $"Expected Time \n{hours:D2}:{minutes:D2}:{seconds:D2}"; // 형식 지정
+            printerExpectTime.color = Color.blue;
+
+            UpdatePrintStatus();
+
+            yield return null; // 다음 프레임까지 대기
+        }
+
+        // 예상 시간이 0에 도달했을 때
+        PrinterFinish(); // 프린터 완료 처리
+    }
+    private void UpdatePrintStatus()
+    {
+        // 진행률을 정수형으로 계산
+        int status = Mathf.FloorToInt((workingTime / totalExpectedTime) * 100);
+        printingStatus.text = $"Printing Status \n{status:D2}%"; // 정수형으로 표시
+        printingStatus.color = Color.green;
+    }
+
+
+    private void PrinterFinish()
+    {
+        printerExpectTime.text = "Expected Time \n 00:00:00";
+        StopAllCoroutines();
+
+        // 초기화 버튼 활성화
+        resetBtn.SetActive(true);
+        printingStatus.text = "Printing Complete"; // 완료 메시지 표시
+        printingStatus.color = Color.red;
+    }
+    public void ResetPrinter()
+    {
+        // 초기화 작업 수행
+        workingTime = 0f; // 작업 시간 초기화
+        expectedTime = totalExpectedTime; // 예상 시간 초기화
+        UpdateExpectTimeText(); // 예상 작업 시간 텍스트 초기화
+        printingStatus.text = "Printing Status \n00%"; // 프린팅 상태 초기화
+        printerExpectTime.text = $"Expect Time \n{expectedTime}";
+        printerWorkingTime.text = "Working Time \n00:00:00";
+        isPrinting = false; // 인쇄 중지 상태로 설정
+        resetBtn.SetActive(false);
+        printingStatus.color = Color.black;
+        printerExpectTime.color = Color.black;
+        printerWorkingTime.color = Color.black;
     }
 }
