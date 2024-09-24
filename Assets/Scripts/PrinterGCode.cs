@@ -340,7 +340,7 @@ public class PrinterGcode : MonoBehaviour
         expectedTime = totalExpectedTime; // 예상 시간 초기화
         UpdateExpectTimeText(); // 예상 작업 시간 텍스트 초기화
         printingStatus.text = "Printing Status \n00%"; // 프린팅 상태 초기화
-        printerExpectTime.text = $"Expect Time \n{expectedTime}";
+        printerExpectTime.text = $"Expect Time \n00:00:00";
         printerWorkingTime.text = "Working Time \n00:00:00";
         isPrinting = false; // 인쇄 중지 상태로 설정
         resetBtn.SetActive(false);
