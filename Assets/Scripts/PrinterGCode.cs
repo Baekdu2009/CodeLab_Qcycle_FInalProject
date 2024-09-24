@@ -17,6 +17,7 @@ public class PrinterGcode : MonoBehaviour
     public Transform rod;       // 로드
     public Transform plate;     // 플레이트
     public GameObject filament; // 필라멘트
+    public GameObject printingPrefab; // 출력물 프리팹
 
     public TMP_Text printerInformation;
     public TMP_Text printerWorkingTime;
@@ -39,12 +40,13 @@ public class PrinterGcode : MonoBehaviour
     public float printingResolution = 0.02f;
     public float rotSpeed = 200;
 
-    private Coroutine originCoroutine; // 클래스 필드로 선언
+    private Coroutine originCoroutine; // 원점 코루틴
+    private Coroutine finishCoroutine; // 종료 코루틴
     private float workingTime; // 작업 시간
     private float expectedTime; // 잔여 예상 시간
     private float totalExpectedTime; // 전체 예상 시간
     private bool isPrinting; // 인쇄 중 여부
-
+    private GameObject printingObj; // 출력물
 
     private void Start()
     {
@@ -57,11 +59,11 @@ public class PrinterGcode : MonoBehaviour
     {
         if (size == PrinterSize.Large)
         {
-            expectedTime = 60; // 4시간
+            expectedTime = 10; // 4시간
         }
         else if (size == PrinterSize.Small)
         {
-            expectedTime = 60; // 2시간
+            expectedTime = 10; // 2시간
         }
 
         totalExpectedTime = expectedTime;
@@ -100,7 +102,16 @@ public class PrinterGcode : MonoBehaviour
         yield return MoveRod(rodQueue.Dequeue());
         yield return MovePlate(plateQueue.Dequeue());
     }
+    private IEnumerator FinishPosition()
+    {
+        GenerateGcode("G0", Xmax, 0, 0, plateQueue);
+        GenerateGcode("G0", 0, Ymax, 0, nozzleQueue);
+        GenerateGcode("G0", 0, 0, Zmax, rodQueue);
 
+        yield return MoveNozzle(nozzleQueue.Dequeue());
+        yield return MoveRod(rodQueue.Dequeue());
+        yield return MovePlate(plateQueue.Dequeue());
+    }
     public void StartProcess()
     {
         isPrinting = true; // 인쇄 시작
@@ -311,6 +322,16 @@ public class PrinterGcode : MonoBehaviour
         resetBtn.SetActive(true);
         printingStatus.text = "Printing Complete"; // 완료 메시지 표시
         printingStatus.color = Color.red;
+
+        if (finishCoroutine == null)
+        {
+            finishCoroutine = StartCoroutine(FinishPosition());
+        }
+        else
+        {
+            StopCoroutine(finishCoroutine);
+            finishCoroutine = null;
+        }
     }
     public void ResetPrinter()
     {
