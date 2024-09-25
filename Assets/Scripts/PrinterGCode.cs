@@ -348,12 +348,4 @@ public class PrinterGcode : MonoBehaviour
         printerExpectTime.color = Color.black;
         printerWorkingTime.color = Color.black;
     }
-
-    //private void UpdatePositions()
-    //{
-    //    nozzle.localPosition = new Vector3(nozzle.localPosition.x, nozzleY, nozzle.localPosition.z);
-    //    rod.localPosition = new Vector3(rod.localPosition.x, rod.localPosition.y, rodZ);
-    //    plate.localPosition = new Vector3(plateX, plate.localPosition.y, plate.localPosition.z);
-    //}
-    
 }
