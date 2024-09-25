@@ -63,7 +63,7 @@ public class PrinterGcode : MonoBehaviour
         }
         else if (size == PrinterSize.Small)
         {
-            expectedTime = 10; // 2시간
+            expectedTime = 7200; // 2시간
         }
 
         totalExpectedTime = expectedTime;
@@ -309,7 +309,7 @@ public class PrinterGcode : MonoBehaviour
         // 진행률을 정수형으로 계산
         int status = Mathf.FloorToInt((workingTime / totalExpectedTime) * 100);
         printingStatus.text = $"Printing Status \n{status:D2}%"; // 정수형으로 표시
-        printingStatus.color = Color.green;
+        printingStatus.color = Color.cyan;
     }
 
 
