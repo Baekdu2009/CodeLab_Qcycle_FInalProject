@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine.UI;
 
+<<<<<<< Updated upstream
 public class PrinterGcode : MonoBehaviour
 {
     public enum PrinterSize
@@ -75,10 +76,53 @@ public class PrinterGcode : MonoBehaviour
         int seconds = Mathf.FloorToInt(expectedTime % 60);
 
         printerExpectTime.text = $"Expected Time \n{hours:D2}:{minutes:D2}:{seconds:D2}"; // 형식 지정
+=======
+public class PrinterGCode : MonoBehaviour
+{
+    public Transform nozzle;
+    public Transform rod;
+    public Transform plate;
+
+    public float Xmin;
+    public float Xmax;
+    public float Ymin;
+    public float Ymax;
+    public float Zmin;
+    public float Zmax;
+
+    private float nozzleY;
+    private float rodZ;
+    private float plateX;
+
+    private Queue<string> gcodeQueue = new Queue<string>();
+    private bool isMoving = false;
+    private Vector3 currentPosition;
+    public float moveSpeed = 1.0f; // 이동 속도
+
+    private void Start()
+    {
+        // 초기 위치 설정
+        nozzleY = nozzle.localPosition.y;
+        rodZ = rod.localPosition.z;
+        plateX = plate.localPosition.x;
+        currentPosition = nozzle.localPosition; // 초기 위치 설정
+
+        GenerateGCode();
+    }
+
+    private void Update()
+    {
+        if (!isMoving && gcodeQueue.Count > 0)
+        {
+            string gcode = gcodeQueue.Dequeue();
+            StartCoroutine(MoveNozzle(gcode));
+        }
+>>>>>>> Stashed changes
     }
 
     public void OriginBtnEvent()
     {
+<<<<<<< Updated upstream
         if (originCoroutine == null)
         {
             originCoroutine = StartCoroutine(OriginPosition());
@@ -176,6 +220,50 @@ public class PrinterGcode : MonoBehaviour
     private void GenerateGcode(string gcommand, float x, float y, float z, Queue<string> queue)
     {
         queue.Enqueue($"{gcommand} X{x} Y{y} Z{z}");
+=======
+        // Y축을 Ymin에서 Ymax까지 왕복하며 G코드를 생성
+        for (float y = Ymin; y <= Ymax; y += 0.01f)
+        {
+            gcodeQueue.Enqueue($"G1 X{nozzle.localPosition.x} Y{y} Z{nozzle.localPosition.z}");
+        }
+        for (float y = Ymax; y >= Ymin; y -= 0.01f)
+        {
+            gcodeQueue.Enqueue($"G1 X{nozzle.localPosition.x} Y{y} Z{nozzle.localPosition.z}");
+        }
+    }
+
+    public void ProcessGCode(string gcode)
+    {
+        string[] commands = gcode.Split('\n');
+        foreach (string command in commands)
+        {
+            string trimmedCommand = command.Trim();
+            if (string.IsNullOrEmpty(trimmedCommand)) continue;
+
+            if (trimmedCommand.StartsWith("G0") || trimmedCommand.StartsWith("G1"))
+            {
+                HandleMovement(trimmedCommand);
+            }
+        }
+    }
+
+    private void HandleMovement(string command)
+    {
+        float x = nozzle.localPosition.x;
+        float y = nozzle.localPosition.y;
+        float z = nozzle.localPosition.z;
+
+        string[] parts = command.Split(' ');
+        foreach (string part in parts)
+        {
+            if (part.StartsWith("X")) x = Mathf.Clamp(float.Parse(part.Substring(1)), Xmin, Xmax);
+            else if (part.StartsWith("Y")) y = Mathf.Clamp(float.Parse(part.Substring(1)), Ymin, Ymax);
+            else if (part.StartsWith("Z")) z = Mathf.Clamp(float.Parse(part.Substring(1)), Zmin, Zmax);
+        }
+
+        nozzleY = y; // Y 위치 업데이트
+        UpdatePositions();
+>>>>>>> Stashed changes
     }
 
     private IEnumerator MoveNozzle(string gcode)
@@ -234,6 +322,7 @@ public class PrinterGcode : MonoBehaviour
             }
         }
 
+<<<<<<< Updated upstream
         return new Vector3(x, y, z);
     }
 
@@ -346,5 +435,23 @@ public class PrinterGcode : MonoBehaviour
         printingStatus.color = Color.black;
         printerExpectTime.color = Color.black;
         printerWorkingTime.color = Color.black;
+=======
+        // 노즐을 목표 위치로 부드럽게 이동
+        while (Vector3.Distance(nozzle.localPosition, targetPosition) > 0.01f)
+        {
+            nozzle.localPosition = Vector3.MoveTowards(nozzle.localPosition, targetPosition, moveSpeed * Time.deltaTime);
+            yield return new WaitForEndOfFrame();
+        }
+
+        currentPosition = targetPosition; // 현재 위치 업데이트
+        isMoving = false;
+    }
+
+    private void UpdatePositions()
+    {
+        nozzle.localPosition = new Vector3(nozzle.localPosition.x, nozzleY, nozzle.localPosition.z);
+        rod.localPosition = new Vector3(rod.localPosition.x, rod.localPosition.y, rodZ);
+        plate.localPosition = new Vector3(plateX, plate.localPosition.y, plate.localPosition.z);
+>>>>>>> Stashed changes
     }
 }
