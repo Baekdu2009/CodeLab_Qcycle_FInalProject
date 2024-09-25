@@ -2,13 +2,12 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class AGVMovementManual : MonoBehaviour
+public class AGVMovementManual : AGVMoving
 {
-    public float moveSpeed = 5f; // 이동 속도
-    public float rotationSpeed = 200f; // 회전 속도
     bool isPosSave = false;
 
     private LineRendererExample lineRenderer;
+    public LineRendererExample Line { get => lineRenderer;}
     public List<Vector3> savingPosition = new List<Vector3>();
     private int currentTargetIndex = 0; // 현재 목표 위치 인덱스
 
@@ -19,15 +18,7 @@ public class AGVMovementManual : MonoBehaviour
 
     void Update()
     {
-        if (currentTargetIndex < savingPosition.Count)
-        {
-            MoveWithRoute(); // 경로를 따라 이동
-        }
-        else
-        {
-            AGVMoveByKey(); // 키 입력에 따른 이동
-        }
-
+        AGVMoveByKey(); // 키 입력에 따른 이동
         PositionCheck();
     }
 
@@ -73,35 +64,25 @@ public class AGVMovementManual : MonoBehaviour
         }
     }
 
-    public void MoveWithRoute()
-    {
-        if (currentTargetIndex < savingPosition.Count)
-        {
-            Vector3 targetPosition = savingPosition[currentTargetIndex];
-            Vector3 direction = (targetPosition - transform.position).normalized;
-
-            // 회전
-            Quaternion lookRotation = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, lookRotation, rotationSpeed * Time.deltaTime);
-
-            // 이동
-            transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
-
-            // 목표 위치에 도달했는지 확인
-            if (Vector3.Distance(transform.position, targetPosition) < 0.1f)
-            {
-                currentTargetIndex++; // 다음 목표 위치로 이동
-            }
-        }
-    }
-
     public void RouteCreate()
     {
         if (savingPosition.Count > 0)
         {
-            lineRenderer.UpdateLine(savingPosition.ToArray()); // List를 배열로 변환하여 호출
+            // points 배열을 savingPosition의 크기로 초기화
+            lineRenderer.points = new Vector3[savingPosition.Count];
+
+            // savingPosition의 값을 points 배열에 할당
+            for (int i = 0; i < savingPosition.Count; i++)
+            {
+                lineRenderer.points[i] = savingPosition[i];
+            }
+
+            // LineRenderer 업데이트
+            lineRenderer.UpdateLine(lineRenderer.points); // UpdateLine 메서드 호출
             lineRenderer.GetComponent<LineRenderer>().startColor = Color.yellow;
             lineRenderer.GetComponent<LineRenderer>().endColor = Color.yellow;
+
+            print("라인 생성 완료");
         }
     }
 }
