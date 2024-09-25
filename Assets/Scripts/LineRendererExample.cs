@@ -25,7 +25,7 @@ public class LineRendererExample : MonoBehaviour
         UpdateLine();
     }
 
-    void UpdateLine()
+    public void UpdateLine()
     {
         if (points != null && points.Length > 0)
         {
@@ -33,6 +33,14 @@ public class LineRendererExample : MonoBehaviour
             {
                 lineRenderer.SetPosition(i, points[i].position);
             }
+        }
+    }
+    public void UpdateLine(Vector3[] vector)
+    {
+        lineRenderer.positionCount = vector.Length; // 점 수 설정
+        for (int i = 0; i < vector.Length; i++)
+        {
+            lineRenderer.SetPosition(i, vector[i]);
         }
     }
 }
