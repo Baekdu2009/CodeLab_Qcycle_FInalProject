@@ -1,11 +1,13 @@
 using UnityEngine;
 
-public class AGVMovementAuto : AGVMoving
+public class AGVMovementAuto : MonoBehaviour
 {
-    private LineRendererExample lineRendererAuto;
+    private LineRendererMake lineRendererAuto;
     private int currentPointIndex = 0; // 현재 목표 점 인덱스
     private bool movingForward = true; // 이동 방향 추적
     private bool isRotating = false; // 회전 중인지 확인
+    float moveSpeed;
+    float rotationSpeed;
 
     void Start()
     {

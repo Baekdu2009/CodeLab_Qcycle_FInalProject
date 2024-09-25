@@ -3,18 +3,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
-
 public class ConveyorExample : MonoBehaviour
 {
     [SerializeField] float speed = 1.5f;
-
     [SerializeField] Transform StartPosition;
+    [SerializeField] Transform MidPosition1;
+    [SerializeField] Transform MidPosition2;
     [SerializeField] Transform EndPosition;
 
     public bool isMoving;
     public List<GameObject> clintList = new List<GameObject>();
-    List<Vector3> clintPosition = new List<Vector3>();
+    public List<GameObject> pusherList = new List<GameObject>();
+    private LineRenderer lineRenderer;
 
     private void Start()
     {
@@ -29,83 +29,72 @@ public class ConveyorExample : MonoBehaviour
             }
         }
 
-        // clintList의 위치를 clintPosition에 저장
-        clintPosition.Clear(); // 클리어하여 이전 데이터를 제거
-        for (int i = 0; i < clintList.Count; i++)
-        {
-            clintPosition.Add(clintList[i].transform.position);
-            print($"{i}번째 위치: {clintPosition[i]}");
-        }
+        // LineRenderer 초기화 및 경로 설정
+        lineRenderer = gameObject.AddComponent<LineRenderer>();
+        lineRenderer.positionCount = 4; // 4개의 점
+        lineRenderer.SetPosition(0, StartPosition.position);
+        lineRenderer.SetPosition(1, MidPosition1.position);
+        lineRenderer.SetPosition(2, MidPosition2.position);
+        lineRenderer.SetPosition(3, EndPosition.position);
+
+        // LineRenderer 스타일 설정
+        lineRenderer.startWidth = 0.1f;
+        lineRenderer.endWidth = 0.1f;
+        lineRenderer.material = new Material(Shader.Find("Sprites/Default")); // 기본 재질 사용
+        lineRenderer.startColor = Color.green; // 시작 색상
+        lineRenderer.endColor = Color.green; // 끝 색상
     }
 
     private void Update()
     {
-        
+        // 업데이트 로직 (필요시 추가)
     }
 
     // A에서 B지점까지 이동 시작/정지
-    //public void GoRight()
-    //{
-    //    isMoving = !isMoving;
+    public void GoRight()
+    {
+        isMoving = !isMoving;
 
-    //    if (isMoving)
-    //    {
-    //        StartCoroutine(MoveRight());
-    //    }
-    //}
+        if (isMoving)
+        {
+            foreach (var clint in clintList)
+            {
+                StartCoroutine(MoveClint(clint));
+            }
+        }
+    }
 
-    //private IEnumerator MoveRight()
-    //{
-    //    while (isMoving)
-    //    {
-    //        // 방향 벡터 계산
-    //        Vector3 direction = EndPosition.position - StartPosition.position;
-    //        direction.y = 0; // y 성분 무시
-    //        direction.x = 0; // x 성분 무시
+    private IEnumerator MoveClint(GameObject clint)
+    {
+        Vector3[] positions = new Vector3[4];
+        lineRenderer.GetPositions(positions); // LineRenderer의 위치 가져오기
 
-    //        // 방향 벡터의 단위 벡터로 변환
-    //        Vector3 normalizedDirection = direction.normalized;
+        // 경로를 따라 이동
+        for (int i = 0; i < positions.Length - 1; i++)
+        {
+            Vector3 start = positions[i];
+            Vector3 end = positions[i + 1];
+            float journeyLength = Vector3.Distance(start, end);
+            float startTime = Time.time;
 
-    //        // GameObject 이동 (z 방향으로만)
-    //        transform.position += normalizedDirection * speed * Time.deltaTime;
+            while (clint.transform.position != end)
+            {
+                float distCovered = (Time.time - startTime) * speed;
+                float fractionOfJourney = distCovered / journeyLength;
 
-    //        // 현재 위치와 EndPosition 사이의 거리 계산
-    //        float distance = (EndPosition.position - transform.position).magnitude;
+                clint.transform.position = Vector3.Lerp(start, end, fractionOfJourney);
 
-    //        // EndPosition에 도달했는지 확인
-    //        if (distance < 0.1f)
-    //        {
-    //            // EndPosition에 도달한 후 StartPosition으로 돌아감
-    //            transform.position = StartPosition.position;
-    //        }
+                // 이동 완료 시
+                if (fractionOfJourney >= 1)
+                {
+                    break;
+                }
 
-    //        yield return new WaitForEndOfFrame();
-    //    }
-    //}
+                yield return null;
+            }
+        }
 
-    //public void PositionCheck()
-    //{
-    //    print(transform.position);
-    //    print(transform.localPosition);
-    //}
-
-    //private void OnTriggerEnter(Collider other)
-    //{
-    //    if (other.CompareTag("Metal")) // "Metal" 태그 확인
-    //    {
-    //        other.transform.parent = this.transform; // 부모로 설정
-    //    }
-    //}
-
-    //private void OnTriggerExit(Collider other)
-    //{
-    //    if (transform.childCount > 0)
-    //    {
-    //        for (int i = 0; i < transform.childCount; i++)
-    //        {
-    //            Transform child = transform.GetChild(i); // 첫 번째 자식 가져오기
-    //            child.parent = null; // 부모 제거
-    //        }
-    //    }
-    //}
+        // 이동 완료 후 클리어
+        clint.transform.position = positions[positions.Length - 1]; // 마지막 위치로 설정
+    }
 }

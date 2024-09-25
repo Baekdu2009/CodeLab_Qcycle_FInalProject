@@ -2,18 +2,20 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class AGVMovementManual : AGVMoving
+public class AGVMovementManual : MonoBehaviour
 {
     bool isPosSave = false;
 
-    private LineRendererExample lineRenderer;
-    public LineRendererExample Line { get => lineRenderer;}
+    private LineRendererMake lineRenderer;
+    public LineRendererMake Line { get => lineRenderer;}
     public List<Vector3> savingPosition = new List<Vector3>();
     private int currentTargetIndex = 0; // 현재 목표 위치 인덱스
+    float moveSpeed;
+    float rotationSpeed;
 
     void Start()
     {
-        lineRenderer = gameObject.AddComponent<LineRendererExample>(); // LineRendererExample 인스턴스 추가
+        lineRenderer = gameObject.AddComponent<LineRendererMake>(); // LineRendererExample 인스턴스 추가
     }
 
     void Update()

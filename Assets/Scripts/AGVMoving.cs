@@ -8,7 +8,7 @@ public class AGVMoving : MonoBehaviour
     public float rotationSpeed = 200f; // 회전 속도
 
     private bool isPosSave = false;
-    private LineRendererExample lineRenderer;
+    private LineRendererMake lineRenderer;
     public List<Vector3> savingPosition = new List<Vector3>();
     private int currentPointIndex = 0; // 현재 목표 점 인덱스
     private bool movingForward = true; // 이동 방향 추적
@@ -16,7 +16,7 @@ public class AGVMoving : MonoBehaviour
 
     void Start()
     {
-        lineRenderer = gameObject.AddComponent<LineRendererExample>(); // LineRendererExample 인스턴스 추가
+        lineRenderer = gameObject.AddComponent<LineRendererMake>(); // LineRendererExample 인스턴스 추가
     }
 
     void Update()
@@ -82,8 +82,9 @@ public class AGVMoving : MonoBehaviour
 
             // LineRenderer 업데이트
             lineRenderer.UpdateLine(lineRenderer.points); // UpdateLine 메서드 호출
-            lineRenderer.GetComponent<LineRenderer>().startColor = Color.red;
-            lineRenderer.GetComponent<LineRenderer>().endColor = Color.red;
+            //lineRenderer.GetComponent<Renderer>().enabled = true;
+            //lineRenderer.GetComponent<LineRenderer>().startColor = Color.red;
+            //lineRenderer.GetComponent<LineRenderer>().endColor = Color.red;
 
             print("라인 생성 완료");
         }
