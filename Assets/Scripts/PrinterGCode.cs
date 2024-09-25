@@ -18,7 +18,6 @@ public class PrinterGcode : MonoBehaviour
     public Transform rod;       // 로드
     public Transform plate;     // 플레이트
     public GameObject filament; // 필라멘트
-    public GameObject printingPrefab; // 출력물 프리팹
 
     public TMP_Text printerInformation;
     public TMP_Text printerWorkingTime;
