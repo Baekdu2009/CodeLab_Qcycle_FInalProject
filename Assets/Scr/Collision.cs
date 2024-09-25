@@ -1,23 +1,26 @@
 using UnityEngine;
 using System.Collections;
+using static UnityEngine.GraphicsBuffer;
 
 public class Collision : MonoBehaviour
 {
     float detectionDistance = 5f; // 감지 거리 설정
-
+    RaycastHit hitinfo;
     public float moveSpeed = 5f; // 이동 속도
-    private bool isMoving = true; // 이동 여부
     private bool isColliding = false; // 충돌 상태
     private float waitTime = 5f; // 대기 시간
     private float timer = 0f; // 타이머
+                              // bool isMovingForward = LineAGV1.instance.isMovingForward; // 먼저 실행되서 null
 
     void Start()
     {
-
+        //bool isMovingForward = LineAGV1.instance.isMovingForward;
     }
 
-    void Update()
+    public void Update()
     {
+
+
         Vector3 position = transform.position;
 
 
@@ -46,6 +49,7 @@ public class Collision : MonoBehaviour
 
 
     }
+
     private void CheckCollision(Vector3 direction)
     {
         // 레이캐스트를 통해 충돌 체크
@@ -55,7 +59,7 @@ public class Collision : MonoBehaviour
             if (hitinfo.collider.tag == "target")
             {
                 Debug.Log("충돌객체 있음");
-                isMoving = false; // 멈춤 상태로 설정
+                LineAGV1.instance.isMovingForward = false; // 멈춤 상태로 설정
                 isColliding = true; // 충돌 상태로 설정
                 timer = 0f; // 타이머 초기화
             }
@@ -68,18 +72,18 @@ public class Collision : MonoBehaviour
                 timer += Time.deltaTime; // 타이머 증가
                 if (timer >= waitTime)
                 {
-                    isMoving = true; // 이동 가능 상태로 설정
+                    LineAGV1.instance.isMovingForward = true; // 이동 가능 상태로 설정
                     isColliding = false; // 충돌 상태 해제
                 }
             }
         }
 
-            // 물체 이동
-            if (isMoving)
-            {
-                transform.Translate(Vector3.forward * moveSpeed * Time.deltaTime);
-            }
-       
+        // 물체 이동
+        /* if (isMoving)
+         {
+             transform.Translate(Vector3.forward * moveSpeed * Time.deltaTime);
+         }*/
+
     }
     private void CheckCollision2(Vector3 direction)
     {
@@ -90,7 +94,7 @@ public class Collision : MonoBehaviour
             if (hitinfo.collider.tag == "target")
             {
                 Debug.Log("대각선 충돌객체 있음");
-                isMoving = false; // 멈춤 상태로 설정
+                LineAGV1.instance.isMovingForward = false; // 멈춤 상태로 설정
                 isColliding = true; // 충돌 상태로 설정
                 timer = 0f; // 타이머 초기화
             }
@@ -103,14 +107,15 @@ public class Collision : MonoBehaviour
                 timer += Time.deltaTime; // 타이머 증가
                 if (timer >= waitTime)
                 {
-                    isMoving = true; // 이동 가능 상태로 설정
+                    LineAGV1.instance.isMovingForward = true; // 이동 가능 상태로 설정
                     isColliding = false; // 충돌 상태 해제
+                                         // Debug.Log("다시 움직임");
                 }
             }
         }
 
     }
-    }
+}
 
 
 

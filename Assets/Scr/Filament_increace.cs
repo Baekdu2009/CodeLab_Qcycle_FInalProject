@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Filament_increace : MonoBehaviour
 {
-    public float initialScale = 0.2f; // 초기 Scale
+    public float initialScale = 0.001f; // 초기 Scale
     public float scaleIncreaseSpeed; // 길이 증가 속도
     private bool isScaling = true;  // Scale 증가 여부
     private float maxScale; // 최대 Scale
@@ -27,10 +27,10 @@ public class Filament_increace : MonoBehaviour
             currentScale.y += scaleIncreaseSpeed * Time.deltaTime; // Y축 Scale 증가 양쪽으로 증가
             transform.position += new Vector3(scaleIncreaseSpeed * Time.deltaTime, 0, 0); // 위치 조정 (X축으로 이동)
 
-            // Y축 Scale이 9 초과 시 제한
-            if (currentScale.y > 9)
+            // Y축 Scale이 1.65 초과 시 제한
+            if (currentScale.y > 1.65f)
             {
-                currentScale.y = 9; // 최대 Scale로 설정
+                currentScale.y = 1.65f; // 최대 Scale로 설정
                 isScaling = false;    // Scale 증가 중지
             }
 

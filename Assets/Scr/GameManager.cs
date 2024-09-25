@@ -19,7 +19,7 @@ public class GameManager : MonoBehaviour
 
         // CylinderController 스크립트를 추가하여 초기화
         Filament_increace controller = cylinder.AddComponent<Filament_increace>();
-        controller.initialScale = 0.2f; // 초기 스케일 설정
+        controller.initialScale = 0.01f; // 초기 스케일 설정
         controller.scaleIncreaseSpeed = scaleIncreaseSpeed; // 길이 증가 속도 설정
     }
 }
