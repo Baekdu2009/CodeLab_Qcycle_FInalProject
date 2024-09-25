@@ -1,9 +1,9 @@
-Printer1
+Printer Large
 x축 : -0.3 ~ 0.18
 y축 : -0.25 ~ 0.23
 z축 : 0.13 ~ 0.6
 
-Printer3
+Printer Small
 x축 : -0.14 ~ 0.09
 y축 : -0.09 ~ 0.09
 z축 : -0.01 ~ 0.18

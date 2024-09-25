@@ -12,11 +12,11 @@ public class LineRendererExample : MonoBehaviour
         lineRenderer = gameObject.AddComponent<LineRenderer>();
 
         // LineRenderer 속성 설정
-        lineRenderer.startWidth = 0.01f;
-        lineRenderer.endWidth = 0.01f;
-        lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
-        lineRenderer.startColor = Color.red;
-        lineRenderer.endColor = Color.red;
+        lineRenderer.startWidth = 0f;
+        lineRenderer.endWidth = 0f;
+        //lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+        //lineRenderer.startColor = Color.red;
+        //lineRenderer.endColor = Color.red;
 
         // 선의 점 수 설정
         lineRenderer.positionCount = points.Length;
