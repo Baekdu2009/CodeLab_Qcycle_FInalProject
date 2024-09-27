@@ -279,12 +279,12 @@ MonoBehaviour:
   printerExpectTime: {fileID: 896888648}
   printingStatus: {fileID: 896888647}
   resetBtn: {fileID: 896888646}
-  Xmin: 0
-  Ymin: 0
-  Zmin: 0
-  Xmax: 0
-  Ymax: 0
-  Zmax: 0
+  Xmin: -0.3
+  Ymin: -0.25
+  Zmin: 0.15
+  Xmax: 0.18
+  Ymax: 0.23
+  Zmax: 0.6
   moveSpeed: 0.1
   printingResolution: 0.02
   rotSpeed: 200
@@ -722,12 +722,12 @@ MonoBehaviour:
   printerExpectTime: {fileID: 7527937}
   printingStatus: {fileID: 7527936}
   resetBtn: {fileID: 7527935}
-  Xmin: 0
-  Ymin: 0
-  Zmin: 0
-  Xmax: 0
-  Ymax: 0
-  Zmax: 0
+  Xmin: -0.13
+  Ymin: -0.09
+  Zmin: -0.01
+  Xmax: 0.05
+  Ymax: 0.09
+  Zmax: 0.18
   moveSpeed: 0.1
   printingResolution: 0.02
   rotSpeed: 200
