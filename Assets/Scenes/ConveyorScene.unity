@@ -646,6 +646,8 @@ GameObject:
   - component: {fileID: 594625031}
   - component: {fileID: 594625032}
   - component: {fileID: 594625033}
+  - component: {fileID: 594625034}
+  - component: {fileID: 594625035}
   m_Layer: 0
   m_Name: Conveyormanager
   m_TagString: Untagged
@@ -722,7 +724,39 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cubeObjs: []
   points: []
+  currentPointIndices: 
 --- !u!114 &594625033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 594625028}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2fce5fffc3af284d83427112e5f9d54, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  clintList: []
+  vectorList: []
+  currentPointIndices: 
+  speed: 0.2
+--- !u!114 &594625034
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 594625028}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff26d0285619b7a48a6f1bfd7ed5540e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  clintList: []
+  vectorList: []
+  speed: 0.2
+--- !u!114 &594625035
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -731,14 +765,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 594625028}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a2fce5fffc3af284d83427112e5f9d54, type: 3}
+  m_Script: {fileID: 11500000, guid: 2496aef331545144fb53bde23576bc9b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  clintList: []
-  vectorList: []
-  clintStatus:
-    _serializedList: []
-  speed: 0.2
+  speed: 1
 --- !u!1 &630842442
 GameObject:
   m_ObjectHideFlags: 0
@@ -2492,7 +2522,7 @@ GameObject:
   - component: {fileID: 4787425066630856378}
   - component: {fileID: 7473644448908376760}
   m_Layer: 0
-  m_Name: CLINT_4
+  m_Name: CLINT_04
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2541,7 +2571,7 @@ GameObject:
   - component: {fileID: 8071636205930199701}
   - component: {fileID: 977853481735608685}
   m_Layer: 0
-  m_Name: CLINT_9
+  m_Name: CLINT_09
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5746,7 +5776,7 @@ GameObject:
   - component: {fileID: 6635120466292736575}
   - component: {fileID: 2750088259683398328}
   m_Layer: 0
-  m_Name: CLINT_8
+  m_Name: CLINT_08
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6440,7 +6470,7 @@ GameObject:
   - component: {fileID: 6241072249040289886}
   - component: {fileID: 6656504714530115782}
   m_Layer: 0
-  m_Name: CLINT_6
+  m_Name: CLINT_06
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9666,7 +9696,7 @@ GameObject:
   - component: {fileID: 294535939375267906}
   - component: {fileID: 702141985994006233}
   m_Layer: 0
-  m_Name: CLINT_1
+  m_Name: CLINT_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11076,7 +11106,7 @@ GameObject:
   - component: {fileID: 8998068035845237045}
   - component: {fileID: 4060873850754184713}
   m_Layer: 0
-  m_Name: CLINT_7
+  m_Name: CLINT_07
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12325,7 +12355,7 @@ GameObject:
   - component: {fileID: 5100718970696188206}
   - component: {fileID: 5047425896405409413}
   m_Layer: 0
-  m_Name: CLINT_3
+  m_Name: CLINT_03
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13411,7 +13441,7 @@ GameObject:
   - component: {fileID: 2451885556595346831}
   - component: {fileID: 6949632578367714539}
   m_Layer: 0
-  m_Name: CLINT_2
+  m_Name: CLINT_02
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13984,7 +14014,7 @@ GameObject:
   - component: {fileID: 4140067881213031636}
   - component: {fileID: 6770822224911919920}
   m_Layer: 0
-  m_Name: CLINT_5
+  m_Name: CLINT_05
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15206,7 +15236,7 @@ GameObject:
   - component: {fileID: 1305646805739148298}
   - component: {fileID: 7820867674648464118}
   m_Layer: 0
-  m_Name: CLINT_0
+  m_Name: CLINT_00
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

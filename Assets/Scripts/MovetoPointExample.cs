@@ -9,7 +9,7 @@ public class MovetoPointExample : MonoBehaviour
     public List<Transform> points = new List<Transform>();
     bool isMoving;
     float speed = 1.0f;
-    int[] currentPointIndices; // 각 큐브의 현재 목표 인덱스를 저장할 배열
+    public int[] currentPointIndices; // 각 큐브의 현재 목표 인덱스를 저장할 배열
 
     private void Start()
     {

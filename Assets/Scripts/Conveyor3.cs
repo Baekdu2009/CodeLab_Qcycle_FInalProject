@@ -1,26 +1,22 @@
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 using AYellowpaper.SerializedCollections;
 
-public class Conveyor2 : MonoBehaviour
+public class Conveyor3 : MonoBehaviour
 {
+
     public List<GameObject> clintList = new List<GameObject>();
     private List<Transform> transformList = new List<Transform>();
     public List<Vector3> vectorList = new List<Vector3>();
     private SerializedDictionary<string, bool> clintStatus = new SerializedDictionary<string, bool>();
-    public int[] currentPointIndices;
 
     public float speed = 0.2f;
     private bool isMoving = false;
 
-    private void Start()
+    
+    void Start()
     {
         ClintExtract();
-        currentPointIndices = new int[clintList.Count]; // 배열 초기화
-        for (int i = 0; i < clintList.Count; i++)
-        {
-            currentPointIndices[i] = i;
-        }
     }
 
     private void ClintExtract()
@@ -60,51 +56,35 @@ public class Conveyor2 : MonoBehaviour
         }
         clintStatus = sortedMovementStatus;
     }
-
-    private void Update()
+    
+    void Update()
     {
-        if (isMoving)
+        for (int i = 0; i < clintList.Count; i++)
         {
-            for (int i = 0; i < clintList.Count; i++)
-            {
-                if (currentPointIndices[i] < transformList.Count)
-                {
-                    ClintMove(clintList[i], i);
-                    print($"{clintList[i].name}가 {i}번째로 이동 중");
-                }
-            }
+            ClintMove(i);
         }
     }
 
-    private void ClintMove(GameObject gameObject, int index)
+    void ClintMove(int index)
     {
-        if (currentPointIndices[index] < transformList.Count)
+        if (index < transformList.Count - 1)
         {
-            Transform targetPos = transformList[currentPointIndices[index]];
+            Transform targetPos = transformList[index + 1];
+            Transform currentPos = transformList[index];
 
-            if (Vector3.Distance(gameObject.transform.position, targetPos.position) > 0.01f)
+            if (Vector3.Distance(clintList[index].transform.position, targetPos.position) > 0.01f)
             {
-                gameObject.transform.position = Vector3.MoveTowards(gameObject.transform.position, targetPos.position, speed * Time.deltaTime);
+                clintList[index].transform.position = Vector3.MoveTowards(clintList[index].transform.position, targetPos.position, speed * Time.deltaTime);
             }
             else
             {
-                currentPointIndices[index]++;
-
-                if(currentPointIndices[index] >= transformList.Count)
-                {
-                    currentPointIndices[index] = 0;
-                }
+                currentPos = targetPos;
             }
         }
-    }
+        else if (index > transformList.Count - 1)
+        {
+            index = 0;
+        }
 
-    public void MoveStart()
-    {
-        isMoving = true;
-    }
-
-    public void MoveStop()
-    {
-        isMoving = false;
     }
 }
