@@ -763,12 +763,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 594625028}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2496aef331545144fb53bde23576bc9b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 1
+  clints: []
 --- !u!1 &630842442
 GameObject:
   m_ObjectHideFlags: 0
@@ -9695,6 +9696,7 @@ GameObject:
   - component: {fileID: 3901399854605261635}
   - component: {fileID: 294535939375267906}
   - component: {fileID: 702141985994006233}
+  - component: {fileID: 4090481281290417983}
   m_Layer: 0
   m_Name: CLINT_01
   m_TagString: Untagged
@@ -9702,6 +9704,21 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &4090481281290417983
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4090481281290417982}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8947d26b26eb8b44db4620113356808c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  transformList: []
+  currentNum: 0
+  speed: 0.5
 --- !u!4 &4102584124128658008
 Transform:
   m_ObjectHideFlags: 0
@@ -15235,6 +15252,7 @@ GameObject:
   - component: {fileID: 9029783914569864508}
   - component: {fileID: 1305646805739148298}
   - component: {fileID: 7820867674648464118}
+  - component: {fileID: 9029783914569864509}
   m_Layer: 0
   m_Name: CLINT_00
   m_TagString: Untagged
@@ -17418,6 +17436,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 586008016649461644}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &9029783914569864509
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7675909089629577852}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8947d26b26eb8b44db4620113356808c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  transformList: []
+  currentNum: 0
+  speed: 0.5
 --- !u!23 &9030779847986956053
 MeshRenderer:
   m_ObjectHideFlags: 0
