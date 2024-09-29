@@ -13,10 +13,10 @@ public class PrinterGcode : MonoBehaviour
     }
 
     public PrinterSize size;
-    public Transform nozzle;    // 노즐
-    public Transform rod;       // 로드
-    public Transform plate;     // 플레이트
-    public GameObject filament; // 필라멘트
+    public Transform nozzle;    // 노즐(Y)
+    public Transform rod;       // 로드(Z)
+    public Transform plate;     // 플레이트(X)
+    public GameObject[] filaments; // 필라멘트
 
     public TMP_Text printerInformation;
     public TMP_Text printerWorkingTime;
@@ -242,13 +242,15 @@ public class PrinterGcode : MonoBehaviour
     {
         while (true)
         {
-            if (filament != null)
+            if (filaments != null)
             {
-                Quaternion currentRotation = filament.transform.localRotation;
-                Quaternion deltaRotation = Quaternion.Euler(0, rotSpeed * Time.deltaTime, 0);
-                filament.transform.localRotation = currentRotation * deltaRotation;
+                foreach(var filament in filaments)
+                {
+                    Quaternion currentRotation = filament.transform.localRotation;
+                    Quaternion deltaRotation = Quaternion.Euler(0, 0, rotSpeed * Time.deltaTime);
+                    filament.transform.localRotation = currentRotation * deltaRotation;
+                }
             }
-
             yield return new WaitForEndOfFrame();
         }
     }
