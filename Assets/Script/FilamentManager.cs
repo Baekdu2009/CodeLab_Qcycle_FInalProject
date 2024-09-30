@@ -5,8 +5,8 @@ using TMPro;
 
 public class FilamentManager : MonoBehaviour
 {
-    [SerializeField] public List<FilamentFactory> filamentFactories = new List<FilamentFactory>();
-    [SerializeField] public TMP_Text factoryNum;
+    [SerializeField] List<FilamentFactory> filamentFactories = new List<FilamentFactory>();
+    [SerializeField] TMP_Text factoryNum;
 
     int currentCanvasNum;
 

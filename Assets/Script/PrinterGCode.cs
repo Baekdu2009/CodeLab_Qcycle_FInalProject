@@ -24,6 +24,7 @@ public class PrinterGcode : MonoBehaviour
     public TMP_Text printerExpectTime;
     public TMP_Text printingStatus;
     public GameObject resetBtn;
+    public GameObject Canvas;
 
     public float Xmin;
     public float Ymin;
@@ -66,7 +67,7 @@ public class PrinterGcode : MonoBehaviour
         rodOrigin = rod.transform.localPosition;
         nozzleOrigin = nozzle.transform.localPosition;
     }
-
+    
     private void SetExpectedTime()
     {
         if (size == PrinterSize.Large)
