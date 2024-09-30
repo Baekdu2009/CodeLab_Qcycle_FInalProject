@@ -35,6 +35,13 @@ public class PrinterGcode : MonoBehaviour
     private Queue<string> plateQueue = new Queue<string>();
     private Queue<string> rodQueue = new Queue<string>();
 
+    private Vector3 plateOrigin;
+    private Vector3 rodOrigin;
+    private Vector3 nozzleOrigin;
+
+    bool plateMoveOn = false;
+    bool rodMoveOn = false;
+
     public float moveSpeed = 0.1f;  // 이동속도
     public float printingResolution = 0.02f;
     public float rotSpeed = 200;
@@ -52,6 +59,10 @@ public class PrinterGcode : MonoBehaviour
         PrinterInformationNotice();
         SetExpectedTime(); // 예상 작업 시간 설정
         resetBtn.SetActive(false); // 초기화 버튼 비활성화
+
+        plateOrigin = plate.transform.localPosition;
+        rodOrigin = rod.transform.localPosition;
+        nozzleOrigin = nozzle.transform.localPosition;
     }
 
     private void SetExpectedTime()
@@ -93,9 +104,9 @@ public class PrinterGcode : MonoBehaviour
 
     private IEnumerator OriginPosition()
     {
-        GenerateGcode("G0", Xmin, 0, 0, nozzleQueue);
-        GenerateGcode("G0", 0, Ymin, 0, rodQueue);
-        GenerateGcode("G0", 0, 0, Zmin, plateQueue);
+        GenerateGcode("G0", Xmin, nozzleOrigin.y, nozzleOrigin.z, nozzleQueue);
+        GenerateGcode("G0", rodOrigin.x, Ymin, rodOrigin.z, rodQueue);
+        GenerateGcode("G0", plateOrigin.x, plateOrigin.y, Zmax, plateQueue);
 
         yield return MoveNozzle(nozzleQueue.Dequeue());
         yield return MoveRod(rodQueue.Dequeue());
@@ -103,9 +114,9 @@ public class PrinterGcode : MonoBehaviour
     }
     private IEnumerator FinishPosition()
     {
-        GenerateGcode("G0", Xmax, 0, 0, nozzleQueue);
-        GenerateGcode("G0", 0, Ymax, 0, rodQueue);
-        GenerateGcode("G0", 0, 0, Zmax, plateQueue);
+        GenerateGcode("G0", Xmax, nozzleOrigin.y, nozzleOrigin.z, nozzleQueue);
+        GenerateGcode("G0", rodOrigin.x, Ymax, rodOrigin.z, rodQueue);
+        GenerateGcode("G0", plateOrigin.x, plateOrigin.y, Zmin, plateQueue);
 
         yield return MoveNozzle(nozzleQueue.Dequeue());
         yield return MoveRod(rodQueue.Dequeue());
@@ -148,40 +159,44 @@ public class PrinterGcode : MonoBehaviour
         // Y축 왕복
         for (float x = Xmin; x <= Xmax; x += printingResolution)
         {
-            GenerateGcode("G1", x, 0, 0, nozzleQueue);
+            GenerateGcode("G1", x, nozzleOrigin.y, nozzleOrigin.z, nozzleQueue);
             yield return MoveNozzle(nozzleQueue.Dequeue());
         }
 
         for (float x = Xmax; x >= Xmin; x -= printingResolution)
         {
-            GenerateGcode("G1", x, 0, 0, nozzleQueue);
+            GenerateGcode("G1", x, nozzleOrigin.y, nozzleOrigin.z, nozzleQueue);
             yield return MoveNozzle(nozzleQueue.Dequeue());
         }
     }
-
+    
     private IEnumerator PlateMovement()
     {
-        if (plate.localPosition.z >= Zmax - printingResolution)
+        if (plateMoveOn)
         {
-            GenerateGcode("G1", 0, 0, Zmin + printingResolution, plateQueue);
+            if (plate.localPosition.z <= Zmin)
+            {
+                GenerateGcode("G1", plateOrigin.x, plateOrigin.y, Zmax, plateQueue);
+            }
+            else
+            {
+                GenerateGcode("G1", plateOrigin.x, plateOrigin.y, plate.localPosition.z - printingResolution, plateQueue);
+            }
+            yield return MovePlate(plateQueue.Dequeue());
         }
-        else
-        {
-            GenerateGcode("G1", 0, 0, plate.localPosition.z + printingResolution, plateQueue);
-        }
-
-        yield return MovePlate(plateQueue.Dequeue());
+        plateMoveOn = false;
     }
 
     private IEnumerator RodMovement()
     {
-        if(rod.localPosition.y >= Ymax)
+        if(rod.localPosition.y <= Ymax)
         {
-            GenerateGcode("G1", 0, rod.localPosition.y + printingResolution, 0, rodQueue);
+            GenerateGcode("G1", rodOrigin.x, rod.localPosition.y + printingResolution, rodOrigin.z, rodQueue);
         }
         else
         {
-            GenerateGcode("G1", 0, rod.localPosition.y, 0, rodQueue);
+            GenerateGcode("G1", rodOrigin.x, Ymin, rodOrigin.z, rodQueue);
+            plateMoveOn = true;
         }
         yield return MoveRod(rodQueue.Dequeue());
     }
