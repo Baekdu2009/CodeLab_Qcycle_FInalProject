@@ -6,9 +6,11 @@ using UnityEngine.UI;
 public class FilamentFactory : MonoBehaviour
 {
     public Transform filamentRotPosition;
-    public GameObject filamentCover;
-    public GameObject filamentLine;
+    public GameObject filamentCoverPrefab;
+    public GameObject filamentLinePrefab;
     private GameObject filamentObject;
+    private GameObject filamentLineObj;
+    private GameObject filamentCoverObj;
 
     public GameObject Canvas;
     public Image conveyorStatus;
@@ -87,17 +89,18 @@ public class FilamentFactory : MonoBehaviour
     {
         if (filamentObject == null)
         {
-            GameObject line = Instantiate(filamentLine);
-            GameObject cover = Instantiate(filamentCover);
+            filamentLineObj = Instantiate(filamentLinePrefab);
+            filamentCoverObj = Instantiate(filamentCoverPrefab);
             
             filamentObject = new GameObject("FilamentObject");
-            line.transform.parent = filamentObject.transform;
-            cover.transform.parent = filamentObject.transform;
+            filamentLineObj.transform.parent = filamentObject.transform;
+            filamentCoverObj.transform.parent = filamentObject.transform;
 
             filamentObject.transform.position = filamentRotPosition.position;
             filamentObject.transform.rotation = Quaternion.Euler(0, 90, 0);
-            initialScale = filamentObject.transform.localScale;
-            filamentObject.transform.localScale = new Vector3(0.1f, 1, 0.1f);
+            filamentCoverObj.transform.localScale = new Vector3(1, 1, 1);
+            filamentLineObj.transform.localScale = new Vector3(1, 1, 0.1f);
+            initialScale = filamentLineObj.transform.localScale;
         }
     }
 
@@ -119,12 +122,11 @@ public class FilamentFactory : MonoBehaviour
         if (currentRotation >= 360f)
         {
             currentRotation = 0;
-            filamentObject.transform.localScale += new Vector3(0.3f, 0.1f, 0.3f);
+            filamentLineObj.transform.localScale += new Vector3(0, 0, 0.1f);
         }
 
-        if (filamentObject.transform.localScale.z >= initialScale.z * 10f)
+        if (filamentLineObj.transform.localScale.z >= 1)
         {
-            print("필라멘트 크기가 10배가 되었음");
             rotSpeed = 0;
         }
     }
