@@ -1,0 +1,10 @@
+3DP_S
+Code
+Nozzle(Y)
+Rod(Z)
+Plate(X)
+
+Unity
+Nozzle(X) -0.38 ~ -0.06
+Plate(Z) 0.13 ~ 0.48
+Rod(Y) 0.1 ~ 0.36

@@ -13,10 +13,10 @@ public class PrinterGcode : MonoBehaviour
     }
 
     public PrinterSize size;
-    public Transform nozzle;    // 노즐
-    public Transform rod;       // 로드
-    public Transform plate;     // 플레이트
-    public GameObject filament; // 필라멘트
+    public Transform nozzle;    // 노즐(Y)
+    public Transform rod;       // 로드(Z)
+    public Transform plate;     // 플레이트(X)
+    public GameObject[] filaments; // 필라멘트
 
     public TMP_Text printerInformation;
     public TMP_Text printerWorkingTime;
@@ -93,9 +93,9 @@ public class PrinterGcode : MonoBehaviour
 
     private IEnumerator OriginPosition()
     {
-        GenerateGcode("G0", Xmin, 0, 0, plateQueue);
-        GenerateGcode("G0", 0, Ymin, 0, nozzleQueue);
-        GenerateGcode("G0", 0, 0, Zmin, rodQueue);
+        GenerateGcode("G0", Xmin, 0, 0, nozzleQueue);
+        GenerateGcode("G0", 0, Ymin, 0, rodQueue);
+        GenerateGcode("G0", 0, 0, Zmin, plateQueue);
 
         yield return MoveNozzle(nozzleQueue.Dequeue());
         yield return MoveRod(rodQueue.Dequeue());
@@ -103,9 +103,9 @@ public class PrinterGcode : MonoBehaviour
     }
     private IEnumerator FinishPosition()
     {
-        GenerateGcode("G0", Xmax, 0, 0, plateQueue);
-        GenerateGcode("G0", 0, Ymax, 0, nozzleQueue);
-        GenerateGcode("G0", 0, 0, Zmax, rodQueue);
+        GenerateGcode("G0", Xmax, 0, 0, nozzleQueue);
+        GenerateGcode("G0", 0, Ymax, 0, rodQueue);
+        GenerateGcode("G0", 0, 0, Zmax, plateQueue);
 
         yield return MoveNozzle(nozzleQueue.Dequeue());
         yield return MoveRod(rodQueue.Dequeue());
@@ -132,46 +132,60 @@ public class PrinterGcode : MonoBehaviour
     {
         while (true) // 무한 루프
         {
-            // 노즐 Y축으로 왕복 운동
+            // 노즐 운동
             yield return StartCoroutine(NozzleMovement());
 
-            // 플레이트 X축으로 이동
-            yield return StartCoroutine(PlateRodMovement());
+            // 로드 운동
+            yield return StartCoroutine(RodMovement());
+
+            // 플레이트 운동
+            yield return StartCoroutine(PlateMovement());
         }
     }
 
     private IEnumerator NozzleMovement()
     {
         // Y축 왕복
-        for (float y = Ymin; y <= Ymax; y += printingResolution)
+        for (float x = Xmin; x <= Xmax; x += printingResolution)
         {
-            GenerateGcode("G1", 0, y, 0, nozzleQueue);
+            GenerateGcode("G1", x, 0, 0, nozzleQueue);
             yield return MoveNozzle(nozzleQueue.Dequeue());
         }
 
-        for (float y = Ymax; y >= Ymin; y -= printingResolution)
+        for (float x = Xmax; x >= Xmin; x -= printingResolution)
         {
-            GenerateGcode("G1", 0, y, 0, nozzleQueue);
+            GenerateGcode("G1", x, 0, 0, nozzleQueue);
             yield return MoveNozzle(nozzleQueue.Dequeue());
         }
     }
 
-    private IEnumerator PlateRodMovement()
+    private IEnumerator PlateMovement()
     {
-        if (plate.localPosition.x >= Xmax - printingResolution)
+        if (plate.localPosition.z >= Zmax - printingResolution)
         {
-            GenerateGcode("G1", Xmin + printingResolution, 0, 0, plateQueue);
-            GenerateGcode("G1", 0, 0, rod.localPosition.z + printingResolution, rodQueue);
+            GenerateGcode("G1", 0, 0, Zmin + printingResolution, plateQueue);
         }
         else
         {
-            GenerateGcode("G1", plate.localPosition.x + printingResolution, 0, 0, plateQueue);
-            GenerateGcode("G1", 0, 0, rod.localPosition.z, rodQueue);
+            GenerateGcode("G1", 0, 0, plate.localPosition.z + printingResolution, plateQueue);
         }
 
         yield return MovePlate(plateQueue.Dequeue());
+    }
+
+    private IEnumerator RodMovement()
+    {
+        if(rod.localPosition.y >= Ymax)
+        {
+            GenerateGcode("G1", 0, rod.localPosition.y + printingResolution, 0, rodQueue);
+        }
+        else
+        {
+            GenerateGcode("G1", 0, rod.localPosition.y, 0, rodQueue);
+        }
         yield return MoveRod(rodQueue.Dequeue());
     }
+
 
     private void GenerateGcode(string gcommand, float x, float y, float z, Queue<string> queue)
     {
@@ -242,13 +256,15 @@ public class PrinterGcode : MonoBehaviour
     {
         while (true)
         {
-            if (filament != null)
+            if (filaments != null)
             {
-                Quaternion currentRotation = filament.transform.localRotation;
-                Quaternion deltaRotation = Quaternion.Euler(0, rotSpeed * Time.deltaTime, 0);
-                filament.transform.localRotation = currentRotation * deltaRotation;
+                foreach(var filament in filaments)
+                {
+                    Quaternion currentRotation = filament.transform.localRotation;
+                    Quaternion deltaRotation = Quaternion.Euler(0, 0, rotSpeed * Time.deltaTime);
+                    filament.transform.localRotation = currentRotation * deltaRotation;
+                }
             }
-
             yield return new WaitForEndOfFrame();
         }
     }
