@@ -1,10 +1,9 @@
-3DP_S
-Code
-Nozzle(Y)
-Rod(Z)
-Plate(X)
+Unity(3DP_S)
+Nozzle(X) -0.31 ~ -0.13
+Plate(Z) 0.13 ~ 0.47
+Rod(Y) 0.145 ~ 0.37
 
-Unity
-Nozzle(X) -0.38 ~ -0.06
-Plate(Z) 0.13 ~ 0.48
-Rod(Y) 0.1 ~ 0.36
+Unity(3DP_M)
+Nozzle(X) -0.155 ~ 0.18
+Plate(Z) 0.13 ~ 0.54
+Rod(Y) 0.135 ~ 0.45

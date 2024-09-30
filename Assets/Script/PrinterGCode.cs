@@ -17,6 +17,7 @@ public class PrinterGcode : MonoBehaviour
     public Transform rod;       // 로드(Z)
     public Transform plate;     // 플레이트(X)
     public GameObject[] filaments; // 필라멘트
+    public bool[] filamentCCW;
 
     public TMP_Text printerInformation;
     public TMP_Text printerWorkingTime;
@@ -59,6 +60,7 @@ public class PrinterGcode : MonoBehaviour
         PrinterInformationNotice();
         SetExpectedTime(); // 예상 작업 시간 설정
         resetBtn.SetActive(false); // 초기화 버튼 비활성화
+        filamentCCW = new bool[filaments.Length];
 
         plateOrigin = plate.transform.localPosition;
         rodOrigin = rod.transform.localPosition;
@@ -69,7 +71,7 @@ public class PrinterGcode : MonoBehaviour
     {
         if (size == PrinterSize.Large)
         {
-            expectedTime = 10; // 4시간
+            expectedTime = 14400; // 4시간
         }
         else if (size == PrinterSize.Small)
         {
@@ -275,6 +277,11 @@ public class PrinterGcode : MonoBehaviour
             {
                 foreach(var filament in filaments)
                 {
+                    foreach (bool direction in filamentCCW)
+                    {
+                        if (direction) rotSpeed *= -1;
+                        else rotSpeed *= 1;
+                    }
                     Quaternion currentRotation = filament.transform.localRotation;
                     Quaternion deltaRotation = Quaternion.Euler(0, 0, rotSpeed * Time.deltaTime);
                     filament.transform.localRotation = currentRotation * deltaRotation;
