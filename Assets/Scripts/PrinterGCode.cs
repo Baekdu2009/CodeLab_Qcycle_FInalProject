@@ -68,6 +68,7 @@ public class PrinterGcode : MonoBehaviour
         totalExpectedTime = expectedTime;
         UpdateExpectTimeText(); // 예상 작업 시간 표시
     }
+
     private void UpdateExpectTimeText()
     {
         int hours = Mathf.FloorToInt(expectedTime / 3600);
@@ -76,7 +77,6 @@ public class PrinterGcode : MonoBehaviour
 
         printerExpectTime.text = $"Expected Time \n{hours:D2}:{minutes:D2}:{seconds:D2}"; // 형식 지정
     }
-
     public void OriginBtnEvent()
     {
         if (originCoroutine == null)
@@ -176,6 +176,7 @@ public class PrinterGcode : MonoBehaviour
     private void GenerateGcode(string gcommand, float x, float y, float z, Queue<string> queue)
     {
         queue.Enqueue($"{gcommand} X{x} Y{y} Z{z}");
+
     }
 
     private IEnumerator MoveNozzle(string gcode)
@@ -265,7 +266,7 @@ public class PrinterGcode : MonoBehaviour
     {
         while (isPrinting)
         {
-            
+
             workingTime += Time.deltaTime; // 흐른 시간 업데이트
 
             // 시간을 hh:mm:ss 형식으로 변환
