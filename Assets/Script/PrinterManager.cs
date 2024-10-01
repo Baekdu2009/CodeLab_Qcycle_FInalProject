@@ -5,27 +5,24 @@ using TMPro;
 public class PrinterManager : MonoBehaviour
 {
     [SerializeField] List<PrinterGcode> printers = new List<PrinterGcode>();
+    [SerializeField] List<Transform> directPositions = new List<Transform>();
     [SerializeField] TMP_Text printerNum;
 
     int currentCanvasNum;
+    public GameObject directPointerPrefab;
+    GameObject directPointer;
+    float pointerRotSpeed = 100f;
 
     void Start()
     {
-        
+        printers[0].Canvas.SetActive(true);
+        printerNum.text = "0";
     }
 
     // Update is called once per frame
     void Update()
     {
-        
-    }
-    public void BtnPrinterOnOff()
-    {
-        bool isOn = printers[currentCanvasNum].Canvas.activeSelf;
-
-        printers[currentCanvasNum].Canvas.SetActive(!isOn);
-
-        printerNum.text = currentCanvasNum.ToString();
+        PointerControl();
     }
     /// <summary>
     /// Printer List를 정방향으로 순회
@@ -75,5 +72,27 @@ public class PrinterManager : MonoBehaviour
             printers[currentCanvasNum].Canvas.SetActive(true);
         }
         printerNum.text = currentCanvasNum.ToString();
+    }
+    private void PointerControl()
+    {
+        if (directPointer == null)
+        {
+            directPointer = Instantiate(directPointerPrefab);
+            directPointer.transform.position = directPositions[currentCanvasNum].position;
+        }
+        else
+        {
+            directPointer.transform.position = directPositions[currentCanvasNum].position;
+        }
+        directPointer.transform.Rotate(0, 0, pointerRotSpeed * Time.deltaTime);
+    }
+
+    public void BtnSelectPanelEvent()
+    {
+        Destroy(directPointer);
+        foreach (var printer in printers)
+        {
+            printer.Canvas.SetActive(false);
+        }
     }
 }

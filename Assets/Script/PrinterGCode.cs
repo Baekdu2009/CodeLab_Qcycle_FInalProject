@@ -42,7 +42,6 @@ public class PrinterGcode : MonoBehaviour
     private Vector3 nozzleOrigin;
 
     bool plateMoveOn = false;
-    bool rodMoveOn = false;
 
     public float moveSpeed = 0.1f;  // 이동속도
     public float printingResolution = 0.02f;

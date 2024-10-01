@@ -2,52 +2,60 @@ using UnityEngine;
 
 public class FactoryManager : MonoBehaviour
 {
-    public GameObject SelectionPanel;
-    public GameObject FilamentFactory;
-    public GameObject PrinterFactory;
-    // public GameObject AGVcontrol;
+    [SerializeField] GameObject SelectionPanel;
+    [SerializeField] GameObject FilamentFactory;
+    [SerializeField] GameObject PrinterFactory;
 
-    
+    private bool selectionIsOn;
+    private bool filamentFactIsOn;
+    private bool printerFactIsOn;
 
     void Start()
     {
-        SelectionPanel.SetActive(true);
-        FilamentFactory.SetActive(false);
-        PrinterFactory.SetActive(false);
-        // AGVcontrol.SetActive(false);
+        selectionIsOn = true;
+        filamentFactIsOn = false;
+        printerFactIsOn = false;
+
+        // 초기 UI 업데이트
+        UpdateUI();
     }
 
-    void Update()
+    private void UpdateUI()
     {
-
+        SelectionPanel.SetActive(selectionIsOn);
+        FilamentFactory.SetActive(filamentFactIsOn);
+        PrinterFactory.SetActive(printerFactIsOn);
     }
 
     public void BtnStartingPanel()
     {
-        SelectionPanel.SetActive(true);
-        FilamentFactory.SetActive(false);
-        PrinterFactory.SetActive(false);
-        //AGVcontrol.SetActive(false);
+        selectionIsOn = true;
+        filamentFactIsOn = false;
+        printerFactIsOn = false;
+        UpdateUI(); // UI 업데이트
     }
+
     public void BtnFilamentFactory()
     {
-        SelectionPanel.SetActive(false);
-        FilamentFactory.SetActive(true);
-        PrinterFactory.SetActive(false);
-        //AGVcontrol.SetActive(false);
+        selectionIsOn = false;
+        filamentFactIsOn = true;
+        printerFactIsOn = false;
+        UpdateUI(); // UI 업데이트
     }
+
     public void BtnPrinterFactory()
     {
-        SelectionPanel.SetActive(false);
-        FilamentFactory.SetActive(false);
-        PrinterFactory.SetActive(true);
-        //AGVcontrol.SetActive(false);
+        selectionIsOn = false;
+        filamentFactIsOn = false;
+        printerFactIsOn = true;
+        UpdateUI(); // UI 업데이트
     }
+
     public void BtnAGVControl()
     {
-        SelectionPanel.SetActive(false);
-        FilamentFactory.SetActive(false);
-        PrinterFactory.SetActive(false);
-        //AGVcontrol.SetActive(true);
+        selectionIsOn = false;
+        filamentFactIsOn = false;
+        printerFactIsOn = false;
+        UpdateUI(); // UI 업데이트
     }
 }
