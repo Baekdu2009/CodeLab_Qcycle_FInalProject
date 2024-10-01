@@ -28,7 +28,7 @@ public class Filament_increace1 : MonoBehaviour
             {
                 currentScale.y = maxScale; // 최대 Scale로 설정
                 isScaling = false;    // Scale 증가 중지
-                GameManager1.instance.SpawnPrefab1();
+                Filament_manager1.instance.SpawnPrefab1();
             }
 
             // 새로운 Scale 적용(매 프레임마다 변화하는 스케일 적용)

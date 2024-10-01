@@ -1,9 +1,9 @@
 using System.Collections;
 using UnityEngine;
 
-public class GameManager2 : MonoBehaviour
+public class Filament_Manager2 : MonoBehaviour
 {
-    public static GameManager2 instance;
+    public static Filament_Manager2 instance;
     public GameObject Filament; // Filament 橇府普
     public GameObject Filamentdia; // 措阿急 Filament 橇府普
     public GameObject Filament2;  // Filament2 橇府普
@@ -89,5 +89,8 @@ public class GameManager2 : MonoBehaviour
             GameObject Filament3In = Instantiate(Filament3, SpawnPosition3, SpawnRotation3);
             Debug.Log("Filament4 积己");
         }
+// yield return new WaitForSeconds(delayTime);
+        Filament_Rotate.instance.Cpf();
+        Debug.Log("积己");
     }
 }
