@@ -1,6 +1,7 @@
 using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 public class FilamentFactory : MonoBehaviour
@@ -29,24 +30,24 @@ public class FilamentFactory : MonoBehaviour
     float currentRotation = 0f;
 
     // 각 장비 상태 변수
-    bool conveyorWorkWell = true;
-    bool shredderWorkWell = true;
-    bool extruder1WorkWell = true;
-    bool wirecuttingWorkWell = true;
-    bool screwconveyorWorkWell = true;
-    bool extruder2WorkWell = true;
-    bool rollingWorkWell = true;
-    bool spoolerWorkWell = true;
+   public bool conveyorWorkWell = false;
+    public bool shredderWorkWell = false;
+    public bool extruder1WorkWell = false;
+    public bool wirecuttingWorkWell = false;
+    public bool screwconveyorWorkWell = false;
+    public bool extruder2WorkWell = false;
+    public bool rollingWorkWell = false;
+    public bool spoolerWorkWell = false;
 
     // 각 장비 정지 상태 변수
-    bool conveyorStop = false;
-    bool shredderStop = false;
-    bool extruder1Stop = false;
-    bool wirecuttingStop = false;
-    bool screwconveyorStop = false;
-    bool extruder2Stop = false;
-    bool rollingStop = false;
-    bool spoolerStop = false;
+    public bool conveyorStop = false;
+    public bool shredderStop = false;
+    public bool extruder1Stop = false;
+    public bool wirecuttingStop = false;
+    public bool screwconveyorStop = false;
+    public bool extruder2Stop = false;
+    public bool rollingStop = false;
+    public bool spoolerStop = false;
 
     void Start() { }
 
@@ -75,9 +76,13 @@ public class FilamentFactory : MonoBehaviour
         TankLevelCheck(tank2Text, 2, 20);
     }
 
-    private void StatusCheck(Image image, bool work, bool stop)
+    public void StatusCheck(Image image, bool work, bool stop)
     {
         image.color = work ? (stop ? Color.yellow : Color.green) : Color.red;
+    }
+    public void StatusCheck(Image image, int work, int stop)
+    {
+        image.color = work == 1 ? (stop == 1 ? Color.yellow : Color.green) : Color.red;
     }
 
     private void TankLevelCheck(TMP_Text text, int tankNum, int tankLevel)
