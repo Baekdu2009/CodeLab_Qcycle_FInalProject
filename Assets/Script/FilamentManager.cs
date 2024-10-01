@@ -98,5 +98,7 @@ public class FilamentManager : MonoBehaviour
         {
             factory.Canvas.SetActive(false);
         }
+        currentCanvasNum = 0;
+        factoryNum.text = "No.";
     }
 }
