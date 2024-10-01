@@ -54,7 +54,6 @@ public class PrinterGcode : MonoBehaviour
     private float expectedTime; // 잔여 예상 시간
     private float totalExpectedTime; // 전체 예상 시간
     private bool isPrinting; // 인쇄 중 여부
-    private GameObject printingObj; // 출력물
 
     private void Start()
     {

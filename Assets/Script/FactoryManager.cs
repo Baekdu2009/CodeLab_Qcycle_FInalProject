@@ -7,6 +7,8 @@ public class FactoryManager : MonoBehaviour
     public GameObject PrinterFactory;
     // public GameObject AGVcontrol;
 
+    
+
     void Start()
     {
         SelectionPanel.SetActive(true);

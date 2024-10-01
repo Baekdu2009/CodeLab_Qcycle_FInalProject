@@ -29,6 +29,8 @@ public class FilamentManager : MonoBehaviour
         filamentFactories[currentCanvasNum].Canvas.SetActive(!isOn);
 
         factoryNum.text = currentCanvasNum.ToString();
+
+        if (!isOn) currentCanvasNum = 0;
     }
     /// <summary>
     /// FilamentFactory List를 정방향으로 순회

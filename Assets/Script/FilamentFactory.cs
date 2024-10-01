@@ -29,14 +29,14 @@ public class FilamentFactory : MonoBehaviour
     float currentRotation = 0f;
 
     // 각 장비 상태 변수
-    bool conveyorWorkWell = true;
-    bool shredderWorkWell = true;
-    bool extruder1WorkWell = true;
-    bool wirecuttingWorkWell = true;
-    bool screwconveyorWorkWell = true;
-    bool extruder2WorkWell = true;
-    bool rollingWorkWell = true;
-    bool spoolerWorkWell = true;
+    bool conveyorWorkWell = false;
+    bool shredderWorkWell = false;
+    bool extruder1WorkWell = false;
+    bool wirecuttingWorkWell = false;
+    bool screwconveyorWorkWell = false;
+    bool extruder2WorkWell = false;
+    bool rollingWorkWell = false;
+    bool spoolerWorkWell = false;
 
     // 각 장비 정지 상태 변수
     bool conveyorStop = false;
