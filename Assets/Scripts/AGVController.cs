@@ -1,96 +1,65 @@
+using Unity.AI.Navigation;
 using UnityEngine;
 using UnityEngine.AI;
 
 public class AGVController : MonoBehaviour
 {
-    public Transform[] targets; // 목표 지점 배열
-    private NavMeshAgent agent;
-    private int currentTargetIndex = 0; // 현재 목표 지점 인덱스
-    public float rayDistance = 5f; // Raycast 거리
-    public float avoidanceDistance = 0.2f; // 회피 거리
-    private bool isStopping = false; // 멈추고 있는지 여부
-    private bool lastTargetStop = false;
+    public LineRenderer lineRenderer; // LineRenderer
+    public NavMeshSurface navMeshSurface; // NavMeshSurface
+    public float moveSpeed = 2f; // AGV 이동 속도
+    public float returnDistance = 0.2f; // LineRenderer로 돌아오는 거리
+    public float updateDistance = 2f; // NavMeshSurface 위치 업데이트 거리
+    public Transform[] targetPos; // 목표 위치 배열
 
-    void Start()
-    {
-        agent = GetComponent<NavMeshAgent>();
-        MoveToTarget();
-    }
+    private int currentTargetIndex = 0; // 현재 목표 인덱스
 
     void Update()
     {
-        // 장애물 감지
-        DetectObstacles();
+        MoveAGV();
+        UpdateNavMeshSurface();
+    }
 
-        if (!isStopping && !lastTargetStop)
+    void MoveAGV()
+    {
+        if (currentTargetIndex < lineRenderer.positionCount)
         {
-            // 목표 지점에 도착했는지 확인
-            if (agent.remainingDistance <= agent.stoppingDistance && !agent.pathPending)
+            Vector3 targetPosition = lineRenderer.GetPosition(currentTargetIndex);
+            Vector3 direction = (targetPosition - transform.position).normalized;
+
+            // 장애물 회피 로직
+            AvoidObstacles();
+
+            // AGV가 LineRenderer의 위치에서 일정 거리 이상 벗어난 경우
+            if (Vector3.Distance(transform.position, targetPosition) > returnDistance)
             {
-                Debug.Log("목표 지점에 도착했습니다.");
+                // LineRenderer 쪽으로 돌아오기
+                transform.position += direction * moveSpeed * Time.deltaTime;
+            }
+            else
+            {
+                // 목표 위치에 도달했으면 다음 목표로 이동
                 currentTargetIndex++;
-
-                if (currentTargetIndex < targets.Length)
-                {
-                    MoveToTarget();
-                }
-                else
-                {
-                    Debug.Log("모든 목표 지점에 도착했습니다.");
-                    lastTargetStop = true;
-                }
             }
         }
     }
 
-    void MoveToTarget()
+    void UpdateNavMeshSurface()
     {
-        if (targets != null && currentTargetIndex < targets.Length)
+        if (Vector3.Distance(transform.position, navMeshSurface.transform.position) > updateDistance)
         {
-            agent.SetDestination(targets[currentTargetIndex].position);
+            navMeshSurface.transform.position = transform.position;
+            navMeshSurface.BuildNavMesh(); // NavMesh 베이크
         }
     }
 
-    void DetectObstacles()
+    void AvoidObstacles()
     {
-        // 전방 Raycast
         RaycastHit hit;
-        Vector3 forward = transform.TransformDirection(Vector3.forward) * rayDistance;
-
-        if (Physics.Raycast(transform.position, forward, out hit, rayDistance))
+        if (Physics.Raycast(transform.position, transform.forward, out hit, 1f))
         {
-            if (hit.collider != null && hit.collider.CompareTag("Person")) // "Person" 태그 확인
-            {
-                // 장애물 감지 시 멈춤
-                isStopping = true;
-                agent.isStopped = true; // NavMeshAgent 정지
-                Debug.DrawRay(transform.position, forward, Color.red); // Raycast 시각화
-            }
-            else if (hit.collider != null && hit.collider.CompareTag("Obstacle")) // "Obstacle" 태그 확인
-            {
-                // 장애물 감지 시 회피 로직
-                Vector3 avoidanceDirection = Vector3.Reflect(forward, hit.normal);
-                Vector3 newDestination = transform.position + avoidanceDirection.normalized * avoidanceDistance;
-                agent.SetDestination(newDestination);
-                Debug.DrawRay(transform.position, forward, Color.yellow); // 회피 시각화
-            }
+            // 장애물이 감지되면 방향을 변경
+            Vector3 newDirection = Vector3.Reflect(transform.forward, hit.normal);
+            transform.rotation = Quaternion.LookRotation(newDirection);
         }
-        else
-        {
-            // 장애물이 없으면 다시 이동
-            if (isStopping)
-            {
-                isStopping = false; // 멈춤 상태 해제
-                agent.isStopped = false; // NavMeshAgent 재개
-                MoveToTarget(); // 목표 지점으로 이동
-            }
-        }
-    }
-
-    public void SetNewTarget(Transform[] newTargets)
-    {
-        targets = newTargets;
-        currentTargetIndex = 0;
-        MoveToTarget();
     }
 }

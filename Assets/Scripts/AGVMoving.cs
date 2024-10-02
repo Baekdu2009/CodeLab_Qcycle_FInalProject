@@ -22,7 +22,10 @@ public class AGVMoving : MonoBehaviour
     void Update()
     {
         AGVMoveByKey(); // 키 입력에 따른 이동
+        RouteCreate();
         PositionCheck();
+        MoveAuto();
+        MoveOrigin();
     }
 
     void AGVMoveByKey()
@@ -69,49 +72,58 @@ public class AGVMoving : MonoBehaviour
 
     public void RouteCreate()
     {
-        if (savingPosition.Count > 0)
+        if (Input.GetKey(KeyCode.R))
         {
-            // points 배열을 savingPosition의 크기로 초기화
-            lineRenderer.points = new Vector3[savingPosition.Count];
-
-            // savingPosition의 값을 points 배열에 할당
-            for (int i = 0; i < savingPosition.Count; i++)
+            if (savingPosition.Count > 0)
             {
-                lineRenderer.points[i] = savingPosition[i];
+                // points 배열을 savingPosition의 크기로 초기화
+                lineRenderer.points = new Vector3[savingPosition.Count];
+
+                // savingPosition의 값을 points 배열에 할당
+                for (int i = 0; i < savingPosition.Count; i++)
+                {
+                    lineRenderer.points[i] = savingPosition[i];
+                }
+
+                // LineRenderer 업데이트
+                lineRenderer.UpdateLine(lineRenderer.points); // UpdateLine 메서드 호출
+                //lineRenderer.GetComponent<Renderer>().enabled = true;
+                //lineRenderer.GetComponent<LineRenderer>().startColor = Color.red;
+                //lineRenderer.GetComponent<LineRenderer>().endColor = Color.red;
+
+                print("라인 생성 완료");
             }
-
-            // LineRenderer 업데이트
-            lineRenderer.UpdateLine(lineRenderer.points); // UpdateLine 메서드 호출
-            //lineRenderer.GetComponent<Renderer>().enabled = true;
-            //lineRenderer.GetComponent<LineRenderer>().startColor = Color.red;
-            //lineRenderer.GetComponent<LineRenderer>().endColor = Color.red;
-
-            print("라인 생성 완료");
         }
     }
 
     public void MoveOrigin()
     {
-        // AGV를 첫 번째 점 위치로 초기화
-        if (lineRenderer.points.Length > 0)
+        if (Input.GetKey(KeyCode.O))
         {
-            transform.position = lineRenderer.points[0];
-        }
-        else
-        {
-            Debug.LogError("LineRendererExample이 초기화되지 않았거나 점이 없습니다.");
+            // AGV를 첫 번째 점 위치로 초기화
+            if (lineRenderer.points.Length > 0)
+            {
+                transform.position = lineRenderer.points[0];
+            }
+            else
+            {
+                Debug.LogError("LineRendererExample이 초기화되지 않았거나 점이 없습니다.");
+            }
         }
     }
 
     public void MoveAuto()
     {
-        if (lineRenderer.points.Length > 0)
+        if (Input.GetKey(KeyCode.M))
         {
-            StartCoroutine(MoveAlongLine()); // 자동으로 이동
-        }
-        else
-        {
-            Debug.LogError("LineRendererExample이 초기화되지 않았거나 점이 없습니다.");
+            if (lineRenderer.points.Length > 0)
+            {
+                StartCoroutine(MoveAlongLine()); // 자동으로 이동
+            }
+            else
+            {
+                Debug.LogError("LineRendererExample이 초기화되지 않았거나 점이 없습니다.");
+            }
         }
     }
 
