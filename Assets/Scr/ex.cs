@@ -17,7 +17,7 @@ public class ex : MonoBehaviour
         Gizmos.color = Color.blue;
         Gizmos.DrawCube(drawCubeObject.transform.position, Vector2.one * 2f);
     }
-}*/
+}*//*
 
 using System.Collections;
 using System.Collections.Generic;
@@ -93,3 +93,4 @@ public class ex : MonoBehaviour
     }
 
 }
+*/
