@@ -1250,9 +1250,9 @@ MonoBehaviour:
   items: []
   initialPositions: []
   initialRotations: []
-  moveSpeed: 2
-  rotationSpeed: 50
-  moveDuration: 2
+  moveSpeed: 500
+  rotationSpeed: 300
+  moveDuration: 0.5
   isRunning: 0
 --- !u!1 &1456298441
 GameObject:
