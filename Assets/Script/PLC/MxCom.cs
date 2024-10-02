@@ -20,7 +20,7 @@ public class MxCom : FilamentFactory
     [SerializeField] int blockNum = 1;
 
     [Header("설비 연결")]
-    [SerializeField] ConveyBelt conveyorA;
+    [SerializeField] Conveyor conveyorA;
     
 
     [SerializeField] LevelSensor sensorA;
@@ -83,7 +83,7 @@ public class MxCom : FilamentFactory
 
         if (runConveyor == 1)
         {
-            conveyorA.OnStartConveyorBtnClkEvent();
+            conveyorA.OnConveyorBtnClkEvent();
             filamentFactory.StatusCheck(conveyorStatus, runConveyor, 0);
         }
 

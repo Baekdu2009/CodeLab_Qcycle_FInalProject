@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class SliderMover : MonoBehaviour
+public class Conveyor : MonoBehaviour
 {
     private Transform[] items; // 슬라이더의 자식 개체들
     private Vector3[] initialPositions; // 초기 위치 배열
@@ -9,6 +9,7 @@ public class SliderMover : MonoBehaviour
     public float rotationSpeed = 50f; // 회전 속도
     public float moveDuration = 2f; // 이동에 걸리는 시간 (초)
     private float timer = 0f; // 타이머
+    public bool isRunning;
 
     void Start()
     {
@@ -27,9 +28,17 @@ public class SliderMover : MonoBehaviour
         }
     }
 
+    public void OnConveyorBtnClkEvent()
+    {
+        isRunning = !isRunning; // 버튼 클릭 시 슬라이더 시작
+    }
+
     void Update()
     {
-        MoveItems();
+        if (isRunning)
+        {
+            MoveItems();
+        }
     }
 
     void MoveItems()
