@@ -4,11 +4,8 @@
 TagManager:
   serializedVersion: 3
   tags:
-  - Plate
-  - Powder
-  - PrintingObj
-  - PrintResultObject
-  - PrintingPart
+  - Person
+  - Obstacle
   layers:
   - Default
   - TransparentFX
