@@ -12,19 +12,13 @@ public class PrinterGcode : MonoBehaviour
         Small
     }
 
+    [Header("프린터 작업")]
     public PrinterSize size;
     public Transform nozzle;    // 노즐(Y)
     public Transform rod;       // 로드(Z)
     public Transform plate;     // 플레이트(X)
     public GameObject[] filaments; // 필라멘트
-    public bool[] filamentCCW;
-
-    public TMP_Text printerInformation;
-    public TMP_Text printerWorkingTime;
-    public TMP_Text printerExpectTime;
-    public TMP_Text printingStatus;
-    public GameObject resetBtn;
-    public GameObject Canvas;
+    public bool[] filamentCCW;  //필라멘트 회전방향
 
     public float Xmin;
     public float Ymin;
@@ -32,6 +26,30 @@ public class PrinterGcode : MonoBehaviour
     public float Xmax;
     public float Ymax;
     public float Zmax;
+    
+    public float moveSpeed = 0.1f;              // 이동속도
+    public float printingResolutionx = 0.02f;   // x축 해상도
+    public float printingResolutiony = 0.02f;   // y축 해상도
+    public float printingResolutionz = 0.02f;   // z축 해상도
+    public float rotSpeed = 200;                // 필라멘트 회전 속도
+
+    [Header("프린터UI")]
+    public TMP_Text printerInformation; // 프린터 작업 크기
+    public TMP_Text printerWorkingTime; // 프린터 진행 시간
+    public TMP_Text printerExpectTime;  // 프린터 예상 시간
+    public TMP_Text printingStatus;     // 프린터 진행률
+    public GameObject resetBtn;
+    public GameObject Canvas;
+
+    [Header("프린터 오브젝트")]
+    public Dictionary<string, GameObject> objectDictionary = new Dictionary<string, GameObject>();
+    public TMP_Dropdown objectDropdown;     // Dropdown UI 요소
+    public GameObject[] objectPrefabs;      // 프리팹 목록
+    public Transform printingObjectLocate;  // 출력되는 오브젝트의 위치
+
+
+    // private 목록
+    private GameObject printingObj;     // 출력될 오브젝트
 
     private Queue<string> nozzleQueue = new Queue<string>();
     private Queue<string> plateQueue = new Queue<string>();
@@ -41,18 +59,17 @@ public class PrinterGcode : MonoBehaviour
     private Vector3 rodOrigin;
     private Vector3 nozzleOrigin;
 
-    bool plateMoveOn = false;
+    bool plateMoveOn = false;       // plate 움직임 여부
+    bool isOriginLocate = false;    // 원점 이동 여부
+    bool isPrinting;                // 인쇄 중 여부
+    bool isObjSelect = false;       // 인쇄할 오브젝트 선택 여부
 
-    public float moveSpeed = 0.1f;  // 이동속도
-    public float printingResolution = 0.02f;
-    public float rotSpeed = 200;
 
-    private Coroutine originCoroutine; // 원점 코루틴
-    private Coroutine finishCoroutine; // 종료 코루틴
-    private float workingTime; // 작업 시간
-    private float expectedTime; // 잔여 예상 시간
-    private float totalExpectedTime; // 전체 예상 시간
-    private bool isPrinting; // 인쇄 중 여부
+    private Coroutine originCoroutine;      // 원점 코루틴
+    private Coroutine finishCoroutine;      // 종료 코루틴
+    private float workingTime;              // 작업 시간(Seconds)
+    private float expectedTime;             // 잔여 예상 시간(Seconds)
+    private float totalExpectedTime;        // 전체 예상 시간(Seconds)
 
     private void Start()
     {
@@ -64,34 +81,14 @@ public class PrinterGcode : MonoBehaviour
         plateOrigin = plate.transform.localPosition;
         rodOrigin = rod.transform.localPosition;
         nozzleOrigin = nozzle.transform.localPosition;
+
+        objectDropdown.onValueChanged.AddListener(OnObjectSelected); // 이벤트 리스너 추가
+        PopulateObjectDictionary();
     }
     
-    private void SetExpectedTime()
-    {
-        if (size == PrinterSize.Large)
-        {
-            expectedTime = 14400; // 4시간
-        }
-        else if (size == PrinterSize.Small)
-        {
-            expectedTime = 7200; // 2시간
-        }
-
-        totalExpectedTime = expectedTime;
-        UpdateExpectTimeText(); // 예상 작업 시간 표시
-    }
-
-    private void UpdateExpectTimeText()
-    {
-        int hours = Mathf.FloorToInt(expectedTime / 3600);
-        int minutes = Mathf.FloorToInt((expectedTime % 3600) / 60);
-        int seconds = Mathf.FloorToInt(expectedTime % 60);
-
-        printerExpectTime.text = $"Expected Time \n{hours:D2}:{minutes:D2}:{seconds:D2}"; // 형식 지정
-    }
     public void OriginBtnEvent()
     {
-        if (originCoroutine == null)
+        if (originCoroutine == null && !isPrinting)
         {
             originCoroutine = StartCoroutine(OriginPosition());
         }
@@ -101,6 +98,8 @@ public class PrinterGcode : MonoBehaviour
             StopCoroutine(RotateFilament());
             originCoroutine = null;
         }
+
+        isOriginLocate = true;
     }
 
     private IEnumerator OriginPosition()
@@ -125,12 +124,28 @@ public class PrinterGcode : MonoBehaviour
     }
     public void StartProcess()
     {
-        isPrinting = true; // 인쇄 시작
-        workingTime = 0f; // 작업 시간 초기화
-        StartCoroutine(PrintProcess());
-        StartCoroutine(RotateFilament());
-        StartCoroutine(UpdateWorkingTime());
-        StartCoroutine(UpdateExpectedTime());
+        if (isOriginLocate && isObjSelect)
+        {
+            isPrinting = true; // 인쇄 시작
+            workingTime = 0f; // 작업 시간 초기화
+            objectDropdown.interactable = false;
+            
+            StartCoroutine(PrintProcess());
+            StartCoroutine(RotateFilament());
+            StartCoroutine(UpdateWorkingTime());
+            StartCoroutine(UpdateExpectedTime());
+        }
+        else
+        {
+            if (!isOriginLocate)
+            {
+                Debug.Log("원점 이동을 눌러주세요.");
+            }
+            else if (!isObjSelect)
+            {
+                Debug.Log("프린팅 오브젝트를 선택해주세요.");
+            }
+        }
     }
 
     public void StopProcess()
@@ -138,6 +153,9 @@ public class PrinterGcode : MonoBehaviour
         StopAllCoroutines();
         isPrinting = false; // 인쇄 중지
         UpdateExpectedTime();
+        resetBtn.SetActive(true);
+
+        print("강제 종료되었습니다.");
     }
 
     private IEnumerator PrintProcess()
@@ -158,13 +176,13 @@ public class PrinterGcode : MonoBehaviour
     private IEnumerator NozzleMovement()
     {
         // Y축 왕복
-        for (float x = Xmin; x <= Xmax; x += printingResolution)
+        for (float x = Xmin; x <= Xmax; x += printingResolutionx)
         {
             GenerateGcode("G1", x, nozzleOrigin.y, nozzleOrigin.z, nozzleQueue);
             yield return MoveNozzle(nozzleQueue.Dequeue());
         }
 
-        for (float x = Xmax; x >= Xmin; x -= printingResolution)
+        for (float x = Xmax; x >= Xmin; x -= printingResolutionx)
         {
             GenerateGcode("G1", x, nozzleOrigin.y, nozzleOrigin.z, nozzleQueue);
             yield return MoveNozzle(nozzleQueue.Dequeue());
@@ -181,9 +199,11 @@ public class PrinterGcode : MonoBehaviour
             }
             else
             {
-                GenerateGcode("G1", plateOrigin.x, plateOrigin.y, plate.localPosition.z - printingResolution, plateQueue);
+                GenerateGcode("G1", plateOrigin.x, plateOrigin.y, plate.localPosition.z - printingResolutionz, plateQueue);
             }
             yield return MovePlate(plateQueue.Dequeue());
+            
+            UpdatePrintingObjectLocate("z", plate, printingResolutionz);
         }
         plateMoveOn = false;
     }
@@ -192,7 +212,7 @@ public class PrinterGcode : MonoBehaviour
     {
         if(rod.localPosition.y <= Ymax)
         {
-            GenerateGcode("G1", rodOrigin.x, rod.localPosition.y + printingResolution, rodOrigin.z, rodQueue);
+            GenerateGcode("G1", rodOrigin.x, rod.localPosition.y + printingResolutiony, rodOrigin.z, rodQueue);
         }
         else
         {
@@ -200,6 +220,30 @@ public class PrinterGcode : MonoBehaviour
             plateMoveOn = true;
         }
         yield return MoveRod(rodQueue.Dequeue());
+    }
+    
+    private void UpdatePrintingObjectLocate(string axis, Transform referenceTransform, float resolution)
+    {
+        Vector3 newPosition = printingObjectLocate.position;
+
+        // 축에 따라 위치 업데이트
+        switch (axis.ToLower())
+        {
+            case "x":
+                newPosition.x = referenceTransform.localPosition.x + resolution;
+                break;
+            case "y":
+                newPosition.y = referenceTransform.localPosition.y + resolution;
+                break;
+            case "z":
+                newPosition.z = referenceTransform.localPosition.z + resolution;
+                break;
+            default:
+                Debug.LogError("잘못된 축입니다. 'x', 'y', 또는 'z'를 입력하세요.");
+                return; // 잘못된 축인 경우 메서드 종료
+        }
+
+        printingObjectLocate.position = newPosition; // 새로운 위치로 업데이트
     }
 
 
@@ -341,6 +385,31 @@ public class PrinterGcode : MonoBehaviour
         // 예상 시간이 0에 도달했을 때
         PrinterFinish(); // 프린터 완료 처리
     }
+
+    private void SetExpectedTime()
+    {
+        if (size == PrinterSize.Large)
+        {
+            expectedTime = 20;
+        }
+        else if (size == PrinterSize.Small)
+        {
+            expectedTime = 10;
+        }
+
+        totalExpectedTime = expectedTime;
+        UpdateExpectTimeText(); // 예상 작업 시간 표시
+    }
+
+    private void UpdateExpectTimeText()
+    {
+        int hours = Mathf.FloorToInt(expectedTime / 3600);
+        int minutes = Mathf.FloorToInt((expectedTime % 3600) / 60);
+        int seconds = Mathf.FloorToInt(expectedTime % 60);
+
+        printerExpectTime.text = $"Expected Time \n{hours:D2}:{minutes:D2}:{seconds:D2}"; // 형식 지정
+    }
+
     private void UpdatePrintStatus()
     {
         // 진행률을 정수형으로 계산
@@ -348,15 +417,14 @@ public class PrinterGcode : MonoBehaviour
         printingStatus.text = $"Printing Status \n{status:D2}%"; // 정수형으로 표시
         printingStatus.color = Color.cyan;
     }
-
-
+    
     private void PrinterFinish()
     {
-        printerExpectTime.text = "Expected Time \n 00:00:00";
         StopAllCoroutines();
 
-        // 초기화 버튼 활성화
         resetBtn.SetActive(true);
+        
+        printerExpectTime.text = "Expected Time \n 00:00:00";
         printingStatus.text = "Printing Complete"; // 완료 메시지 표시
         printingStatus.color = Color.red;
 
@@ -370,6 +438,7 @@ public class PrinterGcode : MonoBehaviour
             finishCoroutine = null;
         }
     }
+
     public void ResetPrinter()
     {
         // 초기화 작업 수행
@@ -379,10 +448,74 @@ public class PrinterGcode : MonoBehaviour
         printingStatus.text = "Printing Status \n00%"; // 프린팅 상태 초기화
         printerExpectTime.text = $"Expect Time \n00:00:00";
         printerWorkingTime.text = "Working Time \n00:00:00";
+        
+        objectDropdown.interactable = true;
         isPrinting = false; // 인쇄 중지 상태로 설정
         resetBtn.SetActive(false);
         printingStatus.color = Color.black;
         printerExpectTime.color = Color.black;
         printerWorkingTime.color = Color.black;
     }
+
+    private void PopulateObjectDictionary()
+    {
+        // 기존 내용 초기화
+        objectDictionary.Clear();
+
+        // "None" 항목 추가
+        objectDictionary.Add("None", null);
+
+        // objectPrefabs의 모든 항목을 objectDictionary에 추가
+        for (int i = 0; i < objectPrefabs.Length; i++)
+        {
+            if (objectPrefabs[i] != null) // null 체크
+            {
+                objectDictionary.Add($"Example{i + 1}", objectPrefabs[i]);
+            }
+            else
+            {
+                Debug.LogWarning($"objectPrefabs[{i}]는 null입니다. 확인하세요.");
+            }
+        }
+        // DropDown 업데이트
+        PopulateDropdown();
+    }
+
+    private void PopulateDropdown()
+    {
+        objectDropdown.options.Clear(); // 기존 옵션 제거
+
+        foreach (var key in objectDictionary.Keys)
+        {
+            objectDropdown.options.Add(new TMP_Dropdown.OptionData(key));
+        }
+
+        objectDropdown.value = 0; // 기본값 설정
+    }
+
+    private void OnObjectSelected(int index)
+    {
+        if (index < 0 || index >= objectDropdown.options.Count) return; // 인덱스 범위 체크
+
+        string selectedObjectName = objectDropdown.options[index].text;
+        PrintObjectSelect(selectedObjectName);
+    }
+
+    public void PrintObjectSelect(string objectName)
+    {
+        if (objectName != "None" && objectDictionary.ContainsKey(objectName))
+        {
+            printingObj = objectDictionary[objectName];
+            // 객체 출력 로직 추가
+            Debug.Log($"{objectName}를 출력합니다.");
+            isObjSelect = true; // 오브젝트 선택 상태 설정
+        }
+        else
+        {
+            isObjSelect = false;
+            printingObj = null;
+            Debug.Log("기존 작업을 취소했습니다.");
+        }
+    }
+
 }
