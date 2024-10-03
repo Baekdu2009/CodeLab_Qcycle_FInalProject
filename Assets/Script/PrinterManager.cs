@@ -4,7 +4,7 @@ using TMPro;
 
 public class PrinterManager : MonoBehaviour
 {
-    [SerializeField] List<PrinterGcode> printers = new List<PrinterGcode>();
+    [SerializeField] List<PrinterCode> printers = new List<PrinterCode>();
     [SerializeField] List<Transform> directPositions = new List<Transform>();
     [SerializeField] TMP_Text printerNum;
 

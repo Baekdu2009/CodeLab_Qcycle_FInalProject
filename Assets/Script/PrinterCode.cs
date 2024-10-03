@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine.UI;
 
-public class PrinterGcode : MonoBehaviour
+public class PrinterCode : MonoBehaviour
 {
     public enum PrinterSize
     {
@@ -17,6 +17,7 @@ public class PrinterGcode : MonoBehaviour
     public Transform nozzle;    // 노즐(Y)
     public Transform rod;       // 로드(Z)
     public Transform plate;     // 플레이트(X)
+    public MeshRenderer machineLight;
     public GameObject[] filaments; // 필라멘트
     public bool[] filamentCCW;  //필라멘트 회전방향
 
@@ -28,7 +29,7 @@ public class PrinterGcode : MonoBehaviour
     public float Zmax;
     
     public float moveSpeed = 0.1f;              // 이동속도
-    public float printingResolutionx = 0.02f;   // x축 해상도
+    public float printingResolutionx = 0.02f;   // x축 해상도  -> range를 통해서 resolution을 변화시키게 바꾸기
     public float printingResolutiony = 0.02f;   // y축 해상도
     public float printingResolutionz = 0.02f;   // z축 해상도
     public float rotSpeed = 200;                // 필라멘트 회전 속도
@@ -38,15 +39,15 @@ public class PrinterGcode : MonoBehaviour
     public TMP_Text printerWorkingTime; // 프린터 진행 시간
     public TMP_Text printerExpectTime;  // 프린터 예상 시간
     public TMP_Text printingStatus;     // 프린터 진행률
+    public TMP_Text filamentStatus;     // 필라멘트 상태
     public GameObject resetBtn;
     public GameObject Canvas;
 
-    [Header("프린터 오브젝트")]
+    [Header("프린터 출력물")]
     public Dictionary<string, GameObject> objectDictionary = new Dictionary<string, GameObject>();
     public TMP_Dropdown objectDropdown;     // Dropdown UI 요소
     public GameObject[] objectPrefabs;      // 프리팹 목록
     public Transform printingObjectLocate;  // 출력되는 오브젝트의 위치
-
 
     // private 목록
     private GameObject printingObj;     // 출력될 오브젝트
@@ -64,6 +65,7 @@ public class PrinterGcode : MonoBehaviour
     bool isPrinting;                // 인쇄 중 여부
     bool isObjSelect = false;       // 인쇄할 오브젝트 선택 여부
 
+    private float filamentUsingPercent = 100f;
 
     private Coroutine originCoroutine;      // 원점 코루틴
     private Coroutine finishCoroutine;      // 종료 코루틴
@@ -81,11 +83,18 @@ public class PrinterGcode : MonoBehaviour
         plateOrigin = plate.transform.localPosition;
         rodOrigin = rod.transform.localPosition;
         nozzleOrigin = nozzle.transform.localPosition;
+        machineLight.material.color = Color.yellow;
 
         objectDropdown.onValueChanged.AddListener(OnObjectSelected); // 이벤트 리스너 추가
         PopulateObjectDictionary();
     }
-    
+
+    private void Update()
+    {
+        FilamentStatusUpdate();
+
+    }
+
     public void OriginBtnEvent()
     {
         if (originCoroutine == null && !isPrinting)
@@ -124,11 +133,12 @@ public class PrinterGcode : MonoBehaviour
     }
     public void StartProcess()
     {
-        if (isOriginLocate && isObjSelect)
+        if (isOriginLocate && isObjSelect && filamentUsingPercent != 0)
         {
             isPrinting = true; // 인쇄 시작
             workingTime = 0f; // 작업 시간 초기화
             objectDropdown.interactable = false;
+            machineLight.material.color = Color.green;
             
             StartCoroutine(PrintProcess());
             StartCoroutine(RotateFilament());
@@ -139,11 +149,15 @@ public class PrinterGcode : MonoBehaviour
         {
             if (!isOriginLocate)
             {
-                Debug.Log("원점 이동을 눌러주세요.");
+                print("원점 이동을 먼저 누르기 바랍니다.");
             }
             else if (!isObjSelect)
             {
-                Debug.Log("프린팅 오브젝트를 선택해주세요.");
+                print("프린팅 오브젝트를 선택하시기 바랍니다.");
+            }
+            else if (filamentUsingPercent == 0)
+            {
+                print("필라멘트를 교체하시기 바랍니다.");
             }
         }
     }
@@ -154,6 +168,7 @@ public class PrinterGcode : MonoBehaviour
         isPrinting = false; // 인쇄 중지
         UpdateExpectedTime();
         resetBtn.SetActive(true);
+        machineLight.material.color = Color.red;
 
         print("강제 종료되었습니다.");
     }
@@ -455,6 +470,35 @@ public class PrinterGcode : MonoBehaviour
         printingStatus.color = Color.black;
         printerExpectTime.color = Color.black;
         printerWorkingTime.color = Color.black;
+    }
+
+    private void FilamentStatusUpdate()
+    {
+        if (filaments != null)
+        {
+            filamentStatus.text = $"Filament Status\n{filamentUsingPercent}%";
+            // Start the filament usage tracking coroutine if not already running
+            if (isPrinting && filamentUsingPercent > 0)
+            {
+                StartCoroutine(FilamentUsingPercent());
+            }
+        }
+    }
+
+    private IEnumerator FilamentUsingPercent()
+    {
+        while (isPrinting && filamentUsingPercent > 0)
+        {
+
+            filamentUsingPercent = Mathf.Max(filamentUsingPercent, 0); // 0 이하로 떨어지지 않게 조정
+            filamentStatus.text = $"Filament Status\n{filamentUsingPercent}%";
+
+            if (filamentUsingPercent <= 0)
+            {
+                Debug.Log("필라멘트가 소진되었습니다.");
+            }
+            yield return null;
+        }
     }
 
     private void PopulateObjectDictionary()
