@@ -4,100 +4,80 @@ using UnityEngine;
 
 public class LevelSensor : MonoBehaviour
 {
-    public GameObject printingObject;
-    private int collisionCnt = 0;
-    private float changeValue = 0.1f;
-    public int count = 0;
-    public bool isDetected;
+    [SerializeField] private int collisionCount = 0; // 충돌 수
+    public bool isDetected = false; // 감지 상태
 
-    public List<GameObject> plasticList = new List<GameObject>();
-    private Coroutine shrinkCoroutine;
-
-    private void Start()
-    {
-        printingObject.transform.localScale = new Vector3(0.8f, 0f, 0.8f);
-    }
+    private HashSet<Collider> collidedPlastics = new HashSet<Collider>(); // 중복 충돌 방지를 위한 리스트
 
     private void Update()
     {
-        PrintingObjectScaleUpdate();
-    }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.CompareTag("Plastic") && shrinkCoroutine == null)
+        // 감지 횟수가 150회 이상이면 isDetected를 true로 설정
+        if (collisionCount >= 150 && !isDetected)
         {
-            collisionCnt++;
-            plasticList.Add(collision.gameObject);
-            print("충돌");
+            isDetected = true;
+            Debug.Log("isDetected 활성화!");
+            StartCoroutine(RemovePlastics(0.4f, 4)); // 30%씩 4번 제거
         }
     }
 
-    void PrintingObjectScaleUpdate()
+    private void OnTriggerEnter(Collider other)
     {
-        Vector3 changeScale = printingObject.transform.localScale;
-
-        if (changeScale.y < 1f && count < 3 && collisionCnt >= 20)
+        // 충돌한 오브젝트가 Plastic 태그인지 확인
+        if (other.CompareTag("Plastic"))
         {
-            collisionCnt = 0; // 충돌 수 초기화
-            changeScale.y += changeValue;
-            printingObject.transform.localScale = changeScale;
-            count++;
-
-            if (count >= 3 && shrinkCoroutine == null)
+            // 중복 충돌 방지
+            if (!collidedPlastics.Contains(other))
             {
-                isDetected = true;
-                shrinkCoroutine = StartCoroutine(Shrink());
+                collidedPlastics.Add(other); // 현재 충돌 중인 Plastic을 추가
+                collisionCount++;
+                Debug.Log("Plastic과 충돌 감지: " + collisionCount);
             }
         }
     }
 
-    IEnumerator Shrink()
+    private void OnTriggerExit(Collider other)
     {
-        Vector3 changeScale = printingObject.transform.localScale;
-
-        // 크기를 0으로 줄이는 과정
-        while (changeScale.y > 0f)
+        // 충돌이 끝나면 해당 Collider 제거
+        if (other.CompareTag("Plastic"))
         {
-            changeScale.y -= changeValue;
-            printingObject.transform.localScale = changeScale;
-
-            yield return new WaitForSeconds(2f); // 2초 대기
+            collidedPlastics.Remove(other); // 중복 충돌 리스트에서 제거
+            Debug.Log("Plastic과의 충돌 종료: " + other.gameObject.name);
         }
-
-        // 크기가 0이 되었을 때 최종 크기 보장
-        changeScale.y = 0f;
-        printingObject.transform.localScale = changeScale;
-
-        // 씬에서 모든 플라스틱 제거
-        RemoveRandomPlastics(0.9f); // 90%를 기준으로 제거
-        print("크기 감소를 완료했습니다.");
-
-        count = 0;
-        isDetected = false;
-        shrinkCoroutine = null;
     }
 
-    void RemoveRandomPlastics(float percentage)
+    private IEnumerator RemovePlastics(float percentage, int times)
     {
-        List<GameObject> allPlastics = new List<GameObject>(GameObject.FindGameObjectsWithTag("Plastic"));
-        int totalCount = allPlastics.Count;
-        int countToRemove = Mathf.CeilToInt(totalCount * percentage);
-
-        // 플라스틱이 존재하는 경우에만 제거
-        for (int i = 0; i < countToRemove && allPlastics.Count > 0; i++)
+        for (int i = 0; i < times; i++)
         {
-            int randomIndex = Random.Range(0, allPlastics.Count);
-            GameObject plasticToRemove = allPlastics[randomIndex];
+            // 현재 모든 Plastic 오브젝트를 가져옴
+            GameObject[] allPlastics = GameObject.FindGameObjectsWithTag("Plastic");
+            int totalPlastics = allPlastics.Length;
+            int countToRemove = Mathf.CeilToInt(totalPlastics * percentage);
 
-            if (plasticToRemove != null)
+            for (int j = 0; j < countToRemove && allPlastics.Length > 0; j++)
             {
-                Destroy(plasticToRemove); // 씬에서 플라스틱 제거
-                print("씬에서 플라스틱 제거됨"); // 로그 출력
+                int randomIndex = Random.Range(0, allPlastics.Length);
+                GameObject plasticToRemove = allPlastics[randomIndex];
 
-                // 리스트에서 제거
-                allPlastics.RemoveAt(randomIndex);
+                if (plasticToRemove != null)
+                {
+                    Destroy(plasticToRemove);
+                    Debug.Log("씬에서 플라스틱 제거됨: " + plasticToRemove.name);
+                    allPlastics = GameObject.FindGameObjectsWithTag("Plastic"); // 갱신된 Plastic 배열
+                }
             }
+
+            yield return new WaitForSeconds(3f); // 각 단계 후 1초 대기
         }
+
+        ResetDetection(); // 모든 플라스틱 제거 후 초기화
+    }
+
+    private void ResetDetection()
+    {
+        isDetected = false; // 감지 상태 초기화
+        collisionCount = 0; // 충돌 수 초기화
+        collidedPlastics.Clear(); // 중복 충돌 리스트 초기화
+        Debug.Log("감지 상태와 충돌 수 초기화 완료!");
     }
 }
