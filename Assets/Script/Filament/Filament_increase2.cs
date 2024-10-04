@@ -16,6 +16,7 @@ public class Filament_increase2 : MonoBehaviour
     float delayTime = 2.0f;
     void Start()
     {
+       // Filament_Rotate.FilamentSpawn.gameObject.SetActive(false);
         transform.localScale = new Vector3(initialScale, initialScale, initialScale);
     }
 
@@ -40,7 +41,7 @@ public class Filament_increase2 : MonoBehaviour
         Vector3 currentScale = transform.localScale;
         currentScale.y += scaleIncreaseSpeed * Time.deltaTime;
         transform.localScale = currentScale;
-        transform.Translate(new Vector3(0, 0, zMoveSpeed * Time.deltaTime), Space.World);
+        transform.Translate(new Vector3(0, 0, - zMoveSpeed * Time.deltaTime), Space.World);
     }
 
     void FinalizeScaling()
@@ -57,8 +58,8 @@ public class Filament_increase2 : MonoBehaviour
     {
         if (Filamentdia != null)
         {
-            Vector3 SpawnPosition = new Vector3(30.437f, 2.102f, -2.463f);
-            Quaternion SpawnRotation = Quaternion.Euler(0, 90, 15);
+            Vector3 SpawnPosition = new Vector3(-16.029f, 1.183f, 5.334f);
+            Quaternion SpawnRotation = Quaternion.Euler(0, 90, -12.5f);
 
             GameObject FilamentSpDia = Instantiate(Filamentdia, SpawnPosition, SpawnRotation);
 
@@ -72,7 +73,7 @@ public class Filament_increase2 : MonoBehaviour
         {
             yield return new WaitForSeconds(delayTime);
 
-            Vector3 SpawnPosition2 = new Vector3(30.437f, 2.504f, -1.845f);
+            Vector3 SpawnPosition2 = new Vector3(-16.027f, 1.631f, 4.758f);
             Quaternion SpawnRotation2 = Quaternion.Euler(0, 90, 90);
 
             GameObject FilamentSp2 = Instantiate(Filament2, SpawnPosition2, SpawnRotation2);
@@ -85,8 +86,8 @@ public class Filament_increase2 : MonoBehaviour
     {
         if (Filament3 != null)
         {
-            Vector3 SpawnPosition3 = new Vector3(30.437f, 2.209f, -0.98f);
-            Quaternion SpawnRotation3 = Quaternion.Euler(0, 90, 130);
+            Vector3 SpawnPosition3 = new Vector3(-16.026f, 1.39f, 3.891f);
+            Quaternion SpawnRotation3 = Quaternion.Euler(0, 90, 58);
 
             GameObject FilamentSp3 = Instantiate(Filament3, SpawnPosition3, SpawnRotation3);
         }
