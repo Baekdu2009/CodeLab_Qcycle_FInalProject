@@ -64,6 +64,7 @@ public class PrinterCode : MonoBehaviour
     bool isOriginLocate = false;    // 원점 이동 여부
     bool isPrinting;                // 인쇄 중 여부
     bool isObjSelect = false;       // 인쇄할 오브젝트 선택 여부
+    bool isPaused = false;         // 일시정지 여부
 
     private float filamentUsingPercent = 100f;
 
@@ -107,7 +108,6 @@ public class PrinterCode : MonoBehaviour
             StopCoroutine(RotateFilament());
             originCoroutine = null;
         }
-
         isOriginLocate = true;
     }
 
@@ -121,6 +121,7 @@ public class PrinterCode : MonoBehaviour
         yield return MoveRod(rodQueue.Dequeue());
         yield return MovePlate(plateQueue.Dequeue());
     }
+
     private IEnumerator FinishPosition()
     {
         GenerateGcode("G0", Xmax, nozzleOrigin.y, nozzleOrigin.z, nozzleQueue);
@@ -131,6 +132,7 @@ public class PrinterCode : MonoBehaviour
         yield return MoveRod(rodQueue.Dequeue());
         yield return MovePlate(plateQueue.Dequeue());
     }
+
     public void StartProcess()
     {
         if (isOriginLocate && isObjSelect && filamentUsingPercent != 0)
@@ -161,21 +163,64 @@ public class PrinterCode : MonoBehaviour
             }
         }
     }
+    public void BtnTogglePauseProcess()
+    {
+        if (isPrinting)
+        {
+            isPaused = !isPaused; // 현재 일시정지 상태를 반전
+
+            if (isPaused)
+            {
+                PauseProcess(); // 현재 상태가 일시정지면 일시정지 호출
+            }
+            else
+            {
+                ResumeProcess(); // 현재 상태가 재개면 재개 호출
+            }
+        }
+    }
+
+    private void PauseProcess()
+    {
+        isPrinting = false; // 인쇄 중지
+        machineLight.material.color = Color.yellow; // 색상 변경
+
+        StopCoroutine(PrintProcess());
+        StopCoroutine(RotateFilament());
+        StopCoroutine(UpdateExpectedTime());
+        StopCoroutine(UpdateWorkingTime());
+        print("일시정지 되었습니다.");
+    }
+
+    private void ResumeProcess()
+    {
+        isPrinting = true; // 인쇄 재개
+        machineLight.material.color = Color.green; // 색상 변경
+
+        StartCoroutine(PrintProcess()); // 인쇄 프로세스 재개
+        StartCoroutine(RotateFilament()); // 필라멘트 회전 재개
+        StartCoroutine(UpdateWorkingTime()); // 작업 시간 업데이트 재개
+        StartCoroutine(UpdateExpectedTime()); // 예상 시간 업데이트 재개
+
+        print("작업을 재개합니다");
+    }
+
 
     public void StopProcess()
     {
+        
         StopAllCoroutines();
-        isPrinting = false; // 인쇄 중지
         UpdateExpectedTime();
         resetBtn.SetActive(true);
-        machineLight.material.color = Color.red;
 
+        isPrinting = false;
+        machineLight.material.color = Color.red;
         print("강제 종료되었습니다.");
     }
 
     private IEnumerator PrintProcess()
     {
-        while (true) // 무한 루프
+        while (isPrinting || !isPaused) // 무한 루프
         {
             // 노즐 운동
             yield return StartCoroutine(NozzleMovement());
@@ -260,7 +305,6 @@ public class PrinterCode : MonoBehaviour
 
         printingObjectLocate.position = newPosition; // 새로운 위치로 업데이트
     }
-
 
     private void GenerateGcode(string gcommand, float x, float y, float z, Queue<string> queue)
     {
@@ -360,7 +404,7 @@ public class PrinterCode : MonoBehaviour
 
     private IEnumerator UpdateWorkingTime()
     {
-        while (isPrinting)
+        while (isPrinting && !isPaused)
         {
 
             workingTime += Time.deltaTime; // 흐른 시간 업데이트
@@ -377,9 +421,10 @@ public class PrinterCode : MonoBehaviour
             yield return null; // 다음 프레임까지 대기
         }
     }
+
     private IEnumerator UpdateExpectedTime()
     {
-        while (isPrinting && expectedTime > 0)
+        while (isPrinting && expectedTime > 0 && !isPaused)
         {
             expectedTime -= Time.deltaTime;
 
@@ -396,9 +441,10 @@ public class PrinterCode : MonoBehaviour
 
             yield return null; // 다음 프레임까지 대기
         }
-
-        // 예상 시간이 0에 도달했을 때
-        PrinterFinish(); // 프린터 완료 처리
+        if (isPrinting && expectedTime < 0 && !isPaused)
+        {
+            PrinterFinish(); // 프린터 완료 처리
+        }
     }
 
     private void SetExpectedTime()
@@ -460,9 +506,9 @@ public class PrinterCode : MonoBehaviour
         workingTime = 0f; // 작업 시간 초기화
         expectedTime = totalExpectedTime; // 예상 시간 초기화
         UpdateExpectTimeText(); // 예상 작업 시간 텍스트 초기화
-        printingStatus.text = "Printing Status \n00%"; // 프린팅 상태 초기화
-        printerExpectTime.text = $"Expect Time \n00:00:00";
-        printerWorkingTime.text = "Working Time \n00:00:00";
+        printingStatus.text = "Printing Status\n00%"; // 프린팅 상태 초기화
+        printerExpectTime.text = $"Expect Time\n00:00:00";
+        printerWorkingTime.text = "Working Time\n00:00:00";
         
         objectDropdown.interactable = true;
         isPrinting = false; // 인쇄 중지 상태로 설정
@@ -489,7 +535,6 @@ public class PrinterCode : MonoBehaviour
     {
         while (isPrinting && filamentUsingPercent > 0)
         {
-
             filamentUsingPercent = Mathf.Max(filamentUsingPercent, 0); // 0 이하로 떨어지지 않게 조정
             filamentStatus.text = $"Filament Status\n{filamentUsingPercent}%";
 
