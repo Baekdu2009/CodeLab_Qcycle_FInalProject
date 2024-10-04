@@ -32,7 +32,6 @@ public class PrinterCode : MonoBehaviour
     public float printingResolutionx = 0.02f;   // x축 해상도  -> range를 통해서 resolution을 변화시키게 바꾸기
     public float printingResolutiony = 0.02f;   // y축 해상도
     public float printingResolutionz = 0.02f;   // z축 해상도
-    public float rotSpeed = 200;                // 필라멘트 회전 속도
 
     [Header("프린터UI")]
     public TMP_Text printerInformation; // 프린터 작업 크기
@@ -43,14 +42,14 @@ public class PrinterCode : MonoBehaviour
     public GameObject resetBtn;
     public GameObject Canvas;
 
-    [Header("프린터 출력물")]
     public Dictionary<string, GameObject> objectDictionary = new Dictionary<string, GameObject>();
     public TMP_Dropdown objectDropdown;     // Dropdown UI 요소
     public GameObject[] objectPrefabs;      // 프리팹 목록
     public Transform printingObjectLocate;  // 출력되는 오브젝트의 위치
 
     // private 목록
-    private GameObject printingObj;     // 출력될 오브젝트
+    private GameObject printingObj;     // 선택된 오브젝트
+    private GameObject visibleObject;   // 실제 출력 오브젝트
 
     private Queue<string> nozzleQueue = new Queue<string>();
     private Queue<string> plateQueue = new Queue<string>();
@@ -66,7 +65,8 @@ public class PrinterCode : MonoBehaviour
     bool isObjSelect = false;       // 인쇄할 오브젝트 선택 여부
     bool isPaused = false;         // 일시정지 여부
 
-    private float filamentUsingPercent = 100f;
+    private float rotSpeed = 200;                // 필라멘트 회전 속도
+    private float filamentUsingPercent = 100f;   // 필라멘트 남은량
 
     private Coroutine originCoroutine;      // 원점 코루틴
     private Coroutine finishCoroutine;      // 종료 코루틴
@@ -93,10 +93,14 @@ public class PrinterCode : MonoBehaviour
     private void Update()
     {
         FilamentStatusUpdate();
+        if (plateMoveOn)
+        {
+            PrintingObjectControl();
+        }
 
     }
 
-    public void OriginBtnEvent()
+    public void BtnOriginEvent()
     {
         if (originCoroutine == null && !isPrinting)
         {
@@ -133,7 +137,7 @@ public class PrinterCode : MonoBehaviour
         yield return MovePlate(plateQueue.Dequeue());
     }
 
-    public void StartProcess()
+    public void BtnStartProcess()
     {
         if (isOriginLocate && isObjSelect && filamentUsingPercent != 0)
         {
@@ -201,9 +205,8 @@ public class PrinterCode : MonoBehaviour
 
         print("작업을 재개합니다");
     }
-
-
-    public void StopProcess()
+    
+    public void BtnStopProcess()
     {
         
         StopAllCoroutines();
@@ -260,7 +263,6 @@ public class PrinterCode : MonoBehaviour
             }
             yield return MovePlate(plateQueue.Dequeue());
             
-            UpdatePrintingObjectLocate("z", plate, printingResolutionz);
         }
         plateMoveOn = false;
     }
@@ -281,7 +283,7 @@ public class PrinterCode : MonoBehaviour
     
     private void UpdatePrintingObjectLocate(string axis, Transform referenceTransform, float resolution)
     {
-        Vector3 newPosition = printingObjectLocate.position;
+        Vector3 newPosition = printingObjectLocate.localPosition;
 
         // 축에 따라 위치 업데이트
         switch (axis.ToLower())
@@ -300,7 +302,7 @@ public class PrinterCode : MonoBehaviour
                 return; // 잘못된 축인 경우 메서드 종료
         }
 
-        printingObjectLocate.position = newPosition; // 새로운 위치로 업데이트
+        printingObjectLocate.localPosition = newPosition; // 새로운 위치로 업데이트
     }
 
     private void GenerateGcode(string gcommand, float x, float y, float z, Queue<string> queue)
@@ -396,7 +398,7 @@ public class PrinterCode : MonoBehaviour
         float y = (Ymax - Ymin) * 1000;
         float z = (Zmax - Zmin) * 1000;
         string information = $"W{y} * B{x} * H{z}";
-        printerInformation.text = "Working Space \n" + information + " (mm)";
+        printerInformation.text = "Working Space\n" + information + "(mm)";
     }
 
     private IEnumerator UpdateWorkingTime()
@@ -448,11 +450,11 @@ public class PrinterCode : MonoBehaviour
     {
         if (size == PrinterSize.Large)
         {
-            expectedTime = 20;
+            expectedTime = 600;
         }
         else if (size == PrinterSize.Small)
         {
-            expectedTime = 10;
+            expectedTime = 600;
         }
 
         totalExpectedTime = expectedTime;
@@ -497,7 +499,7 @@ public class PrinterCode : MonoBehaviour
         }
     }
 
-    public void ResetPrinter()
+    public void BtnResetPrinter()
     {
         // 초기화 작업 수행
         workingTime = 0f; // 작업 시간 초기화
@@ -604,4 +606,24 @@ public class PrinterCode : MonoBehaviour
         }
     }
 
+    private void PrintingObjectControl()
+    {
+        if (visibleObject == null)
+            PrintingObjectCreate();
+        else
+            PrintingObjectScaleChange();
+    }
+
+    private void PrintingObjectCreate()
+    {
+        printingObj.GetComponent<GameObject>();
+        visibleObject = Instantiate(printingObj, printingObjectLocate);
+        visibleObject.transform.localPosition = new Vector3(0, -0.02f, 0);
+        visibleObject.transform.localScale = new Vector3(1, 1, 0);
+    }
+
+    private void PrintingObjectScaleChange()
+    {
+        visibleObject.transform.localScale = new Vector3(visibleObject.transform.localScale.x, visibleObject.transform.localScale.y, visibleObject.transform.localScale.z + printingResolutionz / 10);
+    }
 }
