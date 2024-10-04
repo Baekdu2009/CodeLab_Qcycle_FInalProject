@@ -165,18 +165,15 @@ public class PrinterCode : MonoBehaviour
     }
     public void BtnTogglePauseProcess()
     {
-        if (isPrinting)
-        {
-            isPaused = !isPaused; // 현재 일시정지 상태를 반전
+        isPaused = !isPaused; // 현재 일시정지 상태를 반전
 
-            if (isPaused)
-            {
-                PauseProcess(); // 현재 상태가 일시정지면 일시정지 호출
-            }
-            else
-            {
-                ResumeProcess(); // 현재 상태가 재개면 재개 호출
-            }
+        if (isPaused)
+        {
+            PauseProcess(); // 현재 상태가 일시정지면 일시정지 호출
+        }
+        else
+        {
+            ResumeProcess(); // 현재 상태가 재개면 재개 호출
         }
     }
 
