@@ -10,11 +10,13 @@ public class AGVControl : MonoBehaviour
     [Header("AGV 제어")]
     public Transform[] movingPositions;
     
-    public float moveSpeed = 2f;
-    public float rotSpeed = 200f;
+    public float moveSpeed = 2f;            // 이동속도
+    public float rotSpeed = 200f;           // 회전속도
     public float rayDistance = 5f;          // Raycast 거리
     public float avoidanceDistance = 0.2f;  // 회피 거리
-    public bool isStopped;                  // 멈춤 여부
+    public bool isMoving;                   // 움직임 여부
+    public bool isStopping;                 // 멈춤 여부
+    public bool isStandby;                  // 대기 여부
 
     private void Start()
     {
@@ -23,13 +25,13 @@ public class AGVControl : MonoBehaviour
 
     public void AGVMove(Transform targetPos)
     {
-        if (!isStopped)
+        if (!isStopping)
             transform.position = Vector3.MoveTowards(transform.position, targetPos.position, moveSpeed * Time.deltaTime);
     }
 
     public void AGVMove()
     {
-        if (!isStopped)
+        if (!isStopping)
             transform.Translate(Vector3.forward * moveSpeed * Time.deltaTime);
     }
 
@@ -52,12 +54,22 @@ public class AGVControl : MonoBehaviour
         {
             if (hit.collider != null && hit.collider.CompareTag("Person"))      // Person 태그 확인
             {
-                isStopped = true;
+                isMoving = false;
             }
         }
         else
         {
-            isStopped = false;
+            isMoving = true;
         }
+    }
+
+    public void AGVStandBy()
+    {
+
+    }
+
+    public void AGVtoCharge()
+    {
+
     }
 }
