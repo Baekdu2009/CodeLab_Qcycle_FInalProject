@@ -20,13 +20,14 @@ public class LineRendererMake : MonoBehaviour
     
     public void UpdateLine(Vector3[] vector)
     {
+        lineRenderer.positionCount = vector.Length; // 점 수 설정
+
         if (vector == null || vector.Length == 0)
         {
             lineRenderer.positionCount = 0; // 점 수를 0으로 설정
             return; // 함수 종료
         }
 
-        lineRenderer.positionCount = vector.Length; // 점 수 설정
         for (int i = 0; i < vector.Length; i++)
         {
             lineRenderer.SetPosition(i, vector[i]);
@@ -34,13 +35,14 @@ public class LineRendererMake : MonoBehaviour
     }
     public void UpdateLine(Transform[] locate)
     {
+        lineRenderer.positionCount = locate.Length; // 점 수 설정
+
         if (locate == null || locate.Length == 0)
         {
             lineRenderer.positionCount = 0; // 점 수를 0으로 설정
             return; // 함수 종료
         }
 
-        lineRenderer.positionCount = locate.Length; // 점 수 설정
         for (int i = 0; i < locate.Length; i++)
         {
             lineRenderer.SetPosition(i, locate[i].position);

@@ -38,7 +38,7 @@ public class EachFilamentFactory : MonoBehaviour
     float currentRotation = 0f;
 
     // 저장탱크 변수
-    bool[] tankLevelbool;
+    public bool[] tankLevelbool;
 
     // 각 장비 상태 변수
     bool conveyorWorkWell = false;
@@ -63,15 +63,14 @@ public class EachFilamentFactory : MonoBehaviour
     void Start()
     {
         filamentObject = null;
+        
+        ArrayLengthSet(ref tankLevelbool, tanks);
     }
 
     void Update()
     {
         UpdateStatusUI();
         NextAction();
-
-        ArrayLengthSet(ref tankStatus, tanks);
-        ArrayLengthSet(ref tankLevelbool, tanks);
     }
 
     private void UpdateStatusUI()
@@ -96,9 +95,9 @@ public class EachFilamentFactory : MonoBehaviour
         image.color = work ? (stop ? Color.yellow : Color.green) : Color.red;
     }
 
-    private void TankLevelNoticeUI(Image image, bool full)
+    private void TankLevelNoticeUI(Image image, bool check)
     {
-        image.color = full ? Color.yellow : Color.green;
+        image.color = check ? Color.yellow : Color.green;
     }
     private void ArrayLengthSet<T>(ref T[] variableArray, Array baseArray)
     {
