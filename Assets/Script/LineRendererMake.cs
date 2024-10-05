@@ -32,4 +32,18 @@ public class LineRendererMake : MonoBehaviour
             lineRenderer.SetPosition(i, vector[i]);
         }
     }
+    public void UpdateLine(Transform[] locate)
+    {
+        if (locate == null || locate.Length == 0)
+        {
+            lineRenderer.positionCount = 0; // 점 수를 0으로 설정
+            return; // 함수 종료
+        }
+
+        lineRenderer.positionCount = locate.Length; // 점 수 설정
+        for (int i = 0; i < locate.Length; i++)
+        {
+            lineRenderer.SetPosition(i, locate[i].position);
+        }
+    }
 }

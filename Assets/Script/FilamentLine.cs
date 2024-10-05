@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Linq;
 
 public class FilamentLine : MonoBehaviour
 {
@@ -7,8 +8,9 @@ public class FilamentLine : MonoBehaviour
     public Transform[] transformPos;
     public Vector3[] vectorPos;
 
+    public int managerNumber;
     public float lineWidth = 0.02f;
-    public float drawDuration = 0.5f; // 각 선을 그리는 데 걸리는 시간
+    public float drawDuration = 2f; // 각 선을 그리는 데 걸리는 시간
     public bool isOn;
 
     private Coroutine drawCoroutine;
@@ -103,5 +105,18 @@ public class FilamentLine : MonoBehaviour
         }
 
         lineRenderer.SetPosition(endIndex, endPos); // 마지막 위치 설정
+    }
+
+    public bool LastPointArrive()
+    {
+        float distance = 0f;
+
+        if (lineRenderer.positionCount > 0)
+        {
+            Vector3 lastPoint = lineRenderer.GetPosition(lineRenderer.positionCount - 1);
+
+            distance = Vector3.Distance(lastPoint, transformPos[transformPos.Length - 1].position);
+        }
+        return distance < 0.1f;
     }
 }
