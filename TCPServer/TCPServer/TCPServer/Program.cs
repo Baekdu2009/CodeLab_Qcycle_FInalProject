@@ -20,6 +20,10 @@ public class TCPServer
     {
         //1.Mx Component 객체 생성
         mxComponent = new MxCom(0, 8);
+
+        // 종료시 이벤트
+        AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
+
         //TCP/IP Port 7000번 설정
         TcpListener listener = new TcpListener(IPAddress.Any, 7000);
         listener.Start();
@@ -71,20 +75,52 @@ public class TCPServer
                     //그러니까 내가 retMsg를 보내니까
                     //retMsg에는 Server에서 PLC로 보낼 신호가 들어있어야겠지?
 
+                 
+                    else if (msg.Contains("GET") && msg.Contains("SET"))
+                    {
+                        //msg : GET,Y0,4,SET,Y0,0,170
+                        //Rad Device -> Write Device
+
+                        string[] dataFromUnity = msg.Split(',');
+                        string devicePoint = dataFromUnity[1]; // Y0, X0
+                        int blockNum = int.Parse(dataFromUnity[2]); //나는 8
+                        string sensorData = dataFromUnity[5] + "," + dataFromUnity[6]; // Sensor Data(0) + Limit Switch Data(170)
+
+                        mxComponent.ReadDeviceBlock(devicePoint, blockNum, out retMsg);
+                        WriteLog(retMsg);
+
+                        retMsg = mxComponent.WriteDeviceBlock(devicePoint, sensorData);
+
+                        //sensorData = sensor + , + limitSwitch
+
+                    }
+                    else
+                    {
+                        WriteLog("잘못 입력하셨습니다.");
+                        mxComponent.Disconnect();
+                        break;
+                    }
+
                     buffer = new byte[1024];
                     buffer = Encoding.UTF8.GetBytes(retMsg);
 
-                    //데이터 송신
-                    stream.Write(buffer,0,buffer.Length);
 
-                    if(msg.Contains("quit"))
+                    //데이터 송신
+                    stream.Write(buffer, 0, buffer.Length);
+
+                    if (msg.Contains("quit"))
                     {
                         Console.WriteLine("서버를 종료합니다.");
                         break;
                     }
 
                     buffer = new byte[1024];
+                }
 
+                if(msg.Contains("quit"))
+                {
+                    mxComponent.Disconnect();
+                    break;
                 }
             }
             catch (Exception e)
@@ -140,48 +176,7 @@ public class TCPServer
 
         }
 
-        private void ScanPLC()
-        {
-
-            if (status == Status.DISCONNECTED) return;
-
-            pointY = ReadDeviceBlock("Y0");
-            WriteDeviceBlock("Y0", pointY);
-            pointX = ReadDeviceBlock("X0");
-            WriteDeviceBlock("X0", pointX);
-
-
-            //컨베이어
-            int runConveyor = pointY[0][1];
-
-            //탱크 제어
-            int Tank1 = pointY[0][5];
-            int Tank2 = pointY[0][6];
-
-
-            //모터릴레이
-            int runShrreder = pointY[2][0];
-            int runExtruder1 = pointY[2][1];
-            int runWasher1 = pointY[2][2];
-            int runCuttingMachine = pointY[2][3];
-            int runHooper = pointY[2][4];
-            int runExtruder2 = pointY[2][5];
-            int runWasher2 = pointY[2][6];
-            int runPullyMachine = pointY[2][7];
-
-            //센서
-
-            int Level1 = pointX[5][0];
-            int Level2 = pointX[5][1];
-            int LimitSwitch = pointX[5][2];
-
-            if (runConveyor == 1)
-            {
-                conveyorA.OnConveyorBtnClkEvent();
-                // filamentFactory.StatusCheck(conveyorStatus, runConveyor, 0);
-            }
-
-        }
+       
 
 
 
@@ -256,18 +251,20 @@ public class TCPServer
 
         //ReadDeviceBlock 했을 때 
 
-        private int[][] ReadDeviceBlock(string deviceName)
+        private int[][] ReadDeviceBlock(string deviceName, out string retMsg)
         {
             int[] values = new int[blockNum];
             int[][] information = new int[values.Length][];
 
-            values = ReadDeviceBlock(deviceName, values.Length);
+
+            retMsg = "";
+            values = ReadDeviceBlock(deviceName, values.Length,out retMsg);
 
             int i = 0;
             foreach (var value in values)
             {
                 string binary = Convert.ToString(value, 2);  //2진수 변환
-                print(binary);
+                retMsg = binary;
 
                 information[i] = ConvertStringToIntArray(binary);
 
@@ -301,25 +298,38 @@ public class TCPServer
             return devicePoints;
         }
 
-        public void WriteDeviceBlock(string deviceName, int[][] Point)
+        public string WriteDeviceBlock(string deviceName, string dataFromClient)
         {
+            string[] dataSplited = dataFromClient.Split(",");
 
-            int sensorAValue = (sensorA.isDetected == true) ? 1 : 0;
-            /*int sensorBValue = (sensorB.isDetected == true) ? 1 : 0;
-            int sensorCValue = (sensorC.isDetected == true) ? 1 : 0;*/
-
-            int sensorNum = /*sensorCValue * 4 + sensorBValue * 2*/  sensorAValue * 1;
-
+            
             int[] data = new int[blockNum];
             data[0] = devices[0];
             data[1] = devices[1];
-            data[5] = sensorNum;
+            data[2] = int.Parse(dataSplited[0]);
+            data[5] = int.Parse(dataSplited[1]);
 
-            mxComponent.WriteDeviceBlock(deviceName, blockNum, ref data[0]);
+            int ret = mxComponent.WriteDeviceBlock(deviceName, blockNum, ref data[0]);
+
+            if (ret == 0)
+            {
+                return $"{data[0]},{data[1]},{data[2]},{data[3]}";
+            }
+            else
+            {
+                return "ERROR " + Convert.ToString(ret, 16);
+            }
         }
 
     }
 
+
+    static void CurrentDomain_ProcessExit(object sender, EventArgs e)
+    {
+        mxComponent.Disconnect();
+
+        Console.WriteLine("exit");
+    }
 
 
 }
