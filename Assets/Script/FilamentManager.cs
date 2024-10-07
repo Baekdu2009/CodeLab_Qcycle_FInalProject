@@ -5,7 +5,7 @@ using TMPro;
 
 public class FilamentManager : MonoBehaviour
 {
-    [SerializeField] List<FilamentFactory> filamentFactories = new List<FilamentFactory>();
+    [SerializeField] List<EachFilamentFactory> filamentFactories = new List<EachFilamentFactory>();
     [SerializeField] List<Transform> directPositions = new List<Transform>();
     [SerializeField] TMP_Text factoryNum;
 
