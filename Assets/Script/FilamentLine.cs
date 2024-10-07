@@ -36,7 +36,7 @@ public class FilamentLine : MonoBehaviour
         }
     }
 
-    private void StartDrawing()
+    public void StartDrawing()
     {
         if (transformPos.Length > 0)
         {
@@ -117,6 +117,6 @@ public class FilamentLine : MonoBehaviour
 
             distance = Vector3.Distance(lastPoint, transformPos[transformPos.Length - 1].position);
         }
-        return distance < 0.1f;
+        return distance < 0.01f;
     }
 }

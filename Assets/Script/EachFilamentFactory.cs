@@ -15,6 +15,8 @@ public class EachFilamentFactory : MonoBehaviour
     public Transform filamentRotPosition;
     public GameObject filamentCoverPrefab;
     public GameObject filamentLinePrefab;
+    public GameObject filamentFullObject;
+    public Transform shiftToConveyor;
 
     [Header("상태표시UI")]
     public GameObject Canvas;
@@ -26,16 +28,21 @@ public class EachFilamentFactory : MonoBehaviour
     public Image extruder2Status;
     public Image rollingStatus;
     public Image spoolerStatus;
+    public GameObject filamentTakeOut;
     public Image[] tankStatus;
 
     // private
     private GameObject filamentObject;
+    private GameObject fullFilament;
     private GameObject filamentLineObj;
     private GameObject filamentCoverObj;
 
     float rotSpeed = 200f;
     Vector3 initialScale;
     float currentRotation = 0f;
+    float scaleFactor;
+
+    bool isfilamentOnRotate;
 
     // 저장탱크 변수
     public bool[] tankLevelbool;
@@ -106,7 +113,10 @@ public class EachFilamentFactory : MonoBehaviour
 
     private void TankLevelAction()
     {
-
+        if (tankLevelbool[0])
+        {
+            linemanagers[0].StartDrawing();
+        }
     }
 
     private void HandleFilament()
@@ -136,12 +146,16 @@ public class EachFilamentFactory : MonoBehaviour
             if (currentRotation >= 360f)
             {
                 currentRotation = 0;
-                filamentLineObj.transform.localScale += new Vector3(0.02f, 0.02f, 0);
+                scaleFactor = 0.05f;
+                filamentLineObj.transform.localScale += new Vector3(scaleFactor, scaleFactor, 0);
             }
 
             if (filamentLineObj.transform.localScale.x >= 1 || filamentLineObj.transform.localScale.y >= 1)
             {
                 rotSpeed = 0;
+                filamentTakeOut.SetActive(true);
+
+                isfilamentOnRotate = false;
             }
         }
     }
@@ -152,5 +166,21 @@ public class EachFilamentFactory : MonoBehaviour
         {
             HandleFilament();
         }
+    }
+
+    public void BtnFilamentShift()
+    {
+        if (filamentObject != null)
+        {
+            Destroy(filamentObject);
+            filamentFullObject = Instantiate(filamentFullObject, shiftToConveyor);
+            filamentFullObject.transform.SetParent(null);
+            filamentFullObject.transform.rotation = Quaternion.Euler(90, 0, 0);
+
+            filamentTakeOut.SetActive(false);
+            isfilamentOnRotate = true;
+        }
+        else
+            return;
     }
 }
