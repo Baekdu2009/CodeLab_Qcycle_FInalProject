@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Person
   - Filament
+  - Box
+  - BoxFoldGuid
   layers:
   - Default
   - TransparentFX
