@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class NewMonoBehaviourScript : MonoBehaviour
+public class MiniConveyor : MonoBehaviour
 {
     public float speed = 2.0f; // 이동 속도
     Rigidbody rb;
