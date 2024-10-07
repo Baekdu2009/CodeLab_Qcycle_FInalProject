@@ -1,0 +1,49 @@
+using UnityEngine;
+
+public class BoxSensor : MonoBehaviour
+{
+    [SerializeField] GameObject UpRight; // 회전할 오브젝트
+    [SerializeField] GameObject boxHander; // BoxHander 오브젝트
+    [SerializeField] GameObject UpLeft; // UpLeft 오브젝트
+    [SerializeField] GameObject UpFront; // UpFront 오브젝트
+    [SerializeField] GameObject UpBack; // UpBack 오브젝트
+
+    private bool hasRotated = false; // 회전 여부를 추적하는 변수
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (!hasRotated && other.CompareTag("Box"))
+        {
+            hasRotated = true; // 회전이 수행되었음을 표시
+
+            // boxHander를 x축으로 -90도 회전
+            boxHander.transform.Rotate(-90, 0, 0);
+
+            // UpRight를 y축으로 90도 회전
+            UpRight.transform.Rotate(0, 90, 0);
+            UpFront.transform.Rotate(0, -90, 0);
+            UpBack.transform.Rotate(0, 90, 0);
+
+            // UpLeft 회전 처리
+            RotateUpLeftIfColliding();
+
+            Debug.Log("회전 완료");
+        }
+    }
+
+    private void RotateUpLeftIfColliding()
+    {
+        // boxHander와 UpLeft의 충돌 감지
+        Collider[] colliders = Physics.OverlapBox(boxHander.transform.position, boxHander.transform.localScale / 2, boxHander.transform.rotation);
+        foreach (Collider collider in colliders)
+        {
+            if (collider.gameObject == UpLeft)
+            {
+                // UpLeft가 boxHander와 충돌했을 경우 x축으로 90도 회전
+                UpLeft.transform.Rotate(0, 90, 0);
+                Debug.Log("UpLeft 회전 완료");
+                break;
+            }
+        }
+    }
+}
