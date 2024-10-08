@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class BoxingRobot : RobotArmControl
 {
-    bool isBoxingHandOn;
 
     protected override void OnValidate()
     {
@@ -29,4 +28,11 @@ public class BoxingRobot : RobotArmControl
     {
         base.Start(); // 부모 클래스의 Start 호출
     }
+
+    private void Update()
+    {
+        
+    }
+
+    
 }

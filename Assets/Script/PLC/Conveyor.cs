@@ -5,9 +5,9 @@ public class Conveyor : MonoBehaviour
     private Transform[] items; // 슬라이더의 자식 개체들
     private Vector3[] initialPositions; // 초기 위치 배열
     private Quaternion[] initialRotations; // 초기 회전 배열
-    public float moveSpeed = 2f; // 이동 속도
-    public float rotationSpeed = 50f; // 회전 속도
-    public float moveDuration = 2f; // 이동에 걸리는 시간 (초)
+    public float moveSpeed = 500f; // 이동 속도
+    public float rotationSpeed = 300f; // 회전 속도
+    public float moveDuration = 0.5f; // 이동에 걸리는 시간 (초)
     private float timer = 0f; // 타이머
     public bool isRunning;
     private bool isMoving;

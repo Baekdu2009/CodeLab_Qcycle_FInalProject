@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class RobotArmControl : MonoBehaviour
 {
@@ -20,12 +21,19 @@ public class RobotArmControl : MonoBehaviour
     [SerializeField] protected TMP_InputField delayInputField;
     [SerializeField] protected TMP_Text currentMotorText;
     [SerializeField] protected TMP_InputField fileNameInputField;
+    [SerializeField] protected Toggle actionToggle;
 
     protected int currentMotorIndex = 0;
     protected List<Step> steps = new List<Step>();
+    protected int currentStepIndex = 0; // 현재 스텝 인덱스 추가
+    public List<Step> GetSteps()
+    {
+        return steps;
+    }
     protected bool isRunning = false;
     protected bool isIncreasing;
     protected bool isDecreasing;
+    
 
     public enum RotationAxis
     {
@@ -40,12 +48,14 @@ public class RobotArmControl : MonoBehaviour
         public int[] angles;
         public float speed;
         public float delay;
+        public bool actionBool;
 
-        public Step(int[] angles, float speed, float delay)
+        public Step(int[] angles, float speed, float delay, bool actionBool)
         {
             this.angles = angles;
             this.speed = speed;
             this.delay = delay;
+            this.actionBool = actionBool;
         }
     }
     protected const float totalDuration = 1f;
@@ -129,6 +139,7 @@ public class RobotArmControl : MonoBehaviour
     {
         float speed = float.Parse(speedInputField.text);
         float delay = float.Parse(delayInputField.text);
+        bool boolstate = actionToggle.isOn;
         int[] angles = new int[motors.Length];
 
         // 나머지 각도 저장
@@ -138,62 +149,11 @@ public class RobotArmControl : MonoBehaviour
             angles[i] = GetCurrentMotorAngle();
         }
 
-        Step step = new Step(angles, speed, delay);
+        Step step = new Step(angles, speed, delay, boolstate);
         steps.Add(step);
         Debug.Log("Step saved: " + string.Join(", ", angles));
     }
 
-    public void OnLoadStepsFromCSV()
-    {
-        string fileName = fileNameInputField.text;
-        string filePath = GetSceneFolderPath(fileName + ".csv");
-
-        if (!File.Exists(filePath))
-        {
-            Debug.LogError("File not found: " + filePath);
-            return;
-        }
-
-        steps.Clear();
-        using (StreamReader reader = new StreamReader(filePath))
-        {
-            string headerLine = reader.ReadLine(); // 헤더 줄 읽기
-
-            while (!reader.EndOfStream)
-            {
-                string line = reader.ReadLine();
-                string[] values = line.Split(',');
-
-                // 각도 배열의 길이를 motors.Length로 설정
-                if (values.Length == motors.Length + 2)
-                {
-                    try
-                    {
-                        int[] angles = new int[motors.Length];
-                        for (int i = 0; i < motors.Length; i++)
-                        {
-                            angles[i] = int.Parse(values[i + 2]); // 각도는 3열부터 시작
-                        }
-                        float speed = float.Parse(values[0]); // 속도는 1열
-                        float delay = float.Parse(values[1]); // 지연 시간은 2열
-
-                        steps.Add(new Step(angles, speed, delay));
-                    }
-                    catch (FormatException e)
-                    {
-                        Debug.LogError($"Failed to parse line: {line}. Error: {e.Message}");
-                    }
-                }
-                else
-                {
-                    Debug.LogWarning($"Line skipped due to incorrect format: {line}");
-                }
-            }
-        }
-
-        Debug.Log("Loaded steps from CSV: " + steps.Count + " steps.");
-    }
-    
     public void OnSaveStepsToCSV()
     {
         string fileName = fileNameInputField.text;
@@ -202,12 +162,13 @@ public class RobotArmControl : MonoBehaviour
         using (StreamWriter writer = new StreamWriter(filePath))
         {
             // CSV 헤더 작성
-            string[] header = new string[motors.Length + 2];
-            header[0] = "speed"; // 1열
-            header[1] = "delay"; // 2열
+            string[] header = new string[motors.Length + 3];
+            header[0] = "speed";    // 1열
+            header[1] = "delay";    // 2열
+            header[2] = "action";   // 3열
             for (int i = 0; i < motors.Length; i++)
             {
-                header[i + 2] = "angle" + (i + 1); // 각도는 3열부터 시작
+                header[i + 3] = "angle" + (i + 1); // 각도는 3열부터 시작
             }
 
             writer.WriteLine(string.Join(",", header));
@@ -236,12 +197,63 @@ public class RobotArmControl : MonoBehaviour
             // 모든 스텝 데이터를 CSV에 작성
             foreach (var step in steps)
             {
-                string stepData = $"{step.speed},{step.delay},{string.Join(",", step.angles)}"; // 순서 유지
+                string stepData = $"{step.speed},{step.delay},{step.actionBool},{string.Join(",", step.angles)}"; // 순서 유지
                 writer.WriteLine(stepData);
             }
         }
 
         Debug.Log("Saved steps to CSV: " + steps.Count + " steps.");
+    }
+
+    public virtual void OnLoadStepsFromCSV()
+    {
+        string fileName = fileNameInputField.text;
+        string filePath = GetSceneFolderPath(fileName + ".csv");
+
+        if (!File.Exists(filePath))
+        {
+            Debug.LogError("File not found: " + filePath);
+            return;
+        }
+
+        steps.Clear();
+        using (StreamReader reader = new StreamReader(filePath))
+        {
+            string headerLine = reader.ReadLine(); // 헤더 줄 읽기
+
+            while (!reader.EndOfStream)
+            {
+                string line = reader.ReadLine();
+                string[] values = line.Split(',');
+
+                // 각도 배열의 길이를 motors.Length로 설정
+                if (values.Length == motors.Length + 3) // +3 (속도, 지연, action)
+                {
+                    try
+                    {
+                        int[] angles = new int[motors.Length];
+                        for (int i = 0; i < motors.Length; i++)
+                        {
+                            angles[i] = int.Parse(values[i + 3]); // 각도는 4열부터 시작
+                        }
+                        float speed = float.Parse(values[0]);   // 속도는 1열
+                        float delay = float.Parse(values[1]);   // 지연 시간은 2열
+                        bool state = bool.Parse(values[2]);     // 액션은 3열
+
+                        steps.Add(new Step(angles, speed, delay, state));
+                    }
+                    catch (FormatException e)
+                    {
+                        Debug.LogError($"Failed to parse line: {line}. Error: {e.Message}");
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning($"Line skipped due to incorrect format: {line}");
+                }
+            }
+        }
+        Debug.Log("Loaded steps from CSV: " + steps.Count + " steps.");
     }
 
     private string GetSceneFolderPath(string fileName)
@@ -279,12 +291,19 @@ public class RobotArmControl : MonoBehaviour
             for (int i = 0; i < steps.Count; i++)
             {
                 Step prevStep = (i == 0)
-                    ? new Step(new int[motors.Length], 0, 0)
+                    ? new Step(new int[motors.Length], 0, 0, false)
                     : steps[i - 1];
 
                 yield return RunStep(prevStep, steps[i]);
+
+                currentStepIndex = i;
             }
         }
+    }
+
+    public int GetCurrentStepIndex()
+    {
+        return currentStepIndex;
     }
 
     private IEnumerator RunStep(Step prevStep, Step nowStep)
@@ -342,7 +361,7 @@ public class RobotArmControl : MonoBehaviour
 
             yield return null; // 다음 프레임까지 대기
         }
-
+        
         // 각 스텝 사이의 지연 추가
         yield return new WaitForSeconds(nowStep.delay);
     }
