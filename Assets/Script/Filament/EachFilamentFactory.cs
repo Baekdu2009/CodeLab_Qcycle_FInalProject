@@ -45,6 +45,9 @@ public class EachFilamentFactory : MonoBehaviour
 
     bool isfilamentOnRotate;
 
+    Conveyor conveyor;
+    WireCutting WireCutting;
+
     // 저장탱크 변수
     // public bool[] tankLevelbool;
 
@@ -71,14 +74,15 @@ public class EachFilamentFactory : MonoBehaviour
     void Start()
     {
         filamentObject = null;
-        
-        // ArrayLengthSet(ref tankLevelbool, tanks);
+        conveyor = FindAnyObjectByType<Conveyor>();
+        WireCutting = FindAnyObjectByType<WireCutting>();
     }
 
     void Update()
     {
+        UpdateStatus();
         UpdateStatusUI();
-        TankLevelAction();
+        TankLevelCheck();
         NextAction();
     }
 
@@ -99,6 +103,25 @@ public class EachFilamentFactory : MonoBehaviour
         }
     }
 
+    private void UpdateStatus()
+    {
+        // 컨베이어벨트
+        conveyorWorkWell = !conveyor.conveyorIsProblem;
+        conveyorStop = !conveyor.conveyorRunning;
+
+        // 파쇄기
+        shredderWorkWell = !conveyor.shredderIsProblem;
+        shredderStop = !conveyor.shredderRunning;
+
+        // 압출기1
+        extruder1WorkWell = !linemanagers[0].isOn;
+        extruder1Stop = !linemanagers[0].isProblem;
+
+        // 커팅기
+        wirecuttingWorkWell = !WireCutting.isProblem;
+        wirecuttingStop = !WireCutting.isWorking;
+    }
+
     private void StatusNoticeUI(Image image, bool work, bool stop)
     {
         image.color = work ? (stop ? Color.yellow : Color.green) : Color.red;
@@ -113,7 +136,7 @@ public class EachFilamentFactory : MonoBehaviour
         variableArray = new T[baseArray.Length];
     }
 
-    private void TankLevelAction()
+    private void TankLevelCheck()
     {
         for (int i = 0; i < levelSensors.Length; i++)
         {

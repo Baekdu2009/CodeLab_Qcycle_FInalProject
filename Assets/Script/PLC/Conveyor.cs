@@ -9,8 +9,11 @@ public class Conveyor : MonoBehaviour
     public float rotationSpeed = 300f; // 회전 속도
     public float moveDuration = 0.5f; // 이동에 걸리는 시간 (초)
     private float timer = 0f; // 타이머
-    public bool isRunning;
-    private bool isMoving;
+    public bool conveyorRunning;
+    public bool shredderRunning;
+    public bool conveyorIsProblem = false;
+    public bool shredderIsProblem = false;
+
     void Start()
     {
         // 슬라이더의 자식 개체들을 가져옵니다.
@@ -30,17 +33,17 @@ public class Conveyor : MonoBehaviour
 
     public void OnConveyorBtnClkEvent()
     {
-        isRunning = true; // 버튼 클릭 시 슬라이더 시작
+        conveyorRunning = !conveyorRunning;
     }
 
     public void OnShredder()
     {
-        isMoving = !isMoving;
+        shredderRunning = !shredderRunning;
     }
 
     void Update()
     {
-        if (isRunning)
+        if (conveyorRunning)
         {
             MoveItems();
         }

@@ -146,8 +146,8 @@ public class TCPClient : MonoBehaviour
 
             //모터릴레이
             int runShrreder = pointY[2][0];
-           /* int runExtruder1 = pointY[2][1];
-            int runWasher1 = pointY[2][2];
+            int runExtruder1 = pointY[2][1];
+            /*int runWasher1 = pointY[2][2];
             int runCuttingMachine = pointY[2][3];
             int runHooper = pointY[2][4];
             int runExtruder2 = pointY[2][5];
@@ -162,13 +162,20 @@ public class TCPClient : MonoBehaviour
 
             if (runConveyor == 1)
             {
-                conveyorA.OnConveyorBtnClkEvent();
-                // filamentFactory.StatusCheck(conveyorStatus, runConveyor, 0);
+                conveyorA.conveyorRunning = true;
+            }
+            else if (runConveyor != 1)
+            {
+                conveyorA.conveyorRunning = false;
             }
 
             if(runShrreder == 1)
             {
-                conveyorA.OnShredder();
+                conveyorA.shredderRunning = true;
+            }
+            else if (runShrreder != 1)
+            {
+                conveyorA.shredderRunning = false;
             }
         }
 

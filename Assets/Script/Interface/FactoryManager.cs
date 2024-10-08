@@ -2,60 +2,50 @@ using UnityEngine;
 
 public class FactoryManager : MonoBehaviour
 {
-    [SerializeField] GameObject SelectionPanel;
-    [SerializeField] GameObject FilamentFactory;
-    [SerializeField] GameObject PrinterFactory;
-
-    private bool selectionIsOn;
-    private bool filamentFactIsOn;
-    private bool printerFactIsOn;
+    [SerializeField] GameObject[] panels; // 모든 패널을 배열로 관리
+    private int currentPanelIndex;
 
     void Start()
     {
-        selectionIsOn = true;
-        filamentFactIsOn = false;
-        printerFactIsOn = false;
-
-        // 초기 UI 업데이트
-        UpdateUI();
+        currentPanelIndex = 0; // 처음 패널 인덱스
+        UpdateUI(); // 초기 UI 업데이트
     }
 
     private void UpdateUI()
     {
-        SelectionPanel.SetActive(selectionIsOn);
-        FilamentFactory.SetActive(filamentFactIsOn);
-        PrinterFactory.SetActive(printerFactIsOn);
+        for (int i = 0; i < panels.Length; i++)
+        {
+            panels[i].SetActive(i == currentPanelIndex); // 현재 패널만 활성화
+        }
     }
 
     public void BtnStartingPanel()
     {
-        selectionIsOn = true;
-        filamentFactIsOn = false;
-        printerFactIsOn = false;
+        currentPanelIndex = 0; // 선택 패널
         UpdateUI(); // UI 업데이트
     }
 
     public void BtnFilamentFactory()
     {
-        selectionIsOn = false;
-        filamentFactIsOn = true;
-        printerFactIsOn = false;
+        currentPanelIndex = 1; // 필라멘트 공장
         UpdateUI(); // UI 업데이트
     }
 
     public void BtnPrinterFactory()
     {
-        selectionIsOn = false;
-        filamentFactIsOn = false;
-        printerFactIsOn = true;
+        currentPanelIndex = 2; // 프린터 공장
+        UpdateUI(); // UI 업데이트
+    }
+
+    public void BtnBoxingMachine()
+    {
+        currentPanelIndex = 3; // 박스 기계
         UpdateUI(); // UI 업데이트
     }
 
     public void BtnAGVControl()
     {
-        selectionIsOn = false;
-        filamentFactIsOn = false;
-        printerFactIsOn = false;
+        currentPanelIndex = 4; // AGV 관리
         UpdateUI(); // UI 업데이트
     }
 }

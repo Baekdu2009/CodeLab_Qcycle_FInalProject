@@ -12,6 +12,7 @@ public class FilamentLine : MonoBehaviour
     public float lineWidth = 0.02f;
     public float drawDuration = 2f; // 각 선을 그리는 데 걸리는 시간
     public bool isOn;
+    public bool isProblem = false;
 
     private Coroutine drawCoroutine;
 
