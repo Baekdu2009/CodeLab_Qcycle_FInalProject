@@ -10,7 +10,7 @@ public class Conveyor : MonoBehaviour
     public float moveDuration = 2f; // 이동에 걸리는 시간 (초)
     private float timer = 0f; // 타이머
     public bool isRunning;
-
+    private bool isMoving;
     void Start()
     {
         // 슬라이더의 자식 개체들을 가져옵니다.
@@ -30,7 +30,12 @@ public class Conveyor : MonoBehaviour
 
     public void OnConveyorBtnClkEvent()
     {
-        isRunning = !isRunning; // 버튼 클릭 시 슬라이더 시작
+        isRunning = true; // 버튼 클릭 시 슬라이더 시작
+    }
+
+    public void OnShredder()
+    {
+        isMoving = !isMoving;
     }
 
     void Update()

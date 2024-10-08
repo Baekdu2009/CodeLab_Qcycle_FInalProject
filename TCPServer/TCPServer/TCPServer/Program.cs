@@ -32,9 +32,9 @@ public class TCPServer
         TcpClient client;
         NetworkStream stream;
         byte[] buffer = new byte[1024];
-        
-       
-        while(true) 
+
+
+        while (true)
         {
             //1.TcpClient의 요청 받아들이기
             client = listener.AcceptTcpClient();
@@ -51,14 +51,14 @@ public class TCPServer
                 //1. 데이터 수신  //수신받을 때는
                 //stream에 Byte[]형식으로 된것을 UTF8, string 형식으로 바꿔야
                 //사람이 읽을 수 있으니
-                while ((nByte = stream.Read(buffer,0,buffer.Length))>0)
+                while ((nByte = stream.Read(buffer, 0, buffer.Length)) > 0)
                 {
                     //데이터 인코딩 (Byte[] -> UTF8)
                     msg = Encoding.UTF8.GetString(buffer);
                     string retMsg = "";
                     WriteLog(msg);
 
-                    if(msg.Contains("Connect"))
+                    if (msg.Contains("Connect"))
                     {
                         retMsg = mxComponent.Connect();
                         WriteLog(retMsg);
@@ -75,7 +75,7 @@ public class TCPServer
                     //그러니까 내가 retMsg를 보내니까
                     //retMsg에는 Server에서 PLC로 보낼 신호가 들어있어야겠지?
 
-                 
+
                     else if (msg.Contains("GET") && msg.Contains("SET"))
                     {
                         //msg : GET,Y0,4,SET,Y0,0,170
@@ -117,7 +117,7 @@ public class TCPServer
                     buffer = new byte[1024];
                 }
 
-                if(msg.Contains("quit"))
+                if (msg.Contains("quit"))
                 {
                     mxComponent.Disconnect();
                     break;
@@ -132,8 +132,8 @@ public class TCPServer
                 break;
             }
         }
-        
-        stream.Close(); 
+
+        stream.Close();
         client.Close();
 
     }
@@ -144,10 +144,10 @@ public class TCPServer
     }
 
 
-    public class MxCom 
+    public class MxCom
     {
-        
-        
+
+
         public enum Status
         {
             CONNECTED,
@@ -155,7 +155,7 @@ public class TCPServer
         };
 
         ActUtlType64 mxComponent;
-      
+
         Status status = Status.DISCONNECTED;
         float scanTime = 1;
         int blockNum = 8;
@@ -176,7 +176,7 @@ public class TCPServer
 
         }
 
-       
+
 
 
 
@@ -186,7 +186,7 @@ public class TCPServer
         {
             if (status == Status.CONNECTED)
             {
-               
+
                 return "이미 연결되었습니다.";
             }
 
@@ -223,7 +223,7 @@ public class TCPServer
             }
         }
 
-      
+
         public int[] ReadDeviceBlock(string deviceName, int blockNum, out string retMsg)
         {
             retMsg = "";
@@ -258,7 +258,7 @@ public class TCPServer
 
 
             retMsg = "";
-            values = ReadDeviceBlock(deviceName, values.Length,out retMsg);
+            values = ReadDeviceBlock(deviceName, values.Length, out retMsg);
 
             int i = 0;
             foreach (var value in values)
@@ -302,18 +302,37 @@ public class TCPServer
         {
             string[] dataSplited = dataFromClient.Split(",");
 
-            
+            if (dataSplited.Length < 2)
+            {
+                return "데이터가 부족합니다.";
+            }
+
             int[] data = new int[blockNum];
+            for (int i = 0; i < blockNum; i++)
+            {
+                data[i] = 0; // 기본값으로 초기화
+            }
+
             data[0] = devices[0];
             data[1] = devices[1];
-            data[2] = int.Parse(dataSplited[0]);
-            data[5] = int.Parse(dataSplited[1]);
+            data[2] = devices[2];
+            data[3] = devices[3];
+            data[4] = devices[4];
+
+
+            // 파싱할 인덱스 유효성 검사
+
+
+            if (dataSplited.Length > 1)
+                data[5] = int.Parse(dataSplited[0]);
+            if (dataSplited.Length > 1)
+                data[6] = int.Parse(dataSplited[1]);
 
             int ret = mxComponent.WriteDeviceBlock(deviceName, blockNum, ref data[0]);
 
             if (ret == 0)
             {
-                return $"{data[0]},{data[1]},{data[2]},{data[3]}";
+                return string.Join(",", data); // 모든 데이터를 반환
             }
             else
             {
@@ -330,7 +349,6 @@ public class TCPServer
 
         Console.WriteLine("exit");
     }
-
 
 }
 

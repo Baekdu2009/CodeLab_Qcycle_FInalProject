@@ -14,12 +14,15 @@ public class TCPClient : MonoBehaviour
 
     [Header("연결과 데이터 전송에 대한 부분입니다.")]
     [SerializeField] bool isConnected = false;
-    [SerializeField] string dataToServer;
-    [SerializeField] string dataFromServer;
-    [SerializeField] int[][] pointX;
+    [SerializeField] string dataToServerY;
+    [SerializeField] string dataFromServerY;
     [SerializeField] int[][] pointY;
+    [SerializeField] string dataToServerX;
+    [SerializeField] string dataFromServerX;
+    [SerializeField] int[][] pointX;
     [SerializeField] float scanTime = 0.1f;
-    [SerializeField] string startPoint = "Y0";
+    [SerializeField] string startPoint1 = "Y0";
+    [SerializeField] string startPoint2 = "X0";
     [SerializeField] int blockNum = 8;
     TcpClient client;
     NetworkStream stream;
@@ -27,6 +30,7 @@ public class TCPClient : MonoBehaviour
     [Header("설비들을 연결합니다.")]
 
     [SerializeField] Conveyor conveyorA;
+    [SerializeField] Conveyor shredder;
     [SerializeField] LevelSensor sensorA;
 
 
@@ -49,22 +53,34 @@ public class TCPClient : MonoBehaviour
     private int[][] ReadDeviceBlock(string dataFromServer)
     {
         print("1. ReadDeviceBlock dataFromServer: " + dataFromServer);
-        // " 0,0,0,170 " 뭐 이런식
-        string[] strSplited = dataFromServer.Split(',');
-        print("2. ReadDeviceBlock newData: " + strSplited);
 
-        int[] values = Array.ConvertAll(strSplited, int.Parse);
+        // 문자열을 분리
+        string[] strSplited = dataFromServer.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+        print("2. ReadDeviceBlock newData: " + string.Join(",", strSplited));
+
+        // 배열의 크기를 strSplited의 길이에 맞추기
+        int[] values = new int[strSplited.Length];
+
+        for (int i = 0; i < strSplited.Length; i++)
+        {
+            if (int.TryParse(strSplited[i], out values[i]))
+            {
+                // 변환 성공
+            }
+            else
+            {
+                Debug.LogError($"변환 실패: '{strSplited[i]}'는 정수로 변환할 수 없습니다.");
+                values[i] = 0; // 기본값 설정
+            }
+        }
+
+        // 2차원 배열로 변환
         int[][] information = new int[values.Length][];
 
-
-        int i = 0;
-        foreach(var value in values)
+        for (int i = 0; i < values.Length; i++)
         {
-            string binary = Convert.ToString(value, 2); // 2진수변환 10000
-
+            string binary = Convert.ToString(values[i], 2).PadLeft(16, '0'); // 16자리로 패딩
             information[i] = ConvertStringToIntArray(binary);
-
-            i++;
         }
 
         return information;
@@ -97,8 +113,8 @@ public class TCPClient : MonoBehaviour
         int sensorAValue = (sensorA.isDetected == true) ? 1 : 0;
 
         int sensorNum = /*sensorCValue * 4 + sensorBValue * 2*/  sensorAValue * 1;
-        int lsNum = 0;
-        
+        int lsNum = sensorAValue * 1;
+
         string sensorData = sensorNum.ToString() +"," + lsNum.ToString();
 
         return sensorData;
@@ -112,34 +128,37 @@ public class TCPClient : MonoBehaviour
         {
 
             string sensorData = WriteDeivceBlock();
-            dataToServer = $"GET,{startPoint},{blockNum},SET,{startPoint},{sensorData}";
+            dataToServerY = $"GET,{startPoint1},{blockNum},SET,{startPoint1},{sensorData}";
+            dataToServerX = $"GET,{startPoint2},{blockNum},SET,{startPoint2},{sensorData}";
 
-            pointY = ReadDeviceBlock(dataFromServer);
-            pointX = ReadDeviceBlock(dataFromServer);
+
+            pointY = ReadDeviceBlock(dataFromServerY);
+            pointX = ReadDeviceBlock(dataFromServerX);
+            
 
             //컨베이어
             int runConveyor = pointY[0][1];
 
             //탱크 제어
-            int Tank1 = pointY[0][5];
-            int Tank2 = pointY[0][6];
+           /* int Tank1 = pointY[0][5];
+            int Tank2 = pointY[0][6];*/
 
 
             //모터릴레이
             int runShrreder = pointY[2][0];
-            int runExtruder1 = pointY[2][1];
+           /* int runExtruder1 = pointY[2][1];
             int runWasher1 = pointY[2][2];
             int runCuttingMachine = pointY[2][3];
             int runHooper = pointY[2][4];
             int runExtruder2 = pointY[2][5];
             int runWasher2 = pointY[2][6];
-            int runPullyMachine = pointY[2][7];
+            int runPullyMachine = pointY[2][7];*/
 
             //센서
 
             int Level1 = pointX[5][0];
-            int Level2 = pointX[5][1];
-            int LimitSwitch = pointX[5][2];
+           // int Level2 = pointX[5][1];
+           //int LimitSwitch = pointX[5][2];
 
             if (runConveyor == 1)
             {
@@ -147,10 +166,16 @@ public class TCPClient : MonoBehaviour
                 // filamentFactory.StatusCheck(conveyorStatus, runConveyor, 0);
             }
 
+            if(runShrreder == 1)
+            {
+                conveyorA.OnShredder();
+            }
         }
+
         catch (Exception ex)
         {
             print(ex.ToString());
+
         }
 
 
@@ -188,20 +213,31 @@ public class TCPClient : MonoBehaviour
         {
             try
             {
-                // dataToServer의 형태 GET,Y0,4,SET,Y0,0,170;
-                byte[] buffer = Encoding.UTF8.GetBytes(dataToServer);
+                // Y 데이터 요청
+                await stream.WriteAsync(Encoding.UTF8.GetBytes(dataToServerY), 0, dataToServerY.Length);
+                // 데이터 수신
+                byte[] bufferY = new byte[1024];
+                int nBytesY = await stream.ReadAsync(bufferY, 0, bufferY.Length);
+                string msgY = Encoding.UTF8.GetString(bufferY, 0, nBytesY);
 
-                // NetworkStream에 데이터 쓰기
-                await stream.WriteAsync(buffer, 0, buffer.Length);
+                if (!string.IsNullOrEmpty(msgY))
+                {
+                    dataFromServerY = msgY; // Y 데이터
+                    pointY = ReadDeviceBlock(dataFromServerY);
+                }
 
-                // 데이터 수신(i.g GET,Y0,5)
-                byte[] buffer2 = new byte[1024];
-                int nBytes = await stream.ReadAsync(buffer2, 0, buffer2.Length);
+                // X 데이터 요청
+                await stream.WriteAsync(Encoding.UTF8.GetBytes(dataToServerX), 0, dataToServerX.Length);
+                // 데이터 수신
+                byte[] bufferX = new byte[1024];
+                int nBytesX = await stream.ReadAsync(bufferX, 0, bufferX.Length);
+                string msgX = Encoding.UTF8.GetString(bufferX, 0, nBytesX);
 
-                // dataFromServer = "0,0,0,170"
-                dataFromServer = Encoding.UTF8.GetString(buffer2, 0, nBytes);
-
-                print("RequestAsync: " + dataFromServer);
+                if (!string.IsNullOrEmpty(msgX))
+                {
+                    dataFromServerX = msgX; // X 데이터
+                    pointX = ReadDeviceBlock(dataFromServerX);
+                }
 
                 if (!isConnected) break;
             }
@@ -240,7 +276,7 @@ public class TCPClient : MonoBehaviour
         {
             // 2. 요청해서 받은 데이터를 Unity의 설비에 적용하는 역할
             ScanPLC();
-
+            
             yield return new WaitForSeconds(scanTime);
         }
     }
