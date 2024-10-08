@@ -11,11 +11,10 @@ public class WireCutting : MonoBehaviour
     public bool isWorking;
     public bool isProblem;
 
-    float rotSpeed = 200f;
+    float rotSpeed;
 
     private void Update()
     {
-        WorkingOn();
         CuttingRotate();
     }
 
@@ -35,8 +34,12 @@ public class WireCutting : MonoBehaviour
     {
         if (isWorking)
         {
-            float rotationAmount = -rotSpeed * Time.deltaTime;
-            wireCutting.transform.Rotate(Vector3.up, rotationAmount);
+            rotSpeed = 200f;
         }
+        else
+            rotSpeed = 0;
+        
+        float rotationAmount = -rotSpeed * Time.deltaTime;
+        wireCutting.transform.Rotate(Vector3.up, rotationAmount);
     }
 }

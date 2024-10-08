@@ -32,8 +32,10 @@ public class TCPClient : MonoBehaviour
     [SerializeField] Conveyor conveyorA;
     [SerializeField] Conveyor shredder;
     [SerializeField] LevelSensor sensorA;
+    [SerializeField] WireCutting wireCutting;
+    [SerializeField] FilamentLine[] linemanagers;
 
-
+    public bool cooling1;
     private void Start()
     {
         // 로컬호스트: 로컬 컴퓨터의 디폴트 IP
@@ -147,11 +149,11 @@ public class TCPClient : MonoBehaviour
             //모터릴레이
             int runShrreder = pointY[2][0];
             int runExtruder1 = pointY[2][1];
-            /*int runWasher1 = pointY[2][2];
+            int runCooler1 = pointY[2][2];
             int runCuttingMachine = pointY[2][3];
-            int runHooper = pointY[2][4];
+            /*int runHooper = pointY[2][4];
             int runExtruder2 = pointY[2][5];
-            int runWasher2 = pointY[2][6];
+            int runCooler2 = pointY[2][6];
             int runPullyMachine = pointY[2][7];*/
 
             //센서
@@ -168,7 +170,6 @@ public class TCPClient : MonoBehaviour
             {
                 conveyorA.conveyorRunning = false;
             }
-
             if(runShrreder == 1)
             {
                 conveyorA.shredderRunning = true;
@@ -176,6 +177,30 @@ public class TCPClient : MonoBehaviour
             else if (runShrreder != 1)
             {
                 conveyorA.shredderRunning = false;
+            }
+            if (runExtruder1 == 1)
+            {
+                linemanagers[0].isWorking = true;
+            }
+            else if (runExtruder1 != 1)
+            {
+                linemanagers[0].isWorking = false;
+            }
+            if (runCooler1 == 1)
+            {
+                cooling1 = true;
+            }
+            else if (runCooler1 != 1)
+            {
+                cooling1 = false;
+            }
+            if (runCuttingMachine == 1)
+            {
+                wireCutting.isWorking = true;
+            }
+            else if (runCuttingMachine != 1)
+            {
+                wireCutting.isWorking = false;
             }
         }
 
