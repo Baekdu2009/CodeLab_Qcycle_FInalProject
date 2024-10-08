@@ -2,14 +2,14 @@ using UnityEngine;
 
 public class BoxSensor : MonoBehaviour
 {
-    [SerializeField] GameObject UpRight; // 회전할 오브젝트
     [SerializeField] GameObject boxHander; // BoxHander 오브젝트
+    [SerializeField] GameObject UpRight; // UpRight 오브젝트
     [SerializeField] GameObject UpLeft; // UpLeft 오브젝트
     [SerializeField] GameObject UpFront; // UpFront 오브젝트
     [SerializeField] GameObject UpBack; // UpBack 오브젝트
 
     private bool hasRotated = false; // 회전 여부를 추적하는 변수
-
+    private Quaternion initialRotation; // 초기 회전 값 저장
     private void OnTriggerEnter(Collider other)
     {
         if (!hasRotated && other.CompareTag("Box"))
@@ -26,8 +26,6 @@ public class BoxSensor : MonoBehaviour
 
             // UpLeft 회전 처리
             RotateUpLeftIfColliding();
-
-            Debug.Log("회전 완료");
         }
     }
 
@@ -41,9 +39,17 @@ public class BoxSensor : MonoBehaviour
             {
                 // UpLeft가 boxHander와 충돌했을 경우 x축으로 90도 회전
                 UpLeft.transform.Rotate(0, 90, 0);
-                Debug.Log("UpLeft 회전 완료");
                 break;
             }
+        }
+    }
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Box"))
+        {
+            hasRotated = false;
+            // boxHander.transform.Rotate(45, 0, 0);
+            boxHander.transform.rotation = initialRotation; // boxHander 초기 값 불러오기
         }
     }
 }
