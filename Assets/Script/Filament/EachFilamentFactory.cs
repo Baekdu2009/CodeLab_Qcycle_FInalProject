@@ -109,8 +109,8 @@ public class EachFilamentFactory : MonoBehaviour
         conveyorStop = !conveyor.conveyorRunning;
 
         // 파쇄기
-        shredderWorkWell = !shredder.shredderIsProblem;
-        shredderStop = !shredder.shredderRunning;
+        shredderWorkWell = !shredder.isProblem;
+        shredderStop = !shredder.isRunning;
 
         // 압출기1
         extruder1WorkWell = !linemanagers[0].isProblem;

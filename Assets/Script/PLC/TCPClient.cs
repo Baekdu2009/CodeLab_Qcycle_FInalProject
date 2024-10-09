@@ -40,12 +40,11 @@ public class TCPClient : MonoBehaviour
     [SerializeField] WireCutting wireCutting;
     [SerializeField] ScrewBelt screwBelt;
 
-    ServerConnect serverConnect;
     public bool cooling1;
     
     private void Awake()
     {
-        serverConnect = GetComponent<ServerConnect>();
+        ServerConnect serverConnect = GetComponent<ServerConnect>();
 
         if (serverConnect != null)
         {
@@ -188,11 +187,11 @@ public class TCPClient : MonoBehaviour
             }
             if(runShreder == 1)
             {
-                shredder.shredderRunning = true;
+                shredder.isRunning = true;
             }
             else if (runShreder != 1)
             {
-                shredder.shredderRunning = false;
+                shredder.isRunning = false;
             }
             if (runExtruder1 == 1)
             {
@@ -231,7 +230,6 @@ public class TCPClient : MonoBehaviour
         catch (Exception ex)
         {
             print(ex.ToString());
-
         }
     }
 
@@ -257,8 +255,6 @@ public class TCPClient : MonoBehaviour
         {
             print(e.ToString());
         }
-
-
     }
 
     private async Task RequestAsync()
