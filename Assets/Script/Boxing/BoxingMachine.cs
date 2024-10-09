@@ -6,7 +6,6 @@ using System.Collections.Generic;
 public class BoxingMachine : MonoBehaviour
 {
     public GameObject[] flatBox;
-    public GameObject Canvas;
     public Transform initialBoxPlate;
 
     int boxCnt;
@@ -18,13 +17,13 @@ public class BoxingMachine : MonoBehaviour
 
     private void Update()
     {
-        if (boxCnt < 20)
+        if (boxCnt < 10)
         {
-            FlatBoxCreate();
+            StartCoroutine(FlatBoxCreate());
         }
     }
 
-    private void FlatBoxCreate()
+    private IEnumerator FlatBoxCreate()
     {
         Instantiate(flatBox[0]);
         Instantiate(flatBox[1]);
@@ -32,5 +31,7 @@ public class BoxingMachine : MonoBehaviour
         flatBox[1].transform.position = initialBoxPlate.transform.position;
 
         boxCnt += 2;
+
+        yield return new WaitForSeconds(1f);
     }
 }

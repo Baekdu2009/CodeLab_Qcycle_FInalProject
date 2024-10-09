@@ -7,6 +7,7 @@ using TMPro;
 public class BoxingManager : ManagerClass
 {
     [SerializeField] List<BoxingMachine> BoxingMachines = new List<BoxingMachine>();
+    public GameObject Canvas;
 
     protected override void Start()
     {
@@ -16,6 +17,6 @@ public class BoxingManager : ManagerClass
 
     protected override GameObject GetCanvasProperty(object obj)
     {
-        return (obj as BoxingMachine)?.Canvas;
+        return (obj as BoxingManager)?.Canvas;
     }
 }

@@ -5,8 +5,7 @@ TagManager:
   serializedVersion: 3
   tags:
   - Person
-  - Plastic
-  - Metal
+  - Box
   layers:
   - Default
   - TransparentFX
