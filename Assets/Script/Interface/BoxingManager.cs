@@ -4,21 +4,18 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 
-public class BoxingManager : MonoBehaviour
+public class BoxingManager : ManagerClass
 {
-    [SerializeField] List<GameObject> BoxingMachine = new List<GameObject>();
-    [SerializeField] List<BoxingRobot> BoxingRobotArm = new List<BoxingRobot>();
-    [SerializeField] List<Transform> directPositions = new List<Transform>();
-    [SerializeField] TMP_Text erectorNum;
+    [SerializeField] List<BoxingMachine> BoxingMachines = new List<BoxingMachine>();
 
-    int currentCanvasNum;
-    public GameObject directPointerPrefab;
-    GameObject directPointer;
-    float pointerRotSpeed = 100f;
-
-    void Start()
+    protected override void Start()
     {
-        
-        erectorNum.text = "0";
+        basicObject = new List<object>(BoxingMachines);
+        base.Start();
+    }
+
+    protected override GameObject GetCanvasProperty(object obj)
+    {
+        return (obj as BoxingMachine)?.Canvas;
     }
 }
