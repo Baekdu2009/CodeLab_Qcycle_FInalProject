@@ -5,6 +5,10 @@ using System.Collections.Generic;
 
 public class ScrewBelt : MonoBehaviour
 {
+    public Transform filletPosition;
+
+
+    [HideInInspector]
     public bool isWorking;
     float rotSpeed;
 

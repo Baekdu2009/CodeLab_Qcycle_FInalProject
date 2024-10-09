@@ -45,8 +45,9 @@ public class EachFilamentFactory : MonoBehaviour
 
     bool isfilamentOnRotate;
 
-    Conveyor conveyor;
-    WireCutting WireCutting;
+    [SerializeField] Conveyor conveyor;
+    [SerializeField] Shredder shredder;
+    [SerializeField] WireCutting WireCutting;
 
     // 저장탱크 변수
     // public bool[] tankLevelbool;
@@ -74,8 +75,6 @@ public class EachFilamentFactory : MonoBehaviour
     void Start()
     {
         filamentObject = null;
-        conveyor = FindAnyObjectByType<Conveyor>();
-        WireCutting = FindAnyObjectByType<WireCutting>();
     }
 
     void Update()
@@ -110,8 +109,8 @@ public class EachFilamentFactory : MonoBehaviour
         conveyorStop = !conveyor.conveyorRunning;
 
         // 파쇄기
-        shredderWorkWell = !conveyor.shredderIsProblem;
-        shredderStop = !conveyor.shredderRunning;
+        shredderWorkWell = !shredder.shredderIsProblem;
+        shredderStop = !shredder.shredderRunning;
 
         // 압출기1
         extruder1WorkWell = !linemanagers[0].isProblem;

@@ -9,10 +9,14 @@ using UnityEditor.Rendering;
 using static UnityEngine.InputSystem.Controls.AxisControl;
 using UnityEngine.InputSystem;
 using System.Linq;
+using System.IO;
+using UnityEngine.SceneManagement;
+using System.Diagnostics;
 public class TCPClient : MonoBehaviour
 {
 
     [Header("연결과 데이터 전송에 대한 부분입니다.")]
+    
     [SerializeField] bool isConnected = false;
     [SerializeField] string dataToServerY;
     [SerializeField] string dataFromServerY;
@@ -30,16 +34,32 @@ public class TCPClient : MonoBehaviour
     [Header("설비들을 연결합니다.")]
 
     [SerializeField] Conveyor conveyor;
-    [SerializeField] Conveyor shredder;
+    [SerializeField] Shredder shredder;
     [SerializeField] LevelSensor[] sensor;
     [SerializeField] FilamentLine[] linemanagers;
     [SerializeField] WireCutting wireCutting;
     [SerializeField] ScrewBelt screwBelt;
 
+    ServerConnect serverConnect;
     public bool cooling1;
+    
+    private void Awake()
+    {
+        serverConnect = GetComponent<ServerConnect>();
+
+        if (serverConnect != null)
+        {
+            serverConnect.RunTCPServer();
+        }
+        else
+        {
+            UnityEngine.Debug.LogError("ServerConnect 인스턴스를 찾을 수 없습니다.");
+        }
+    }
     private void Start()
     {
         // 로컬호스트: 로컬 컴퓨터의 디폴트 IP
+
         try
         {
             client = new TcpClient("127.0.0.1", 7000);
@@ -72,7 +92,7 @@ public class TCPClient : MonoBehaviour
             }
             else
             {
-                Debug.LogError($"변환 실패: '{strSplited[i]}'는 정수로 변환할 수 없습니다.");
+                UnityEngine.Debug.LogError($"변환 실패: '{strSplited[i]}'는 정수로 변환할 수 없습니다.");
                 values[i] = 0; // 기본값 설정
             }
         }
@@ -110,7 +130,6 @@ public class TCPClient : MonoBehaviour
         return devicePoints;
     }
 
-
     public string WriteDeivceBlock()
     {
         int sensorAValue = (sensor[0].isDetected == true) ? 1 : 0;
@@ -123,7 +142,6 @@ public class TCPClient : MonoBehaviour
 
         return sensorData;
     }
-
     
     private void ScanPLC()
     {
@@ -139,16 +157,12 @@ public class TCPClient : MonoBehaviour
             pointY = ReadDeviceBlock(dataFromServerY);
             pointX = ReadDeviceBlock(dataFromServerX);
             
-
-            //컨베이어
-            int runConveyor = pointY[0][1];
-
             //탱크 제어
            /* int Tank1 = pointY[0][5];
             int Tank2 = pointY[0][6];*/
 
-
-            //모터릴레이
+            //장비
+            int runConveyor = pointY[0][1];
             int runShreder = pointY[2][0];
             int runExtruder1 = pointY[2][1];
             int runCooler1 = pointY[2][2];
@@ -174,11 +188,11 @@ public class TCPClient : MonoBehaviour
             }
             if(runShreder == 1)
             {
-                conveyor.shredderRunning = true;
+                shredder.shredderRunning = true;
             }
             else if (runShreder != 1)
             {
-                conveyor.shredderRunning = false;
+                shredder.shredderRunning = false;
             }
             if (runExtruder1 == 1)
             {
@@ -219,8 +233,6 @@ public class TCPClient : MonoBehaviour
             print(ex.ToString());
 
         }
-
-
     }
 
     private void Request(string order)
@@ -298,10 +310,24 @@ public class TCPClient : MonoBehaviour
             print("연동해제 상태입니다. Connect 버튼을 클릭해 주세요.");
     }
 
-
-
     private void OnDestroy()
     {
+        // PLC 연결 종료
+        if (client != null)
+        {
+            stream.Close();
+            client.Close();
+            client = null;
+            UnityEngine.Debug.Log("PLC와의 연결이 종료되었습니다.");
+        }
+
+        // ServerConnect 인스턴스에서 TCP 서버 종료
+        ServerConnect serverConnect = FindAnyObjectByType<ServerConnect>();
+        if (serverConnect != null)
+        {
+            serverConnect.StopTCPServer();
+        }
+
         isConnected = false;
     }
 
@@ -351,8 +377,6 @@ public class TCPClient : MonoBehaviour
             print("연결 해지 상태입니다.");
         }
     }
+
+
 }
-
-   
-
-

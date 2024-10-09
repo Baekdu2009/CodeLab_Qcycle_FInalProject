@@ -7,7 +7,7 @@ TagManager:
   - Person
   - Box
   - Material
-  - Particle
+  - Plastic
   layers:
   - Default
   - TransparentFX
