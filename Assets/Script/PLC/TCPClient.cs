@@ -29,11 +29,12 @@ public class TCPClient : MonoBehaviour
 
     [Header("설비들을 연결합니다.")]
 
-    [SerializeField] Conveyor conveyorA;
+    [SerializeField] Conveyor conveyor;
     [SerializeField] Conveyor shredder;
-    [SerializeField] LevelSensor sensorA;
-    [SerializeField] WireCutting wireCutting;
+    [SerializeField] LevelSensor[] sensor;
     [SerializeField] FilamentLine[] linemanagers;
+    [SerializeField] WireCutting wireCutting;
+    [SerializeField] ScrewBelt screwBelt;
 
     public bool cooling1;
     private void Start()
@@ -112,9 +113,10 @@ public class TCPClient : MonoBehaviour
 
     public string WriteDeivceBlock()
     {
-        int sensorAValue = (sensorA.isDetected == true) ? 1 : 0;
+        int sensorAValue = (sensor[0].isDetected == true) ? 1 : 0;
+        // int sensorBValue = (sensor[1].isDetected == true) ? 1 : 0;
 
-        int sensorNum = /*sensorCValue * 4 + sensorBValue * 2*/  sensorAValue * 1;
+        int sensorNum = /*sensorCValue * 4 + sensorBValue * 2 + */sensorAValue * 1;
         int lsNum = sensorAValue * 1;
 
         string sensorData = sensorNum.ToString() +"," + lsNum.ToString();
@@ -147,12 +149,12 @@ public class TCPClient : MonoBehaviour
 
 
             //모터릴레이
-            int runShrreder = pointY[2][0];
+            int runShreder = pointY[2][0];
             int runExtruder1 = pointY[2][1];
             int runCooler1 = pointY[2][2];
             int runCuttingMachine = pointY[2][3];
-            /*int runHooper = pointY[2][4];
-            int runExtruder2 = pointY[2][5];
+            int runScrewBelt = pointY[2][4];
+            /*int runExtruder2 = pointY[2][5];
             int runCooler2 = pointY[2][6];
             int runPullyMachine = pointY[2][7];*/
 
@@ -164,19 +166,19 @@ public class TCPClient : MonoBehaviour
 
             if (runConveyor == 1)
             {
-                conveyorA.conveyorRunning = true;
+                conveyor.conveyorRunning = true;
             }
             else if (runConveyor != 1)
             {
-                conveyorA.conveyorRunning = false;
+                conveyor.conveyorRunning = false;
             }
-            if(runShrreder == 1)
+            if(runShreder == 1)
             {
-                conveyorA.shredderRunning = true;
+                conveyor.shredderRunning = true;
             }
-            else if (runShrreder != 1)
+            else if (runShreder != 1)
             {
-                conveyorA.shredderRunning = false;
+                conveyor.shredderRunning = false;
             }
             if (runExtruder1 == 1)
             {
@@ -201,6 +203,14 @@ public class TCPClient : MonoBehaviour
             else if (runCuttingMachine != 1)
             {
                 wireCutting.isWorking = false;
+            }
+            if (runScrewBelt == 1)
+            {
+                screwBelt.isWorking = true;
+            }
+            else if (runScrewBelt != 1)
+            {
+                screwBelt.isWorking = false;
             }
         }
 

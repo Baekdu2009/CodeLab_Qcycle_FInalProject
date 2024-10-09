@@ -10,7 +10,7 @@ public class CuttingPlastic : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
         print("¿€µø");
-        if (collision.gameObject.CompareTag("Metal"))
+        if (collision.gameObject.CompareTag("Material"))
         {
             StartCoroutine(shatterAfterDelay(collision.gameObject));
         }

@@ -23,7 +23,7 @@ public class LevelSensor : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         // 충돌한 오브젝트가 Plastic 태그인지 확인
-        if (other.CompareTag("Plastic"))
+        if (other.CompareTag("Particle"))
         {
             // 중복 충돌 방지
             if (!collidedPlastics.Contains(other))
@@ -38,7 +38,7 @@ public class LevelSensor : MonoBehaviour
     private void OnTriggerExit(Collider other)
     {
         // 충돌이 끝나면 해당 Collider 제거
-        if (other.CompareTag("Plastic"))
+        if (other.CompareTag("Particle"))
         {
             collidedPlastics.Remove(other); // 중복 충돌 리스트에서 제거
             Debug.Log("Plastic과의 충돌 종료: " + other.gameObject.name);
@@ -50,7 +50,7 @@ public class LevelSensor : MonoBehaviour
         for (int i = 0; i < times; i++)
         {
             // 현재 모든 Plastic 오브젝트를 가져옴
-            GameObject[] allPlastics = GameObject.FindGameObjectsWithTag("Plastic");
+            GameObject[] allPlastics = GameObject.FindGameObjectsWithTag("Particle");
             int totalPlastics = allPlastics.Length;
             int countToRemove = Mathf.CeilToInt(totalPlastics * percentage);
 
@@ -63,7 +63,7 @@ public class LevelSensor : MonoBehaviour
                 {
                     Destroy(plasticToRemove);
                     Debug.Log("씬에서 플라스틱 제거됨: " + plasticToRemove.name);
-                    allPlastics = GameObject.FindGameObjectsWithTag("Plastic"); // 갱신된 Plastic 배열
+                    allPlastics = GameObject.FindGameObjectsWithTag("Particle");
                 }
             }
 
