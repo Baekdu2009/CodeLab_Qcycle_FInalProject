@@ -2,24 +2,30 @@ using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
+using TMPro;
 
 public class AGVCart : MonoBehaviour
 {
-    public GameObject objectPlate;
-    public bool plateIsFull;
-    int colliderCount;
+    public GameObject PlateCollider;
+    public Image FullCheck;
+    public TMP_Text BoxFullTxt;
+    public GameObject callAGVBtn;
+    bool plateIsFull;
+    public int boxFullNum;
+    public bool isAGVCallOn;
+    public int colliderCount = 0;
 
     private void Start()
     {
-        // objectPlate에서 Collider를 가져옵니다.
-        Collider plateCollider = objectPlate.GetComponent<Collider>();
-        // Collider가 Trigger로 설정되어 있는지 확인합니다.
+        Collider plateCollider = PlateCollider.GetComponent<Collider>();
         plateCollider.isTrigger = true;
+        callAGVBtn.SetActive(false);
     }
 
     private void Update()
     {
-        plateIsFull = PlateFull();
+        CallBtnOn();
     }
 
     public void IncrementColliderCount()
@@ -27,8 +33,24 @@ public class AGVCart : MonoBehaviour
         colliderCount++;
     }
 
-    public bool PlateFull()
+    private void CallBtnOn()
     {
-        return colliderCount > 19;
+        if (colliderCount > boxFullNum)
+        {
+            FullCheck.color = Color.red;
+            callAGVBtn.SetActive(true);
+            BoxFullTxt.text = "Box Full";
+        }
+        else
+        {
+            FullCheck.color = Color.green;
+            callAGVBtn.SetActive(false);
+            BoxFullTxt.text = "";
+        }
+    }
+
+    public void OnAGVCall()
+    {
+        isAGVCallOn = true;
     }
 }

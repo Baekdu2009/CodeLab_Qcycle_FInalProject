@@ -5,11 +5,12 @@ using TMPro;
 using UnityEngine.UI;
 using UnityEngine.Rendering;
 using UnityEditor.SceneManagement;
+using UnityEditor;
 
 public class AGVControl : MonoBehaviour
 {
     [Header("AGV 제어")]
-    public Transform[] movingPositions;     // 이동 위치 포지션
+    public List<Transform> movingPositions = new List<Transform>();
     public Transform chargingPosition;      // 충전 위치 포지션
     
     public float moveSpeed = 2f;            // 이동속도
@@ -24,7 +25,7 @@ public class AGVControl : MonoBehaviour
     public bool isNeedtoCharge;             // 충전 필요 여부
 
     private LineRendererMake lineMake = new LineRendererMake();
-    private int currentTargetIndex = 0;     // 현재 목표 포지션 인덱스
+    public int currentTargetIndex = 0;     // 현재 목표 포지션 인덱스
 
     private void Start()
     {
@@ -38,7 +39,7 @@ public class AGVControl : MonoBehaviour
     {
         if (!isStopping)
         {
-            if (currentTargetIndex < movingPositions.Length)
+            if (currentTargetIndex < movingPositions.Count)
             {
                 // 목표 위치로 이동
                 AGVMove(movingPositions[currentTargetIndex]);
@@ -48,6 +49,8 @@ public class AGVControl : MonoBehaviour
                 {
                     currentTargetIndex++; // 다음 목표로 이동
                 }
+
+                isStandby = false;
             }
             else
             {

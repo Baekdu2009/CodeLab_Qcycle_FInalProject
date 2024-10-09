@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class LineRendererMake : MonoBehaviour
@@ -46,6 +47,15 @@ public class LineRendererMake : MonoBehaviour
         for (int i = 0; i < locate.Length; i++)
         {
             lineRenderer.SetPosition(i, locate[i].position);
+        }
+    }
+
+    public void UpdateLine(List<Transform> positions)
+    {
+        lineRenderer.positionCount = positions.Count; // 포지션 수 설정
+        for (int i = 0; i < positions.Count; i++)
+        {
+            lineRenderer.SetPosition(i, positions[i].position); // 각 포지션 설정
         }
     }
 }
