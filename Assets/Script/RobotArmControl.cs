@@ -6,6 +6,7 @@ using System.IO;
 using System;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.Linq;
 
 public class RobotArmControl : MonoBehaviour
 {
@@ -25,7 +26,7 @@ public class RobotArmControl : MonoBehaviour
 
     protected int currentMotorIndex = 0;
     protected List<Step> steps = new List<Step>();
-    protected int currentStepIndex = 0; // 현재 스텝 인덱스 추가
+    protected int currentStepIndex = 0;
     public List<Step> GetSteps()
     {
         return steps;
@@ -45,12 +46,12 @@ public class RobotArmControl : MonoBehaviour
     [System.Serializable]
     public class Step
     {
-        public int[] angles;
+        public float[] angles;
         public float speed;
         public float delay;
         public bool actionBool;
 
-        public Step(int[] angles, float speed, float delay, bool actionBool)
+        public Step(float[] angles, float speed, float delay, bool actionBool)
         {
             this.angles = angles;
             this.speed = speed;
@@ -58,6 +59,7 @@ public class RobotArmControl : MonoBehaviour
             this.actionBool = actionBool;
         }
     }
+
     protected const float totalDuration = 1f;
 
     protected virtual void OnValidate()
@@ -108,23 +110,24 @@ public class RobotArmControl : MonoBehaviour
 
     protected void UpdateAngleInputField()
     {
-        angleInputField.text = GetCurrentMotorAngle().ToString();
+        angleInputField.text = GetCurrentMotorAngle().ToString("F0");
     }
 
-    protected int GetCurrentMotorAngle()
+    protected float GetCurrentMotorAngle()
     {
         switch (rotationAxes[currentMotorIndex])
         {
             case RotationAxis.X:
-                return Mathf.RoundToInt(motors[currentMotorIndex].localEulerAngles.x);
+                return motors[currentMotorIndex].localEulerAngles.x;
             case RotationAxis.Y:
-                return Mathf.RoundToInt(motors[currentMotorIndex].localEulerAngles.y);
+                return motors[currentMotorIndex].localEulerAngles.y;
             case RotationAxis.Z:
-                return Mathf.RoundToInt(motors[currentMotorIndex].localEulerAngles.z);
+                return motors[currentMotorIndex].localEulerAngles.z;
             default:
-                return 0;
+                return 0f;
         }
     }
+
 
     public void OnClearSteps()
     {
@@ -144,9 +147,8 @@ public class RobotArmControl : MonoBehaviour
         float speed = float.Parse(speedInputField.text);
         float delay = float.Parse(delayInputField.text);
         bool boolstate = actionToggle.isOn;
-        int[] angles = new int[motors.Length];
+        float[] angles = new float[motors.Length];
 
-        // 나머지 각도 저장
         for (int i = 0; i < motors.Length; i++)
         {
             currentMotorIndex = i;
@@ -158,6 +160,7 @@ public class RobotArmControl : MonoBehaviour
         Debug.Log("Step saved: " + string.Join(", ", angles));
     }
 
+
     public void OnSaveStepsToCSV()
     {
         string fileName = fileNameInputField.text;
@@ -165,49 +168,27 @@ public class RobotArmControl : MonoBehaviour
 
         using (StreamWriter writer = new StreamWriter(filePath))
         {
-            // CSV 헤더 작성
             string[] header = new string[motors.Length + 3];
-            header[0] = "speed";    // 1열
-            header[1] = "delay";    // 2열
-            header[2] = "action";   // 3열
+            header[0] = "speed";
+            header[1] = "delay";
+            header[2] = "action";
             for (int i = 0; i < motors.Length; i++)
             {
-                header[i + 3] = "angle" + (i + 1); // 각도는 3열부터 시작
+                header[i + 3] = "angle" + (i + 1);
             }
 
             writer.WriteLine(string.Join(",", header));
 
-            // 각 스텝 데이터를 CSV에 작성
-            if (steps.Count > 0)
-            {
-                // 첫 번째 스텝 각도를 0으로 설정
-                steps[0].angles = new int[motors.Length];
-                for (int i = 0; i < motors.Length; i++)
-                {
-                    steps[0].angles[i] = 0;
-                }
-            }
-
-            if (steps.Count > 1)
-            {
-                // 마지막 스텝 각도를 0으로 설정
-                steps[steps.Count - 1].angles = new int[motors.Length];
-                for (int i = 0; i < motors.Length; i++)
-                {
-                    steps[steps.Count - 1].angles[i] = 0;
-                }
-            }
-
-            // 모든 스텝 데이터를 CSV에 작성
             foreach (var step in steps)
             {
-                string stepData = $"{step.speed},{step.delay},{step.actionBool},{string.Join(",", step.angles)}"; // 순서 유지
+                string stepData = $"{step.speed},{step.delay},{step.actionBool},{string.Join(",", step.angles.Select(angle => angle.ToString("F0")))}";
                 writer.WriteLine(stepData);
             }
         }
 
         Debug.Log("Saved steps to CSV: " + steps.Count + " steps.");
     }
+
 
     public virtual void OnLoadStepsFromCSV()
     {
@@ -235,7 +216,7 @@ public class RobotArmControl : MonoBehaviour
                 {
                     try
                     {
-                        int[] angles = new int[motors.Length];
+                        float[] angles = new float[motors.Length];
                         for (int i = 0; i < motors.Length; i++)
                         {
                             angles[i] = int.Parse(values[i + 3]); // 각도는 4열부터 시작
@@ -295,7 +276,7 @@ public class RobotArmControl : MonoBehaviour
             for (int i = 0; i < steps.Count; i++)
             {
                 Step prevStep = (i == 0)
-                    ? new Step(new int[motors.Length], 0, 0, false)
+                    ? new Step(new float[motors.Length], 0, 0, false)
                     : steps[i - 1];
 
                 yield return RunStep(prevStep, steps[i]);
@@ -362,18 +343,16 @@ public class RobotArmControl : MonoBehaviour
             {
                 motors[i].localRotation = Quaternion.Slerp(prevRotations[i], targetRotations[i], t);
             }
-
-            yield return null; // 다음 프레임까지 대기
         }
         
         // 각 스텝 사이의 지연 추가
         yield return new WaitForSeconds(nowStep.delay);
     }
 
-    public Quaternion RotateAngle(Vector3 from, Vector3 to, float t)
-    {
-        return Quaternion.Slerp(Quaternion.Euler(from), Quaternion.Euler(to), t);
-    }
+    //public Quaternion RotateAngle(Vector3 from, Vector3 to, float t)
+    //{
+    //    return Quaternion.Slerp(Quaternion.Euler(from), Quaternion.Euler(to), t);
+    //}
 
     public void OnIncreaseAngleButtonDown()
     {
@@ -393,6 +372,7 @@ public class RobotArmControl : MonoBehaviour
 
         // 각도 제한: 설정된 최소 및 최대 각도 내에서 유지
         newAngle = Mathf.Clamp(newAngle, minAngles[currentMotorIndex], maxAngles[currentMotorIndex]);
+        Debug.Log($"Motor {currentMotorIndex}: minAngle = {minAngles[currentMotorIndex]},\nmaxAngle = {maxAngles[currentMotorIndex]}, currentAngle = {newAngle}");
 
         // 회전 축에 따라 회전 처리
         switch (rotationAxes[currentMotorIndex])
@@ -407,7 +387,6 @@ public class RobotArmControl : MonoBehaviour
                 motors[currentMotorIndex].localRotation = Quaternion.Euler(0, 0, newAngle);
                 break;
         }
-
         UpdateAngleInputField();
     }
 
