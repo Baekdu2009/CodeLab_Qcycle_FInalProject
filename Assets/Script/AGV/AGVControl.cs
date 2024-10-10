@@ -37,7 +37,7 @@ public class AGVControl : MonoBehaviour
 
     public void MoveAlongPath()
     {
-        if (!isStopping)
+        if (isMoving)
         {
             if (currentTargetIndex < movingPositions.Count)
             {
