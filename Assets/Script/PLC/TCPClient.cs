@@ -42,19 +42,19 @@ public class TCPClient : MonoBehaviour
 
     public bool cooling1;
     
-    private void Awake()
-    {
-        ServerConnect serverConnect = GetComponent<ServerConnect>();
+    //private void Awake()
+    //{
+    //    ServerConnect serverConnect = GetComponent<ServerConnect>();
 
-        if (serverConnect != null)
-        {
-            serverConnect.RunTCPServer();
-        }
-        else
-        {
-            UnityEngine.Debug.LogError("ServerConnect 인스턴스를 찾을 수 없습니다.");
-        }
-    }
+    //    if (serverConnect != null)
+    //    {
+    //        serverConnect.RunTCPServer();
+    //    }
+    //    else
+    //    {
+    //        UnityEngine.Debug.LogError("ServerConnect 인스턴스를 찾을 수 없습니다.");
+    //    }
+    //}
     private void Start()
     {
         // 로컬호스트: 로컬 컴퓨터의 디폴트 IP
