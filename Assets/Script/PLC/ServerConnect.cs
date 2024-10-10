@@ -25,6 +25,13 @@ public class ServerConnect : MonoBehaviour
         }
     }
 
+    private string GetSceneFolderPath(string fileName)
+    {
+        string scenePath = SceneManager.GetActiveScene().path;
+        string sceneFolder = Path.GetDirectoryName(scenePath);
+        return Path.Combine(sceneFolder, fileName);
+    }
+
     public void RunTCPServer()
     {
         string path = GetSceneFolderPath("TCPServer.lnk");
@@ -50,16 +57,9 @@ public class ServerConnect : MonoBehaviour
     {
         if (tcpServerProcess != null && !tcpServerProcess.HasExited)
         {
-            tcpServerProcess.Kill();
+            tcpServerProcess.Close();
             tcpServerProcess = null;
             UnityEngine.Debug.Log("TCPServer가 종료되었습니다.");
         }
-    }
-
-    private string GetSceneFolderPath(string fileName)
-    {
-        string scenePath = SceneManager.GetActiveScene().path;
-        string sceneFolder = Path.GetDirectoryName(scenePath);
-        return Path.Combine(sceneFolder, fileName);
     }
 }
