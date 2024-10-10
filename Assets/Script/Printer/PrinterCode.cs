@@ -454,7 +454,7 @@ public class PrinterCode : MonoBehaviour
         }
         else if (size == PrinterSize.Small)
         {
-            expectedTime = 600;
+            expectedTime = 13;
         }
 
         totalExpectedTime = expectedTime;
@@ -487,6 +487,7 @@ public class PrinterCode : MonoBehaviour
         printerExpectTime.text = "Expected Time \n 00:00:00";
         printingStatus.text = "Printing Complete"; // 완료 메시지 표시
         printingStatus.color = Color.red;
+        machineLight.material.color = Color.yellow;
 
         if (finishCoroutine == null)
         {
