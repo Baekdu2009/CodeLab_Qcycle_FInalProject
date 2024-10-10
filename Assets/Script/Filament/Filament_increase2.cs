@@ -7,10 +7,10 @@ public class Filament_increase2 : MonoBehaviour
     [SerializeField] GameObject Filamentdia; // 대각선 Filament 프리팹
     [SerializeField] GameObject Filament2; // Filament2 프리팹
     [SerializeField] GameObject Filament3; // Filament3 프리팹
-    [SerializeField] float initialScale = 0.01f; // 초기 Scale
-    [SerializeField] float maxScale = 1.4f; // 최대 Scale
-    [SerializeField] float scaleIncreaseSpeed = 70f; // 길이 증가 속도
-    [SerializeField] float zMoveSpeed = 70f; // X축 이동 속도
+        [SerializeField] float initialScale = 0.01f; // 초기 Scale
+        [SerializeField] float maxScale = 1.4f; // 최대 Scale
+        [SerializeField] float scaleIncreaseSpeed = 70f; // 길이 증가 속도
+        [SerializeField] float zMoveSpeed = 70f; // X축 이동 속도
 
     bool isScaling = true;  // Scale 증가 여부
     float delayTime = 2.0f;

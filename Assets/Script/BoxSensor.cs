@@ -1,15 +1,22 @@
+using System;
 using UnityEngine;
 
 public class BoxSensor : MonoBehaviour
 {
+    [Header("Boxing")]
+    [Tooltip("박스 한면을 접는 용도")]
     [SerializeField] GameObject boxHander; // BoxHander 오브젝트
     [SerializeField] GameObject UpRight; // UpRight 오브젝트
     [SerializeField] GameObject UpLeft; // UpLeft 오브젝트
     [SerializeField] GameObject UpFront; // UpFront 오브젝트
     [SerializeField] GameObject UpBack; // UpBack 오브젝트
+    [Space(10f)]
+    [SerializeField] GameObject BoxTape;
+
 
     private bool hasRotated = false; // 회전 여부를 추적하는 변수
     private Quaternion initialRotation; // 초기 회전 값 저장
+    private bool hasTaping = false; // 테이핑 여부를 추적하는 변수
     private void OnTriggerEnter(Collider other)
     {
         if (!hasRotated && other.CompareTag("Box"))
@@ -53,3 +60,4 @@ public class BoxSensor : MonoBehaviour
         }
     }
 }
+

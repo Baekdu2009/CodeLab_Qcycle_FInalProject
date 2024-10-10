@@ -8,6 +8,7 @@ TagManager:
   - Filament
   - Box
   - BoxFoldGuid
+  - Tape
   layers:
   - Default
   - TransparentFX
