@@ -99,17 +99,7 @@ public class AGVLarge : AGVControl
 
     private void FindPinObjects()
     {
-        var pinList = new List<GameObject>();
-        var allObjects = Object.FindObjectsByType<GameObject>(FindObjectsSortMode.None);
-
-        foreach (var obj in allObjects)
-        {
-            if (obj.name.Contains("PIN")) // 이름에 'PIN'이 포함된 경우
-            {
-                pinList.Add(obj); // 리스트에 추가
-            }
-        }
-
-        pinObject = pinList.ToArray(); // 리스트를 배열로 변환하여 저장
+        var pinObjects = FindObjectsByName("PIN");
+        pinObject = pinObjects.ToArray(); // 배열로 변환하여 저장
     }
 }

@@ -64,11 +64,22 @@ public class AGVControl : MonoBehaviour
     public void AGVMove(Transform targetPos)
     {
         Vector3 direction = (targetPos.position - transform.position).normalized;
-        Quaternion lookRotation = Quaternion.LookRotation(direction);
-        transform.position = Vector3.MoveTowards(transform.position, targetPos.position, moveSpeed * Time.deltaTime);
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, lookRotation, rotSpeed * Time.deltaTime);
-        isMoving = true;
+
+        // 방향 벡터가 유효한 경우에만 회전 및 이동 수행
+        if (direction != Vector3.zero)
+        {
+            Quaternion lookRotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, lookRotation, rotSpeed * Time.deltaTime);
+            transform.position = Vector3.MoveTowards(transform.position, targetPos.position, moveSpeed * Time.deltaTime);
+            isMoving = true;
+        }
+        else
+        {
+            // 목표 위치에 도달한 것으로 간주
+            isMoving = false;
+        }
     }
+
 
     public void AGVMove()
     {

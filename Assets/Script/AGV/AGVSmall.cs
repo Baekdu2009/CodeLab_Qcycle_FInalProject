@@ -68,19 +68,18 @@ public class AGVSmall : AGVControl
         }
     }
 
-
     private void FindPrinterObject()
     {
-        foreach (GameObject obj in printerSet) // GameObject로 반복
+        var printerObjects = FindObjectsByName("AGVLocate");
+        foreach (GameObject obj in printerObjects)
         {
-            // 자식 오브젝트에서 이름이 "AGVLocate"인 Transform 찾기
             foreach (Transform child in obj.transform)
             {
-                if (child.name.Contains("AGVLocate") && !printerLocation.Contains(child)) // 중복 체크
+                if (!printerLocation.Contains(child)) // 중복 체크
                 {
                     printerLocation.Add(child); // Transform을 리스트에 추가
                 }
-                
+
                 PrinterCode printerCode = child.GetComponent<PrinterCode>();
                 if (printerCode != null && !printers.Contains(printerCode)) // 중복 체크
                 {
