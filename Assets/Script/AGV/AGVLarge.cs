@@ -58,10 +58,7 @@ public class AGVLarge : AGVControl
         {
             AGVMove(targetToMove);
 
-            // 카트와 AGV의 방향 비교
-            float angleDifference = Quaternion.Angle(transform.rotation, targetToMove.rotation);
-
-            if (AGVtoCartDistance() < 0.01f && angleDifference < 1f)
+            if (GetDistanceToTarget(targetToMove) < 0.01f && IsFacingTarget(targetToMove))
             {
                 CartConnect();
             }
@@ -70,7 +67,13 @@ public class AGVLarge : AGVControl
 
     private void CartConnect()
     {
+        // 카트를 AGVLarge의 자식으로 설정
         PinMove();
+        if (targetToMove != null)
+        {
+            targetToMove.SetParent(transform); // targetToMove를 AGVLarge의 자식으로 설정
+        }
+
     }
 
     private void PinMove()

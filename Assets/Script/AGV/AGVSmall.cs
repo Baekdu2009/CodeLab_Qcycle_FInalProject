@@ -5,16 +5,20 @@ using UnityEngine;
 public class AGVSmall : AGVControl
 {
     public GameObject[] printerSet; // 프린터 세트
+    public GameObject[] hood;       // 후드
     public List<PrinterCode> printers; // 프린터 코드 리스트
     public List<Transform> printerLocation; // 프린터 위치 저장 리스트
+    public List<Transform> hoodLocation;    // 후드 위치 저장 리스트
 
-    public bool printerSignalInput;
+    bool printerSignalInput;
+    bool moveToHood;
     Transform targetToMove;
     RobotArmControl agvRobotArm;
 
     private void Start()
     {
         FindPrinterObject();
+        HoodLocationSetting();
     }
 
     private void Update()
@@ -57,15 +61,13 @@ public class AGVSmall : AGVControl
         {
             AGVMove(targetToMove);
 
-            // 카트와 AGV의 방향 비교
-            float angleDifference = Quaternion.Angle(transform.rotation, targetToMove.rotation);
-
-            if (AGVtoCartDistance() < 0.01f && angleDifference < 1f)
+            if (GetDistanceToTarget(targetToMove) < 0.01f && IsFacingTarget(targetToMove))
             {
-
+                
             }
         }
     }
+
 
     private void FindPrinterObject()
     {
@@ -78,12 +80,25 @@ public class AGVSmall : AGVControl
                 {
                     printerLocation.Add(child); // Transform을 리스트에 추가
                 }
-
-                // 자식 오브젝트에서 PrinterCode 컴포넌트 찾기
+                
                 PrinterCode printerCode = child.GetComponent<PrinterCode>();
                 if (printerCode != null && !printers.Contains(printerCode)) // 중복 체크
                 {
                     printers.Add(printerCode); // PrinterCode를 리스트에 추가
+                }
+            }
+        }
+    }
+
+    private void HoodLocationSetting()
+    {
+        foreach (GameObject obj in hood)
+        {
+            foreach(Transform child in obj.transform)
+            {
+                if (child.name.Contains("Locate") && !hoodLocation.Contains(child))
+                {
+                    hoodLocation.Add(child);
                 }
             }
         }

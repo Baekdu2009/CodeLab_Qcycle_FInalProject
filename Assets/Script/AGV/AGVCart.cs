@@ -11,10 +11,10 @@ public class AGVCart : MonoBehaviour
     public Image FullCheck;
     public TMP_Text BoxFullTxt;
     public GameObject callAGVBtn;
-    bool plateIsFull;
-    public int boxFullNum;
     public bool isAGVCallOn;
-    public int colliderCount = 0;
+    bool plateIsFull;
+    int boxFullNum = 19;
+    int colliderCount = 0;
 
     private void Start()
     {

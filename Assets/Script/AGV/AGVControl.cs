@@ -86,6 +86,33 @@ public class AGVControl : MonoBehaviour
 
     }
 
+    public float GetDistanceToTarget(Transform target)
+    {
+        return Vector3.Distance(transform.position, target.position);
+    }
+
+    public bool IsFacingTarget(Transform target, float angleThreshold = 1f)
+    {
+        float angleDifference = Quaternion.Angle(transform.rotation, target.rotation);
+        return angleDifference < angleThreshold;
+    }
+
+    public List<GameObject> FindObjectsByName(string namePattern)
+    {
+        var foundObjects = new List<GameObject>();
+
+        var allObjects = Object.FindObjectsByType<GameObject>(FindObjectsSortMode.None); // 모든 게임 오브젝트 검색
+
+        foreach (var obj in allObjects)
+        {
+            if (obj.name.Contains(namePattern))
+            {
+                foundObjects.Add(obj);
+            }
+        }
+
+        return foundObjects;
+    }
     public void DetectObstacles()
     {
         RaycastHit hit;
