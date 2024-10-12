@@ -2199,7 +2199,7 @@ Transform:
   m_GameObject: {fileID: 365348888303344503}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.02, z: 0.04}
+  m_LocalPosition: {x: 0, y: 0.04, z: 0.04}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8270,13 +8270,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1335136283284640441}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: 0, y: 0, z: 0.7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2971030131048243655}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!1 &1350603707999031902
 GameObject:
   m_ObjectHideFlags: 0
@@ -17450,6 +17450,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5449965303399067688}
+  - component: {fileID: 4600486127759354593}
   m_Layer: 0
   m_Name: Shelf_S
   m_TagString: Untagged
@@ -17473,6 +17474,27 @@ Transform:
   - {fileID: 5511178518597076350}
   m_Father: {fileID: 2971030131048243655}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &4600486127759354593
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2822640522472034749}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.1418114, y: 0.8880666, z: 0.7349148}
+  m_Center: {x: 0.03899765, y: 0.43885764, z: 0.053016663}
 --- !u!1 &2837421595526003516
 GameObject:
   m_ObjectHideFlags: 0
@@ -26235,6 +26257,7 @@ GameObject:
   - component: {fileID: 8126086353910331247}
   - component: {fileID: 3200427222873831525}
   - component: {fileID: 1817693716469182602}
+  - component: {fileID: 4165498383486477390}
   m_Layer: 0
   m_Name: glass-plate\glass-plate:1
   m_TagString: Untagged
@@ -26311,6 +26334,27 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &4165498383486477390
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4014436245099138780}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.23500001, y: 0.004000002, z: 0.23500013}
+  m_Center: {x: 2.6469781e-25, y: 0.0020001202, z: -1.2327362e-32}
 --- !u!1 &4032196987113683309
 GameObject:
   m_ObjectHideFlags: 0
@@ -33264,7 +33308,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2971030131048243655}
-  - component: {fileID: 1133672836592858496}
   m_Layer: 0
   m_Name: 3DP_(S)Set
   m_TagString: Untagged
@@ -33290,27 +33333,6 @@ Transform:
   - {fileID: 4104624411367170446}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &1133672836592858496
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5016466332303421894}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1.128788, y: 1.7596709, z: 0.7367649}
-  m_Center: {x: 0.029155731, y: 0.8655861, z: 0.04571438}
 --- !u!1 &5047487162049646143
 GameObject:
   m_ObjectHideFlags: 0
@@ -35472,6 +35494,7 @@ MonoBehaviour:
   - {fileID: 1651975632179175932, guid: 51736e677079c0e428e1c78a27c51f4b, type: 3}
   - {fileID: 2790485587422571231, guid: c5bb70acb6216a94cb0a633cacac4341, type: 3}
   printingObjectLocate: {fileID: 467415725238986437}
+  isFinished: 0
 --- !u!114 &3393121807676956534
 MonoBehaviour:
   m_ObjectHideFlags: 0

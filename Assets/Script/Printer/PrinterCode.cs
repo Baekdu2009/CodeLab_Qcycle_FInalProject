@@ -20,6 +20,7 @@ public class PrinterCode : MonoBehaviour
     public MeshRenderer machineLight;
     public GameObject[] filaments; // 필라멘트
     public bool[] filamentCCW;  //필라멘트 회전방향
+    public bool finishSignal { get => isFinished; set => isFinished = value; }
 
     public float Xmin;
     public float Ymin;
@@ -29,9 +30,9 @@ public class PrinterCode : MonoBehaviour
     public float Zmax;
     
     public float moveSpeed = 0.1f;              // 이동속도
-    public float printingResolutionx = 0.02f;   // x축 해상도  -> range를 통해서 resolution을 변화시키게 바꾸기
-    public float printingResolutiony = 0.02f;   // y축 해상도
-    public float printingResolutionz = 0.02f;   // z축 해상도
+    public float printingResolutionx;   // x축 해상도  -> range를 통해서 resolution을 변화시키게 바꾸기
+    public float printingResolutiony;   // y축 해상도
+    public float printingResolutionz;   // z축 해상도
 
     [Header("프린터UI")]
     public TMP_Text printerInformation; // 프린터 작업 크기
@@ -64,6 +65,7 @@ public class PrinterCode : MonoBehaviour
     bool isPrinting;                // 인쇄 중 여부
     bool isObjSelect = false;       // 인쇄할 오브젝트 선택 여부
     bool isPaused = false;         // 일시정지 여부
+    bool isFinished;
 
     private float rotSpeed = 200;                // 필라멘트 회전 속도
     private float filamentUsingPercent = 100f;   // 필라멘트 남은량
@@ -145,6 +147,7 @@ public class PrinterCode : MonoBehaviour
             workingTime = 0f; // 작업 시간 초기화
             objectDropdown.interactable = false;
             machineLight.material.color = Color.green;
+            isFinished = false;
             
             StartCoroutine(PrintProcess());
             StartCoroutine(RotateFilament());
@@ -454,7 +457,7 @@ public class PrinterCode : MonoBehaviour
         }
         else if (size == PrinterSize.Small)
         {
-            expectedTime = 13;
+            expectedTime = 10;
         }
 
         totalExpectedTime = expectedTime;
@@ -488,6 +491,7 @@ public class PrinterCode : MonoBehaviour
         printingStatus.text = "Printing Complete"; // 완료 메시지 표시
         printingStatus.color = Color.red;
         machineLight.material.color = Color.yellow;
+        isFinished = true;
 
         if (finishCoroutine == null)
         {
@@ -512,6 +516,7 @@ public class PrinterCode : MonoBehaviour
         
         objectDropdown.interactable = true;
         isPrinting = false; // 인쇄 중지 상태로 설정
+        isFinished = false;
         resetBtn.SetActive(false);
         printingStatus.color = Color.black;
         printerExpectTime.color = Color.black;
@@ -619,12 +624,19 @@ public class PrinterCode : MonoBehaviour
     {
         printingObj.GetComponent<GameObject>();
         visibleObject = Instantiate(printingObj, printingObjectLocate);
-        visibleObject.transform.localPosition = new Vector3(0, -0.02f, 0);
+        // visibleObject.transform.localPosition = new Vector3(0, -0.02f, 0);
         visibleObject.transform.localScale = new Vector3(1, 1, 0);
     }
 
     private void PrintingObjectScaleChange()
     {
-        visibleObject.transform.localScale = new Vector3(visibleObject.transform.localScale.x, visibleObject.transform.localScale.y, visibleObject.transform.localScale.z + printingResolutionz / 10);
+        if (visibleObject.transform.localScale.z <= 1)
+        {
+            visibleObject.transform.localScale = new Vector3(visibleObject.transform.localScale.x, visibleObject.transform.localScale.y, visibleObject.transform.localScale.z + printingResolutionz /10);
+        }
+        else
+        {
+            PrinterFinish();
+        }
     }
 }
