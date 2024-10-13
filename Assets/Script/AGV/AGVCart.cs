@@ -7,6 +7,7 @@ using TMPro;
 
 public class AGVCart : MonoBehaviour
 {
+    private Quaternion initialRotation;
     public GameObject PlateCollider;
     public Image FullCheck;
     public TMP_Text BoxFullTxt;
@@ -18,6 +19,7 @@ public class AGVCart : MonoBehaviour
 
     private void Start()
     {
+        initialRotation = transform.rotation;
         Collider plateCollider = PlateCollider.GetComponent<Collider>();
         plateCollider.isTrigger = true;
         callAGVBtn.SetActive(false);
@@ -52,5 +54,10 @@ public class AGVCart : MonoBehaviour
     public void OnAGVCall()
     {
         isAGVCallOn = true;
+    }
+
+    public void ResetRotatior()
+    {
+        transform.rotation = initialRotation;
     }
 }

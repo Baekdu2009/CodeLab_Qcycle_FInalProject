@@ -12,7 +12,7 @@ public class AGVControl : MonoBehaviour
     [Header("AGV 제어")]
     public List<Transform> movingPositions = new List<Transform>();
     public Transform chargingPosition;      // 충전 위치 포지션
-    
+
     public float moveSpeed = 2f;            // 이동속도
     public float rotSpeed = 200f;           // 회전속도
     public float rayDistance = 5f;          // Raycast 거리
@@ -31,7 +31,7 @@ public class AGVControl : MonoBehaviour
     {
         lineMake = GetComponent<LineRendererMake>();
 
-        if(lineMake != null )
+        if (lineMake != null)
             lineMake.UpdateLine(movingPositions);
     }
 
@@ -61,23 +61,29 @@ public class AGVControl : MonoBehaviour
         }
     }
 
+
+
     public void AGVMove(Transform targetPos)
     {
+
         Vector3 direction = (targetPos.position - transform.position).normalized;
 
-        // 방향 벡터가 유효한 경우에만 회전 및 이동 수행
-        if (direction != Vector3.zero)
+        // direction이 (0, 0, 0)이 아닌지 확인
+        if (targetPos != null)
         {
             Quaternion lookRotation = Quaternion.LookRotation(direction);
+            Debug.Log(lookRotation);
             transform.rotation = Quaternion.RotateTowards(transform.rotation, lookRotation, rotSpeed * Time.deltaTime);
             transform.position = Vector3.MoveTowards(transform.position, targetPos.position, moveSpeed * Time.deltaTime);
-            isMoving = true;
+
+            if (Vector3.Distance(transform.position, targetPos.position) < 0.01f)
+            {
+                Vector3 localZDirection = targetPos.TransformDirection(Vector3.forward);
+                Quaternion targetLookRotation = Quaternion.LookRotation(localZDirection);
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, targetLookRotation, rotSpeed * Time.deltaTime);
+            }
         }
-        else
-        {
-            // 목표 위치에 도달한 것으로 간주
-            isMoving = false;
-        }
+        isMoving = true;
     }
 
 
@@ -102,7 +108,7 @@ public class AGVControl : MonoBehaviour
         return Vector3.Distance(transform.position, target.position);
     }
 
-    public bool IsFacingTarget(Transform target, float angleThreshold = 1f)
+    public bool IsFacingTarget(Transform target, float angleThreshold = 0.0001f)
     {
         float angleDifference = Quaternion.Angle(transform.rotation, target.rotation);
         return angleDifference < angleThreshold;

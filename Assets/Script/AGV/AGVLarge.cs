@@ -56,9 +56,11 @@ public class AGVLarge : AGVControl
     {
         if (fullSignalInput)
         {
-            AGVMove(targetToMove);
-
-            if (GetDistanceToTarget(targetToMove) < 0.01f && IsFacingTarget(targetToMove))
+            if (GetDistanceToTarget(targetToMove) > 0.01f || !IsFacingTarget(targetToMove))
+            {
+                AGVMove(targetToMove);
+            }
+            else if (GetDistanceToTarget(targetToMove) < 0.01f && IsFacingTarget(targetToMove))
             {
                 CartConnect();
             }
@@ -84,7 +86,7 @@ public class AGVLarge : AGVControl
             float movingY = isCartConnected ? -0.18f : 0;
 
             Vector3 currentPos = obj.transform.position;
-            
+
             if (Mathf.Abs(currentPos.y - movingY) > 0.01f)
             {
                 Vector3 pinTargetPos = new Vector3(currentPos.x, movingY, currentPos.z);
