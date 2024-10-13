@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using TMPro;
+using Unity.Mathematics;
 
 public class AGVCart : MonoBehaviour
 {
@@ -16,11 +17,15 @@ public class AGVCart : MonoBehaviour
     int boxFullNum = 19;
     int colliderCount = 0;
 
+    private Quaternion initialRotationValue;
+
     private void Start()
     {
         Collider plateCollider = PlateCollider.GetComponent<Collider>();
         plateCollider.isTrigger = true;
         callAGVBtn.SetActive(false);
+
+        initialRotationValue = transform.rotation;
     }
 
     private void Update()

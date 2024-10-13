@@ -66,7 +66,7 @@ public class AGVControl : MonoBehaviour
         Vector3 direction = (targetPos.position - transform.position).normalized;
 
         // 방향 벡터가 유효한 경우에만 회전 및 이동 수행
-        if (direction != Vector3.zero)
+        if (targetPos != null)
         {
             Quaternion lookRotation = Quaternion.LookRotation(direction);
             transform.rotation = Quaternion.RotateTowards(transform.rotation, lookRotation, rotSpeed * Time.deltaTime);
@@ -79,7 +79,6 @@ public class AGVControl : MonoBehaviour
             isMoving = false;
         }
     }
-
 
     public void AGVMove()
     {
