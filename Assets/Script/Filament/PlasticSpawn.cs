@@ -5,14 +5,11 @@ public class PlasticSpawn : MonoBehaviour
 {
     [SerializeField] GameObject[] prefabs;
 
-    [HideInInspector]
-    private bool isOn;
+    //[HideInInspector]
+    public bool isOn;
     private Coroutine spawnCoroutine; // 코루틴 인스턴스를 저장할 변수
-
-    public void OnBtnSpawn()
+    private void Update()
     {
-        isOn = !isOn;
-
         if (isOn)
         {
             // 코루틴이 실행 중이지 않을 때만 새로 시작
@@ -30,6 +27,14 @@ public class PlasticSpawn : MonoBehaviour
                 spawnCoroutine = null; // 코루틴 인스턴스 초기화
             }
         }
+
+    }
+   
+    
+    public void OnBtnSpawn()
+    {
+        isOn = !isOn;
+
     }
 
     private IEnumerator SpawnObject()
