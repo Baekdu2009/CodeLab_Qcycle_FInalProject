@@ -11,8 +11,8 @@ public class BoxingRobot : RobotArmControl
         int currentLength = motors != null ? motors.Length : 0;
 
         // 배열 초기화 메서드 호출
-        InitializeArray(ref minAngles, currentLength);
-        InitializeArray(ref maxAngles, currentLength);
+        //InitializeArray(ref minAngles, currentLength);
+        //InitializeArray(ref maxAngles, currentLength);
         InitializeArray(ref rotationAxes, currentLength);
     }
 

@@ -10,13 +10,14 @@ public class AGVSmall : AGVControl
     public List<Transform> printerLocation; // 프린터 위치 저장 리스트
     public List<Transform> hoodLocation;    // 후드 위치 저장 리스트
 
+    RobotArmOnAGV RobotArmOnAGV;
     bool printerSignalInput;
     bool moveToHood;
     Transform targetToMove;
-    RobotArmControl agvRobotArm;
 
     private void Start()
     {
+        RobotArmOnAGV = GetComponentInChildren<RobotArmOnAGV>();
         FindPrinterObject();
         HoodLocationSetting();
     }
@@ -59,9 +60,11 @@ public class AGVSmall : AGVControl
     {
         if (printerSignalInput)
         {
-            AGVMove(targetToMove);
-
-            if (GetDistanceToTarget(targetToMove) < 0.01f && IsFacingTarget(targetToMove))
+            if (GetDistanceToTarget(targetToMove) > 0.01f || !IsFacingTarget(targetToMove))
+            {
+                AGVMove(targetToMove);
+            }
+            else if (GetDistanceToTarget(targetToMove) < 0.01f && IsFacingTarget(targetToMove))
             {
                 
             }
