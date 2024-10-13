@@ -9,9 +9,14 @@ public class RobotArmOnAGV : RobotArmControl
     public GameObject rightGripper;
     public GameObject leftGripper;
     public bool gripperWorking;
+    public Transform plateLocation;
 
+    AGVSmall robotAGV;
+    PrinterCode printer;
+    GameObject printingObject;
     bool gripperOn;
     bool plateOn;
+    public bool printerSignal;
     float gripperRotSpeed = 5f;
     float plateRotSpeed = 5f;
 
@@ -19,7 +24,7 @@ public class RobotArmOnAGV : RobotArmControl
     {
         base.OnValidate();
 
-        // 부모 클래스의 motors 배열 사용
+        robotAGV = GetComponentInParent<AGVSmall>();
         int currentLength = motors != null ? motors.Length : 0;
 
         // 배열 초기화 메서드 호출
@@ -43,8 +48,11 @@ public class RobotArmOnAGV : RobotArmControl
 
     private void Update()
     {
+        printerSignal = robotAGV.printerSignalInput;
+
         GripperRotate();
         PlateRotate();
+        PullOutPrintingObject();
     }
 
     private void GripperRotate()
@@ -83,5 +91,43 @@ public class RobotArmOnAGV : RobotArmControl
         }
     }
 
+    private void PrinterSignalStart()
+    {
+        if (printerSignal)
+        {
+            isRunning = true;
+        }
+        else
+        {
+            isRunning = false;
+        }
+    }
 
+    public void PullOutPrintingObject()
+    {
+        // 프린터 신호가 있고 AGV가 프린터 위치에 도착했을 때만 실행
+        if (printerSignal && robotAGV.printerLocationArrived)
+        {
+            printer = robotAGV.targetPrinter;
+
+            // Null 체크
+            if (printer == null || printer.visibleObject == null) return;
+
+            // 이미 물체가 꺼내졌다면 종료
+            if (printingObject != null) return;
+
+            DetachPrintingObject();
+        }
+    }
+
+    private void DetachPrintingObject()
+    {
+        // 출력 물체 분리
+        printer.visibleObject.transform.SetParent(null, true);
+        printingObject = printer.visibleObject;
+
+        // 물체 위치 설정
+        printingObject.transform.position = plateLocation.position;
+        printingObject.transform.SetParent(plateLocation.transform, true);
+    }
 }

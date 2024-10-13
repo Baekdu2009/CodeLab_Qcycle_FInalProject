@@ -10,8 +10,11 @@ public class AGVSmall : AGVControl
     public List<Transform> printerLocation; // 프린터 위치 저장 리스트
     public List<Transform> hoodLocation;    // 후드 위치 저장 리스트
 
+    [HideInInspector]
     RobotArmOnAGV RobotArmOnAGV;
-    bool printerSignalInput;
+    public bool printerSignalInput;
+    public bool printerLocationArrived;
+    public PrinterCode targetPrinter;
     bool moveToHood;
     Transform targetToMove;
 
@@ -24,34 +27,38 @@ public class AGVSmall : AGVControl
 
     private void Update()
     {
-        if (!printerSignalInput)
-        {
-            targetToMove = null;
-        }
-
+        
         PrinterSignalCheck();
         AGVtoPrinterMove();
     }
 
     private void PrinterSignalCheck()
     {
+        bool signalDetected = false; // 신호 감지 플래그
+
         for (int i = 0; i < printers.Count; i++)
         {
-            if (printers[i].finishSignal)
+            if (printers[i].isFinished)
             {
+                targetPrinter = printers[i];
                 printerSignalInput = true;
                 targetToMove = printerLocation[i];
                 isMoving = true;
-                break; // 신호가 들어오면 이동 시작
-            }
-            else
-            {
-                printerSignalInput = false;
+                signalDetected = true; // 신호 감지
+                break; // 신호가 감지되면 루프 종료
             }
         }
-        
+
+        // 신호가 감지되지 않은 경우
+        if (!signalDetected)
+        {
+            printerSignalInput = false;
+            targetToMove = null; // targetToMove를 null로 설정하여 안전하게 처리
+        }
     }
-    float AGVtoCartDistance()
+
+
+    float CalculateDistance()
     {
         return Vector3.Distance(transform.position, targetToMove.position);
     }
@@ -66,27 +73,28 @@ public class AGVSmall : AGVControl
             }
             else if (GetDistanceToTarget(targetToMove) < 0.01f && IsFacingTarget(targetToMove))
             {
-                
+                printerLocationArrived = true;
+                // 추가: 로봇 팔에 물체 꺼내기 요청
+                RobotArmOnAGV.PullOutPrintingObject();
             }
         }
     }
 
     private void FindPrinterObject()
     {
-        var printerObjects = FindObjectsByName("AGVLocate");
-        foreach (GameObject obj in printerObjects)
+        foreach (GameObject obj in printerSet)
         {
             foreach (Transform child in obj.transform)
             {
-                if (!printerLocation.Contains(child)) // 중복 체크
+                if (child.name.Contains("PrinterLocate") && !printerLocation.Contains(child))
                 {
-                    printerLocation.Add(child); // Transform을 리스트에 추가
+                    printerLocation.Add(child);
                 }
 
                 PrinterCode printerCode = child.GetComponent<PrinterCode>();
-                if (printerCode != null && !printers.Contains(printerCode)) // 중복 체크
+                if (printerCode != null && !printers.Contains(printerCode))
                 {
-                    printers.Add(printerCode); // PrinterCode를 리스트에 추가
+                    printers.Add(printerCode);
                 }
             }
         }
@@ -96,7 +104,7 @@ public class AGVSmall : AGVControl
     {
         foreach (GameObject obj in hood)
         {
-            foreach(Transform child in obj.transform)
+            foreach (Transform child in obj.transform)
             {
                 if (child.name.Contains("Locate") && !hoodLocation.Contains(child))
                 {

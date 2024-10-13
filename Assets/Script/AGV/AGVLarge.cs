@@ -47,7 +47,7 @@ public class AGVLarge : AGVControl
         }
     }
 
-    float AGVtoCartDistance()
+    float CalculateDistance()
     {
         return Vector3.Distance(transform.position, targetToMove.position);
     }

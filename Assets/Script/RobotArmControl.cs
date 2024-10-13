@@ -269,6 +269,18 @@ public class RobotArmControl : MonoBehaviour
         return Path.Combine(sceneFolder, fileName);
     }
 
+    public void OperateSteps()
+    {
+        if (isRunning)
+        {
+            StartCoroutine(RunSteps());
+        }
+        else if (!isRunning)
+        {
+            StopCoroutine(RunSteps());
+        }
+    }
+
     public void OnStartButton()
     {
         if (!isRunning)
@@ -284,7 +296,7 @@ public class RobotArmControl : MonoBehaviour
         StopAllCoroutines();
     }
 
-    private IEnumerator RunSteps()
+    public IEnumerator RunSteps()
     {
         while (isRunning)
         {
