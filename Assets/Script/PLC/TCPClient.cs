@@ -34,35 +34,37 @@ public class TCPClient : MonoBehaviour
 
 
     [Header("설비들을 연결합니다.")]
-
-    [SerializeField] Conveyor conveyor;
-    [SerializeField] Shredder shredder;
+    [SerializeField] EachFilamentFactory filamentFactory;
+    Conveyor conveyor;
+    Shredder shredder;
     [SerializeField] LevelSensor[] tankSensor;
-    [SerializeField] LevelSensorExtruder[] extruderSensor;
-    [SerializeField] PressureSensor[] pressureSensor;
+    LevelSensorExtruder[] extruderSensor;
+    PressureSensor[] pressureSensor;
     [SerializeField] FilamentLine[] linemanagers;
-    [SerializeField] WireCutting wireCutting;
-    [SerializeField] ScrewBelt screwBelt;
-    [SerializeField] PlasticSpawn[] plasticSpawn;
+    WireCutting wireCutting;
+    ScrewBelt screwBelt;
+    PlasticSpawn[] plasticSpawn;
    
     public bool cooling1;
     
     private void Awake()
     {
-        ServerConnect serverConnect = GetComponent<ServerConnect>();
+        //ServerConnect serverConnect = GetComponent<ServerConnect>();
 
-        if (serverConnect != null)
-        {
-            serverConnect.RunTCPServer();
-        }
-        else
-        {
-            UnityEngine.Debug.LogError("ServerConnect 인스턴스를 찾을 수 없습니다.");
-        }
+        //if (serverConnect != null)
+        //{
+        //    serverConnect.RunTCPServer();
+        //}
+        //else
+        //{
+        //    UnityEngine.Debug.LogError("ServerConnect 인스턴스를 찾을 수 없습니다.");
+        //}
     }
     private void Start()
     {
+        
         // 로컬호스트: 로컬 컴퓨터의 디폴트 IP
+        FactoryMachineStart();
 
         try
         {
@@ -77,13 +79,27 @@ public class TCPClient : MonoBehaviour
         }
     }
 
+    private void FactoryMachineStart()
+    {
+        conveyor = filamentFactory.conveyor;
+        shredder = filamentFactory.shredder;
+        wireCutting = filamentFactory.wireCutting;
+        screwBelt = filamentFactory.screwBelt;
+
+        linemanagers = filamentFactory.linemanagers; // 배열을 직접 할당
+        tankSensor = filamentFactory.levelSensors; // 배열을 직접 할당
+        plasticSpawn = filamentFactory.plasticSpawn; // 배열을 직접 할당
+        extruderSensor = filamentFactory.extruder; // 배열을 직접 할당
+        pressureSensor = filamentFactory.pressureSensor; // 배열을 직접 할당
+    }
+
     private int[][] ReadDeviceBlock(string dataFromServer)
     {
-        print("1. ReadDeviceBlock dataFromServer: " + dataFromServer);
+        //print("1. ReadDeviceBlock dataFromServer: " + dataFromServer);
 
         // 문자열을 분리
         string[] strSplited = dataFromServer.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-        print("2. ReadDeviceBlock newData: " + string.Join(",", strSplited));
+        //print("2. ReadDeviceBlock newData: " + string.Join(",", strSplited));
 
         // 배열의 크기를 strSplited의 길이에 맞추기
         int[] values = new int[strSplited.Length];
@@ -178,6 +194,14 @@ public class TCPClient : MonoBehaviour
             int runCooler2 = pointY[2][6];
             int runPullyMachine = pointY[2][7];
 
+            for (int i = 0; i < pointY.Length; i++)
+            {
+                for (int j = 0; j < pointY[i].Length; j++)
+                {
+                    print($"PointY[{i}][{j}]값 : {pointY[i][j]}");
+                }
+            }
+
             //전원
             int processStart = pointX[0][2];    
             
@@ -193,10 +217,6 @@ public class TCPClient : MonoBehaviour
             //리미트
             int limitSwitch1 = pointX[6][0];
 
-
-
-
-          
             if (runConveyor == 1)
             {
                 conveyor.conveyorRunning = true;

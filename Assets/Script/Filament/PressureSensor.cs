@@ -28,12 +28,12 @@ public class PressureSensor : MonoBehaviour
         if (foundPlastic && !isPressing)
         {
             isPressing = true;
-            Debug.Log("Pressing: " + isPressing);
+            //Debug.Log("Pressing: " + isPressing);
         }
         else if (!foundPlastic && isPressing)
         {
             isPressing = false;
-            Debug.Log("Pressing: " + isPressing);
+            //Debug.Log("Pressing: " + isPressing);
         }
     }
 
@@ -42,7 +42,7 @@ public class PressureSensor : MonoBehaviour
         if (other.CompareTag("Plastic1"))
         {
             isPressing = true;
-            Debug.Log("Pressing: " + isPressing);
+            //Debug.Log("Pressing: " + isPressing);
         }
     }
 
@@ -51,7 +51,7 @@ public class PressureSensor : MonoBehaviour
         if (other.CompareTag("Plastic1"))
         {
             isPressing = false;
-            Debug.Log("Pressing: " + isPressing);
+            //Debug.Log("Pressing: " + isPressing);
         }
     }
 }

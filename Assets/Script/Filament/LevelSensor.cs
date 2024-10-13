@@ -29,7 +29,7 @@ public class LevelSensor : MonoBehaviour
         if (collisionCount >= 150 && !isDetected)
         {
             isDetected = true;
-            Debug.Log("isDetected 활성화!");
+            //Debug.Log("isDetected 활성화!");
            
         }
 
@@ -56,7 +56,7 @@ public class LevelSensor : MonoBehaviour
             {
                 sensingChangeCount++;
                 lastIsSensingState = false; // 현재 상태를 false로 변경
-                Debug.Log("isSensing 상태 변화: " + sensingChangeCount);
+                //Debug.Log("isSensing 상태 변화: " + sensingChangeCount);
             }
         }
 
@@ -80,7 +80,7 @@ public class LevelSensor : MonoBehaviour
                 {
                     collidedPlastics.Add(other); // 현재 충돌 중인 Plastic을 추가
                     collisionCount++;
-                    Debug.Log("Plastic과 충돌 감지: " + collisionCount);
+                    //Debug.Log("Plastic과 충돌 감지: " + collisionCount);
                 }
             }
         }
@@ -92,7 +92,7 @@ public class LevelSensor : MonoBehaviour
         if (other.CompareTag("Plastic"))
         {
             collidedPlastics.Remove(other); // 중복 충돌 리스트에서 제거
-            Debug.Log("Plastic과의 충돌 종료: " + other.gameObject.name);
+            //Debug.Log("Plastic과의 충돌 종료: " + other.gameObject.name);
         }
     }
 
@@ -116,7 +116,7 @@ public class LevelSensor : MonoBehaviour
                     if (plasticToRemove != null)
                     {
                         Destroy(plasticToRemove);
-                        Debug.Log("씬에서 플라스틱 제거됨: " + plasticToRemove.name);
+                        //Debug.Log("씬에서 플라스틱 제거됨: " + plasticToRemove.name);
                         allPlastics = GameObject.FindGameObjectsWithTag("Plastic"); // 리스트 업데이트
                         totalPlastics = allPlastics.Length; // 업데이트된 수로 다시 계산
                     }
@@ -141,6 +141,6 @@ public class LevelSensor : MonoBehaviour
         sensingChangeCount = 0; // 상태 변화 카운트 초기화
         collidedPlastics.Clear(); // 중복 충돌 리스트 초기화
 
-        Debug.Log("충돌 상태 초기화됨.");
+        //Debug.Log("충돌 상태 초기화됨.");
     }
 }

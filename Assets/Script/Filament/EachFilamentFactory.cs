@@ -9,9 +9,18 @@ using UnityEngine.UI;
 
 public class EachFilamentFactory : MonoBehaviour
 {
-    [Header("제어 오브젝트")]
-    public List<FilamentLine> linemanagers = new List<FilamentLine>();
+    [Header("설비 스크립트 오브젝트")]
+    public FilamentLine[] linemanagers;
     public LevelSensor[] levelSensors;
+    public Conveyor conveyor;
+    public Shredder shredder;
+    public WireCutting wireCutting;
+    public ScrewBelt screwBelt;
+    public PlasticSpawn[] plasticSpawn;
+    public LevelSensorExtruder[] extruder;
+    public PressureSensor[] pressureSensor;
+
+    [Header("기타 오브젝트")]
     // public GameObject[] tanks;
     public Transform filamentRotPosition;
     public GameObject filamentCoverPrefab;
@@ -45,9 +54,7 @@ public class EachFilamentFactory : MonoBehaviour
 
     bool isfilamentOnRotate;
 
-    [SerializeField] Conveyor conveyor;
-    [SerializeField] Shredder shredder;
-    [SerializeField] WireCutting WireCutting;
+    
 
     // 저장탱크 변수
     // public bool[] tankLevelbool;
@@ -81,8 +88,8 @@ public class EachFilamentFactory : MonoBehaviour
     {
         UpdateStatus();
         UpdateStatusUI();
-        TankLevelCheck();
-        NextAction();
+        // TankLevelCheck();
+        // NextAction();
     }
 
     private void UpdateStatusUI()
@@ -117,8 +124,8 @@ public class EachFilamentFactory : MonoBehaviour
         extruder1Stop = !linemanagers[0].isWorking;
 
         // 커팅기
-        wirecuttingWorkWell = !WireCutting.isProblem;
-        wirecuttingStop = !WireCutting.isWorking;
+        wirecuttingWorkWell = !wireCutting.isProblem;
+        wirecuttingStop = !wireCutting.isWorking;
     }
 
     private void StatusNoticeUI(Image image, bool work, bool stop)

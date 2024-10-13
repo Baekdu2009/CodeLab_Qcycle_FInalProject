@@ -26,7 +26,6 @@ public class LevelSensorExtruder : MonoBehaviour
         {
             // 충돌 횟수 증가
             collisionCount++;
-            Debug.Log("Plastic1과 충돌 감지: " + collisionCount);
 
             // 충돌 횟수가 30 이상이면 isSensing을 true로 설정
             if (collisionCount >= 30 && !isSensing)
@@ -45,7 +44,6 @@ public class LevelSensorExtruder : MonoBehaviour
     private void StartSensing()
     {
         isSensing = true; // 감지 상태 활성화
-        Debug.Log("isSensing 활성화!");
 
         // 모든 Plastic1 제거
         StartCoroutine(RemoveAllPlastic1());
@@ -61,7 +59,6 @@ public class LevelSensorExtruder : MonoBehaviour
             if (plastic != null) // plastic이 존재하는지 확인
             {
                 Destroy(plastic); // 오브젝트 제거
-                Debug.Log("씬에서 Plastic1 제거됨: " + plastic.name);
                 yield return new WaitForSeconds(0.1f); // 조금의 대기 시간
             }
         }
@@ -81,11 +78,6 @@ public class LevelSensorExtruder : MonoBehaviour
         if (obj != null)
         {
             Destroy(obj); // 오브젝트 제거
-            Debug.Log("씬에서 Plastic1 제거됨: " + obj.name);
-        }
-        else
-        {
-            Debug.LogWarning("제거하려는 오브젝트가 이미 파괴되었습니다.");
         }
     }
 
@@ -94,7 +86,6 @@ public class LevelSensorExtruder : MonoBehaviour
     {
         isSensing = false; // 감지 상태 초기화
         collisionCount = 0; // 충돌 수 초기화
-        Debug.Log("isSensing과 충돌 수 초기화 완료!");
 
         // 초기화 후 프리팹 생성
         spawningCoroutine = null; // spawningCoroutine을 null로 설정하여 프리팹 생성 가능하게 함
@@ -107,7 +98,6 @@ public class LevelSensorExtruder : MonoBehaviour
             foreach (var spawnPosition in spawnPositions)
             {
                 Instantiate(prefab, spawnPosition.position, Quaternion.identity);
-                Debug.Log("프리팹 생성됨: " + prefab.name + " 위치: " + spawnPosition.position);
             }
             yield return new WaitForSeconds(1f); // 1초 대기 후 다시 생성
         }
