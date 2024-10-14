@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using UnityEngine.Rendering;
 using UnityEditor.SceneManagement;
 using UnityEditor;
+using UnityEngine.UIElements;
 
 public class AGVControl : MonoBehaviour
 {
@@ -20,6 +21,7 @@ public class AGVControl : MonoBehaviour
     public float batteryCapacity = 100f;    // 배터리 용량
 
     public bool isMoving;                   // 움직임 여부
+
     public bool isStopping;                 // 멈춤 여부
     public bool isStandby;                  // 대기 여부
     public bool isNeedtoCharge;             // 충전 필요 여부
@@ -37,61 +39,55 @@ public class AGVControl : MonoBehaviour
 
     public void MoveAlongPath()
     {
-        if (isMoving)
+        if (isMoving && currentTargetIndex < movingPositions.Count)
         {
-            if (currentTargetIndex < movingPositions.Count)
-            {
-                // 목표 위치로 이동
-                AGVMove(movingPositions[currentTargetIndex]);
+            // 목표 위치로 이동
+            AGVMove(movingPositions[currentTargetIndex]);
 
-                // 목표 위치에 도달했는지 확인
-                if (Vector3.Distance(transform.position, movingPositions[currentTargetIndex].position) < 0.01f)
-                {
-                    currentTargetIndex++; // 다음 목표로 이동
-                }
-
-                isStandby = false;
-            }
-            else
+            // 목표 위치에 도달했는지 확인
+            if (Vector3.Distance(transform.position, movingPositions[currentTargetIndex].position) < 0.01f)
             {
-                // 모든 목표 위치에 도달한 경우
-                isStandby = true;
-                currentTargetIndex = 0;
+                currentTargetIndex++; // 다음 목표로 이동
             }
+
         }
     }
-
-
 
     public void AGVMove(Transform targetPos)
     {
-
         Vector3 direction = (targetPos.position - transform.position).normalized;
 
         // direction이 (0, 0, 0)이 아닌지 확인
-        if (targetPos != null)
+        if (direction != Vector3.zero)
         {
+            // 목표 방향으로 회전
             Quaternion lookRotation = Quaternion.LookRotation(direction);
             Debug.Log(lookRotation);
             transform.rotation = Quaternion.RotateTowards(transform.rotation, lookRotation, rotSpeed * Time.deltaTime);
-            transform.position = Vector3.MoveTowards(transform.position, targetPos.position, moveSpeed * Time.deltaTime);
 
+            // 목표 위치로 이동
+            transform.position = Vector3.MoveTowards(transform.position, targetPos.position, moveSpeed * Time.deltaTime);
+            // 목표에 도달했는지 확인
             if (Vector3.Distance(transform.position, targetPos.position) < 0.01f)
             {
-                Vector3 localZDirection = targetPos.TransformDirection(Vector3.forward);
-                Quaternion targetLookRotation = Quaternion.LookRotation(localZDirection);
-                transform.rotation = Quaternion.RotateTowards(transform.rotation, targetLookRotation, rotSpeed * Time.deltaTime);
+                isMoving = false; // 목표에 도달했으므로 이동 중이 아님
+                return; // 회전 로직을 실행하지 않음
             }
         }
-        isMoving = true;
     }
 
 
-    public void AGVMove()
+    public bool IsFacingTarget(Transform target, float angleThreshold = 0.0001f)
+    {
+        float angleDifference = Quaternion.Angle(transform.rotation, target.rotation);
+        return angleDifference < angleThreshold;
+    }
+
+    /*public void AGVMove()
     {
         transform.Translate(Vector3.forward * moveSpeed * Time.deltaTime);
         isMoving = true;
-    }
+    }*/
 
     public void AGVRotate(bool isRight)
     {
@@ -108,11 +104,7 @@ public class AGVControl : MonoBehaviour
         return Vector3.Distance(transform.position, target.position);
     }
 
-    public bool IsFacingTarget(Transform target, float angleThreshold = 0.0001f)
-    {
-        float angleDifference = Quaternion.Angle(transform.rotation, target.rotation);
-        return angleDifference < angleThreshold;
-    }
+
 
     public List<GameObject> FindObjectsByName(string namePattern)
     {

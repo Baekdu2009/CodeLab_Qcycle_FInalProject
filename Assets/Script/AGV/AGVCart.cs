@@ -17,6 +17,9 @@ public class AGVCart : MonoBehaviour
     int boxFullNum = 19;
     int colliderCount = 0;
 
+    public List<Transform> routePoints;
+    
+
     private void Start()
     {
         initialRotation = transform.rotation;
@@ -60,4 +63,15 @@ public class AGVCart : MonoBehaviour
     {
         transform.rotation = initialRotation;
     }
+
+    public List<Vector3> GetRoute()
+    {
+        List<Vector3> route = new List<Vector3>();
+        foreach(Transform point in routePoints)
+        {
+            route.Add(point.position);
+        }
+        return route;
+    }
+
 }

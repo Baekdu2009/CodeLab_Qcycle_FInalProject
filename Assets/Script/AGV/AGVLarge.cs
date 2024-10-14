@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
+using Unity.VisualScripting;
 
 public class AGVLarge : AGVControl
 {
@@ -7,14 +9,18 @@ public class AGVLarge : AGVControl
     public bool fullSignalInput;   // 신호 상태를 나타내는 변수
     public GameObject[] pinObject; // PIN 오브젝트 배열
 
+    public Quaternion initialrotation;
+    public Vector3 initialPosition;
     public Transform targetToMove;
     bool isAGVLocateToCart;
-    public bool isCartConnected;
+    // public bool isCartConnected;
     float pinMoveSpeed = 1f;
 
     private void Start()
     {
-        movingPositions.Add(transform);
+        initialPosition = transform.position; // 초기 위치 저장
+        initialrotation = transform.rotation;
+        // movingPositions.Add(transform);
         FindPinObjects();
     }
 
@@ -27,6 +33,7 @@ public class AGVLarge : AGVControl
 
         CartSignalCheck();
         AGVtoCartMove();
+       
     }
 
     private void CartSignalCheck()
@@ -63,6 +70,7 @@ public class AGVLarge : AGVControl
             else if (GetDistanceToTarget(targetToMove) < 0.01f && IsFacingTarget(targetToMove))
             {
                 CartConnect();
+                isMoving = false; // 이동 중이 아님
             }
         }
     }
@@ -70,19 +78,79 @@ public class AGVLarge : AGVControl
     private void CartConnect()
     {
         // 카트를 AGVLarge의 자식으로 설정
-        PinMove();
+        PinMove(isCartConnected: false);
+
         if (targetToMove != null)
         {
             targetToMove.SetParent(transform); // targetToMove를 AGVLarge의 자식으로 설정
+            ReadRoutAndMove();
         }
 
     }
+    private void ReadRoutAndMove()
+    {
+        AGVCart cart = targetToMove.GetComponent<AGVCart>();
+        if (cart != null)
+        {
+            List<Vector3> route = cart.GetRoute();
+            movingPositions.Clear();
+            foreach (Vector3 point in route)
+            {
+                Transform tempTransform = new GameObject("RoutePoint").transform;
+                tempTransform.position = point;
+                movingPositions.Add(tempTransform);
+            }
+            StartCoroutine(FollowRoute());
+        }
+    }
 
-    private void PinMove()
+
+    private IEnumerator FollowRoute()
+    {
+        while (currentTargetIndex < movingPositions.Count)
+        {
+            MoveAlongPath();
+            yield return null;
+        }
+
+        if (targetToMove != null)
+        {
+            yield return UnparentAndPinDown(targetToMove); // 카트와의 부모 관계 해제
+        }
+    }
+
+
+    private IEnumerator UnparentAndPinDown(Transform cartTransform)
+    {
+        PinMove(true); // Pin을 내림
+
+        cartTransform.SetParent(null); // 부모 관계 해제
+        movingPositions.Clear(); // 이동 경로 초기화
+        targetToMove = null; // 목표 카트 초기화
+        yield return StartCoroutine(ReturnToInitialPosition()); // 초기 위치로 돌아가기
+    }
+
+    private IEnumerator ReturnToInitialPosition()
+    {
+        // 초기 위치로 부드럽게 이동
+        while (Vector3.Distance(transform.position, initialPosition) > 0.1f)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, initialPosition, moveSpeed * Time.deltaTime);
+            yield return null; // 다음 프레임까지 대기
+        }
+        transform.position = initialPosition; // 최종 위치 설정
+        transform.rotation = initialrotation;
+    }
+
+
+
+    private void PinMove(bool isCartConnected)
     {
         foreach (var obj in pinObject)
         {
             float originalY = obj.transform.position.y;
+
+
             float movingY = isCartConnected ? -0.18f : 0;
 
             Vector3 currentPos = obj.transform.position;
@@ -105,3 +173,4 @@ public class AGVLarge : AGVControl
         pinObject = pinObjects.ToArray(); // 배열로 변환하여 저장
     }
 }
+
