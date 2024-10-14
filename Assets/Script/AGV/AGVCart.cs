@@ -54,9 +54,10 @@ public class AGVCart : MonoBehaviour
         }
     }
 
-    public void OnAGVCall()
+
+    public void SetAGVCallState(bool state)
     {
-        isAGVCallOn = true;
+        isAGVCallOn = state;
     }
 
     public void ResetRotatior()

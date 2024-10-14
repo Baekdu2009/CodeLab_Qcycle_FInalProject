@@ -127,6 +127,11 @@ public class AGVLarge : AGVControl
         movingPositions.Clear(); // 이동 경로 초기화
         
         targetToMove = null; // 목표 카트 초기화
+        AGVCart cart = cartTransform.GetComponent<AGVCart>();
+        if (cart != null)
+        {
+            cart.SetAGVCallState(false); // AGVCall 상태를 false로 설정
+        }
         yield return StartCoroutine(ReturnToInitialPosition()); // 초기 위치로 돌아가기
     }
 
@@ -136,9 +141,18 @@ public class AGVLarge : AGVControl
         while (Vector3.Distance(transform.position, initialPosition) > 0.1f)
         {
             transform.position = Vector3.MoveTowards(transform.position, initialPosition, moveSpeed * Time.deltaTime);
-            yield return null; // 다음 프레임까지 대기
+            
+        
+        Vector3 direction = (initialPosition - transform.position).normalized;
+        if (direction != Vector3.zero)
+        {
+            Quaternion lookRotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, lookRotation, rotSpeed * Time.deltaTime);
         }
-        transform.position = initialPosition; // 최종 위치 설정
+
+        yield return null; // 다음 프레임까지 대기
+    }
+    transform.position = initialPosition; // 최종 위치 설정
         transform.rotation = initialrotation;
 
         currentTargetIndex = 0;
@@ -175,4 +189,5 @@ public class AGVLarge : AGVControl
         pinObject = pinObjects.ToArray(); // 배열로 변환하여 저장
     }
 }
+
 
