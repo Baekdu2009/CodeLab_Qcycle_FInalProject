@@ -457,7 +457,7 @@ public class PrinterCode : MonoBehaviour
         }
         else if (size == PrinterSize.Small)
         {
-            expectedTime = 15;
+            expectedTime = 20;
         }
 
         totalExpectedTime = expectedTime;

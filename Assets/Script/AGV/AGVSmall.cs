@@ -32,31 +32,35 @@ public class AGVSmall : AGVControl
     {
         PrinterSignalCheck();
         AGVtoPrinterMove();
-        MoveToHood();
     }
 
     private void PrinterSignalCheck()
     {
-        bool signalDetected = false; // 신호 감지 플래그
+        bool signalDetected = false;
 
         for (int i = 0; i < printers.Count; i++)
         {
-            if (printers[i].isFinished && !printerLocationArrived)
+            if (printers[i].isFinished && !isMoving)
             {
                 targetPrinter = printers[i];
                 printerSignalInput = true;
                 targetToMove = printerLocation[i];
                 isMoving = true;
-                signalDetected = true; // 신호 감지
-                break; // 신호가 감지되면 루프 종료
+                signalDetected = true;
+                break;
+            }
+            else if (printers[i].isFinished && RobotArmOnAGV.printingObject == null) // 후드에서 작업 후 프린터로 돌아가는 경우
+            {
+                moveToHood = true; // 후드에서 이동할 준비
+                signalDetected = true;
+                break;
             }
         }
 
-        // 신호가 감지되지 않은 경우
         if (!signalDetected)
         {
             printerSignalInput = false;
-            targetToMove = null; // targetToMove를 null로 설정하여 안전하게 처리
+            targetToMove = null;
         }
     }
 
@@ -71,37 +75,57 @@ public class AGVSmall : AGVControl
     {
         if (printerSignalInput)
         {
-
             if (GetDistanceToTarget(targetToMove) > 0.01f)
             {
+                isMoving = true;
                 PathToTarget(targetToMove);
                 MoveAlongPath();
             }
             else if (GetDistanceToTarget(targetToMove) < 0.01f)
             {
                 printerLocationArrived = true;
+                isMoving = false;
 
                 if (targetPrinter != null)
                 {
                     targetPrinter.isFinished = false;
                 }
                 printerSignalInput = false;
-                
+
                 RobotArmOnAGV.PullOutPrintingObject();
             }
         }
+        else if (moveToHood) // 후드로 이동해야 하는 경우
+        {
+            MoveToHood();
+            
+        }
     }
-    
+
+
     private void MoveToHood()
     {
         if (RobotArmOnAGV.printingObject != null)
         {
+            isMoving = true;
+            printerLocationArrived = false;
             targetToMove = hoodLocation[0];
-
             PathToTarget(targetToMove);
             MoveAlongPath();
         }
+
+        // 거리 체크로 도착 여부 확인
+        if (GetDistanceToTarget(targetToMove) < 0.01f && RobotArmOnAGV.printingObject != null)
+        {
+            Destroy(RobotArmOnAGV.printingObject); // 프린팅 객체 파괴
+            targetToMove = null;
+            moveToHood = false; // 후드 이동 완료
+            isMoving = false;
+        }
     }
+
+
+
 
     private void FindPrinterObject()
     {

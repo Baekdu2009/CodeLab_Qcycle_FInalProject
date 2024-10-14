@@ -124,7 +124,7 @@ public class RobotArmOnAGV : RobotArmControl
             gripperWorking = true; // 그리퍼 작동
 
             // 출력물 분리
-            DetachPrintingObject();
+            PIckUpPrintingObject();
 
             // 플레이트를 회전시킴
             plateOn = true; // 플레이트를 회전시키기 위한 플래그 설정
@@ -139,19 +139,24 @@ public class RobotArmOnAGV : RobotArmControl
         }
     }
 
-    private void DetachPrintingObject()
+    private void PIckUpPrintingObject()
     {
         // 출력 물체 분리
-        printer.visibleObject.transform.SetParent(null, true);
+        printer.visibleObject.transform.SetParent(null);
         printingObject = printer.visibleObject;
 
         // 물체 위치 설정
         printingObject.transform.position = plateLocation.position;
-        printingObject.transform.SetParent(plateLocation.transform, true);
+        printingObject.transform.SetParent(plateLocation.transform);
         Rigidbody rb = printingObject.GetComponent<Rigidbody>();
 
         rb.useGravity = false;
         rb.isKinematic = true;
-
     }
+
+    //public void PickDownPrintingObject()
+    //{
+    //    printingObject.transform.SetParent(null);
+    //    Destroy(printingObject);
+    //}
 }
