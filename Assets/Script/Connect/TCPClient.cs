@@ -220,11 +220,13 @@ public class TCPClient : MonoBehaviour
             if (runConveyor == 1)
             {
                 conveyor.conveyorRunning = true;
+                plasticSpawn[0].isOn = true;
             }
 
             else if (runConveyor != 1)
             {
                 conveyor.conveyorRunning = false;
+                plasticSpawn[0].isOn = false;
             }
             if(runShreder == 1)
             {
