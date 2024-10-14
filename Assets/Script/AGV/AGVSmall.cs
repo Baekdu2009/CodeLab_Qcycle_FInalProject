@@ -75,7 +75,6 @@ public class AGVSmall : AGVControl
             }
             else if (GetDistanceToTarget(targetToMove) < 0.01f)
             {
-                print("µµÂø");
                 printerLocationArrived = true;
 
                 if (targetPrinter != null)

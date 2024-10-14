@@ -56,11 +56,11 @@ public class AGVLarge : AGVControl
     {
         if (fullSignalInput)
         {
-            if (GetDistanceToTarget(targetToMove) > 0.01f || !IsFacingTarget(targetToMove))
+            if (GetDistanceToTarget(targetToMove) > 0.01f)
             {
                 AGVMove(targetToMove);
             }
-            else if (GetDistanceToTarget(targetToMove) < 0.01f && IsFacingTarget(targetToMove))
+            else if (GetDistanceToTarget(targetToMove) < 0.01f)
             {
                 CartConnect();
             }

@@ -50,9 +50,6 @@ public class RobotArmOnAGV : RobotArmControl
     {
         printerSignal = robotAGV.printerSignalInput;
 
-        GripperRotate();
-        PlateRotate();
-        // PullOutPrintingObject();
     }
 
     private void GripperRotate()
@@ -116,7 +113,14 @@ public class RobotArmOnAGV : RobotArmControl
             // 이미 물체가 꺼내졌다면 종료
             if (printingObject != null) return;
 
+            // 그리퍼를 작동시켜 출력물을 잡음
+            gripperWorking = true; // 그리퍼 작동
+
+            // 출력물 분리
             DetachPrintingObject();
+
+            // 플레이트를 회전시킴
+            plateOn = true; // 플레이트를 회전시키기 위한 플래그 설정
         }
     }
 
@@ -129,5 +133,9 @@ public class RobotArmOnAGV : RobotArmControl
         // 물체 위치 설정
         printingObject.transform.position = plateLocation.position;
         printingObject.transform.SetParent(plateLocation.transform, true);
+        Rigidbody rb = printingObject.GetComponent<Rigidbody>();
+
+        rb.useGravity = false;
+        rb.isKinematic = true;
     }
 }
