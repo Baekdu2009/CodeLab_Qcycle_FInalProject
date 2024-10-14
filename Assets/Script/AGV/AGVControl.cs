@@ -30,15 +30,22 @@ public class AGVControl : MonoBehaviour
     private void Start()
     {
         lineMake = GetComponent<LineRendererMake>();
+    }
 
-        if(lineMake != null )
+    private void MakePathForAGV()
+    {
+        if (lineMake != null)
             lineMake.UpdateLine(movingPositions);
     }
 
     public void MoveAlongPath()
     {
+        MakePathForAGV();
+
         if (isMoving)
         {
+            DetectObstacles();
+
             if (currentTargetIndex < movingPositions.Count)
             {
                 // 목표 위치로 이동
@@ -134,10 +141,10 @@ public class AGVControl : MonoBehaviour
             {
                 isMoving = false;
             }
-        }
-        else
-        {
-            isMoving = true;
+            else
+            {
+                isMoving = true;
+            }
         }
     }
 
