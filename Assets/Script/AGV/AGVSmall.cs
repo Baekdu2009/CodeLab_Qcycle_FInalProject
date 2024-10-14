@@ -9,81 +9,103 @@ public class AGVSmall : AGVControl
     public List<PrinterCode> printers; // 프린터 코드 리스트
     public List<Transform> printerLocation; // 프린터 위치 저장 리스트
     public List<Transform> hoodLocation;    // 후드 위치 저장 리스트
+    Transform initialPos;
 
-    bool printerSignalInput;
+    [HideInInspector]
+    RobotArmOnAGV RobotArmOnAGV;
+    public bool printerSignalInput;
+    public bool printerLocationArrived;
+    public bool originMove;
+    public PrinterCode targetPrinter;
     bool moveToHood;
     Transform targetToMove;
-    RobotArmControl agvRobotArm;
 
     private void Start()
     {
+        initialPos = transform;
+        RobotArmOnAGV = GetComponentInChildren<RobotArmOnAGV>();
         FindPrinterObject();
         HoodLocationSetting();
     }
 
     private void Update()
     {
-        if (!printerSignalInput)
-        {
-            targetToMove = null;
-        }
-
         PrinterSignalCheck();
         AGVtoPrinterMove();
     }
 
     private void PrinterSignalCheck()
     {
+        bool signalDetected = false; // 신호 감지 플래그
+
         for (int i = 0; i < printers.Count; i++)
         {
-            if (printers[i].finishSignal)
+            if (printers[i].isFinished && !printerLocationArrived)
             {
+                targetPrinter = printers[i];
                 printerSignalInput = true;
                 targetToMove = printerLocation[i];
                 isMoving = true;
-                break; // 신호가 들어오면 이동 시작
-            }
-            else
-            {
-                printerSignalInput = false;
+                signalDetected = true; // 신호 감지
+                break; // 신호가 감지되면 루프 종료
             }
         }
-        
+
+        // 신호가 감지되지 않은 경우
+        if (!signalDetected)
+        {
+            printerSignalInput = false;
+            targetToMove = null; // targetToMove를 null로 설정하여 안전하게 처리
+        }
     }
-    float AGVtoCartDistance()
+
+    private void PathToPrinter(Transform movePosition)
     {
-        return Vector3.Distance(transform.position, targetToMove.position);
+        movingPositions.Clear();
+        movingPositions.Add(this.transform);
+        movingPositions.Add(targetToMove);
     }
 
     private void AGVtoPrinterMove()
     {
         if (printerSignalInput)
         {
-            AGVMove(targetToMove);
 
-            if (GetDistanceToTarget(targetToMove) < 0.01f && IsFacingTarget(targetToMove))
+            if (GetDistanceToTarget(targetToMove) > 0.01f)
             {
+                PathToPrinter(targetToMove);
+                MoveAlongPath();
+            }
+            else if (GetDistanceToTarget(targetToMove) < 0.01f)
+            {
+                printerLocationArrived = true;
+
+                if (targetPrinter != null)
+                {
+                    targetPrinter.isFinished = false;
+                }
+                printerSignalInput = false;
                 
+                RobotArmOnAGV.PullOutPrintingObject();
             }
         }
     }
-
+    
     private void FindPrinterObject()
     {
-        var printerObjects = FindObjectsByName("AGVLocate");
-        foreach (GameObject obj in printerObjects)
+        foreach (GameObject obj in printerSet)
         {
             foreach (Transform child in obj.transform)
             {
-                if (!printerLocation.Contains(child)) // 중복 체크
+                if (child.name.Contains("PrinterLocate") && !printerLocation.Contains(child))
                 {
-                    printerLocation.Add(child); // Transform을 리스트에 추가
+                    printerLocation.Add(child);
                 }
 
                 PrinterCode printerCode = child.GetComponent<PrinterCode>();
-                if (printerCode != null && !printers.Contains(printerCode)) // 중복 체크
+                if (printerCode != null && !printers.Contains(printerCode))
                 {
-                    printers.Add(printerCode); // PrinterCode를 리스트에 추가
+                    printers.Add(printerCode);
                 }
             }
         }
@@ -93,7 +115,7 @@ public class AGVSmall : AGVControl
     {
         foreach (GameObject obj in hood)
         {
-            foreach(Transform child in obj.transform)
+            foreach (Transform child in obj.transform)
             {
                 if (child.name.Contains("Locate") && !hoodLocation.Contains(child))
                 {

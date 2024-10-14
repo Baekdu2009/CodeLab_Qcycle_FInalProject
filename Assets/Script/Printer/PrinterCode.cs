@@ -20,7 +20,6 @@ public class PrinterCode : MonoBehaviour
     public MeshRenderer machineLight;
     public GameObject[] filaments; // 필라멘트
     public bool[] filamentCCW;  //필라멘트 회전방향
-    public bool finishSignal { get => isFinished; set => isFinished = value; }
 
     public float Xmin;
     public float Ymin;
@@ -48,9 +47,10 @@ public class PrinterCode : MonoBehaviour
     public GameObject[] objectPrefabs;      // 프리팹 목록
     public Transform printingObjectLocate;  // 출력되는 오브젝트의 위치
 
-    // private 목록
+    // 안보이는 목록
+    [HideInInspector]
     private GameObject printingObj;     // 선택된 오브젝트
-    private GameObject visibleObject;   // 실제 출력 오브젝트
+    public GameObject visibleObject;   // 실제 출력 오브젝트
 
     private Queue<string> nozzleQueue = new Queue<string>();
     private Queue<string> plateQueue = new Queue<string>();
@@ -65,7 +65,7 @@ public class PrinterCode : MonoBehaviour
     bool isPrinting;                // 인쇄 중 여부
     bool isObjSelect = false;       // 인쇄할 오브젝트 선택 여부
     bool isPaused = false;         // 일시정지 여부
-    bool isFinished;
+    public bool isFinished;
 
     private float rotSpeed = 200;                // 필라멘트 회전 속도
     private float filamentUsingPercent = 100f;   // 필라멘트 남은량
@@ -457,7 +457,7 @@ public class PrinterCode : MonoBehaviour
         }
         else if (size == PrinterSize.Small)
         {
-            expectedTime = 10;
+            expectedTime = 15;
         }
 
         totalExpectedTime = expectedTime;

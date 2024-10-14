@@ -30,33 +30,45 @@ public class AGVControl : MonoBehaviour
     private void Start()
     {
         lineMake = GetComponent<LineRendererMake>();
+    }
 
-        if(lineMake != null )
+    private void MakePathForAGV()
+    {
+        if (lineMake != null)
             lineMake.UpdateLine(movingPositions);
     }
 
     public void MoveAlongPath()
     {
-        if (isMoving)
+        if (movingPositions != null)
         {
-            if (currentTargetIndex < movingPositions.Count)
-            {
-                // 목표 위치로 이동
-                AGVMove(movingPositions[currentTargetIndex]);
+            MakePathForAGV();
 
-                // 목표 위치에 도달했는지 확인
-                if (Vector3.Distance(transform.position, movingPositions[currentTargetIndex].position) < 0.01f)
+            DetectObstacles();
+
+            if (isMoving)
+            {
+
+                if (currentTargetIndex < movingPositions.Count)
                 {
-                    currentTargetIndex++; // 다음 목표로 이동
-                }
+                    // 목표 위치로 이동
+                    AGVMove(movingPositions[currentTargetIndex]);
 
-                isStandby = false;
-            }
-            else
-            {
-                // 모든 목표 위치에 도달한 경우
-                isStandby = true;
-                currentTargetIndex = 0;
+                    // 목표 위치에 도달했는지 확인
+                    if (Vector3.Distance(transform.position, movingPositions[currentTargetIndex].position) < 0.01f)
+                    {
+                        currentTargetIndex++; // 다음 목표로 이동
+                    }
+
+                    isStandby = false;
+                }
+                else
+                {
+                    // 모든 목표 위치에 도달한 경우
+                    isStandby = true;
+                    currentTargetIndex = 0;
+                    movingPositions.Clear();
+                }
             }
         }
     }
@@ -66,7 +78,7 @@ public class AGVControl : MonoBehaviour
         Vector3 direction = (targetPos.position - transform.position).normalized;
 
         // 방향 벡터가 유효한 경우에만 회전 및 이동 수행
-        if (direction != Vector3.zero)
+        if (targetPos != null)
         {
             Quaternion lookRotation = Quaternion.LookRotation(direction);
             transform.rotation = Quaternion.RotateTowards(transform.rotation, lookRotation, rotSpeed * Time.deltaTime);
@@ -75,16 +87,32 @@ public class AGVControl : MonoBehaviour
         }
         else
         {
-            // 목표 위치에 도달한 것으로 간주
             isMoving = false;
         }
     }
-
 
     public void AGVMove()
     {
         transform.Translate(Vector3.forward * moveSpeed * Time.deltaTime);
         isMoving = true;
+    }
+
+    public void AGVRotate(Transform targetPos)
+    {
+        Quaternion rotationOfTarget = targetPos.rotation;
+        float angle = GetAngleToTarget(targetPos);
+        
+        float rotateSpeed;
+
+        if (transform.rotation != rotationOfTarget)
+        {
+            rotateSpeed = 200f;
+        }
+        else
+        {
+            rotateSpeed = 0f;
+        }
+        transform.Rotate(Vector3.up, rotateSpeed * Time.deltaTime);
     }
 
     public void AGVRotate(bool isRight)
@@ -100,6 +128,11 @@ public class AGVControl : MonoBehaviour
     public float GetDistanceToTarget(Transform target)
     {
         return Vector3.Distance(transform.position, target.position);
+    }
+
+    public float GetAngleToTarget(Transform target)
+    {
+        return Quaternion.Angle(transform.rotation, target.rotation);
     }
 
     public bool IsFacingTarget(Transform target, float angleThreshold = 1f)
@@ -135,10 +168,10 @@ public class AGVControl : MonoBehaviour
             {
                 isMoving = false;
             }
-        }
-        else
-        {
-            isMoving = true;
+            else
+            {
+                isMoving = true;
+            }
         }
     }
 

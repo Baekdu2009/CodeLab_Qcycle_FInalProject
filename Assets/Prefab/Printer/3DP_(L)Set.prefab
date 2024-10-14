@@ -34576,7 +34576,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.38, z: 2}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 10, y: 10, z: 10}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 530157471914471152}
@@ -41039,6 +41039,7 @@ MonoBehaviour:
   - {fileID: 1651975632179175932, guid: 51736e677079c0e428e1c78a27c51f4b, type: 3}
   - {fileID: 2790485587422571231, guid: c5bb70acb6216a94cb0a633cacac4341, type: 3}
   printingObjectLocate: {fileID: 8820126218989303592}
+  visibleObject: {fileID: 0}
   isFinished: 0
 --- !u!114 &2949841862893393608
 MonoBehaviour:
@@ -46311,7 +46312,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5356732736162945385}
   m_Layer: 0
-  m_Name: AGVLocate_L
+  m_Name: PrinterLocate_L
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -46326,7 +46327,7 @@ Transform:
   m_GameObject: {fileID: 6888353920299635543}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 0, y: 0, z: 0.7}
+  m_LocalPosition: {x: 0, y: 0, z: 1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

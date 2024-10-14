@@ -37,6 +37,7 @@ public class ManagerClass : MonoBehaviour
         else
         {
             directPointer.transform.position = directPositions[currentCanvasNum].position;
+            directPointer.transform.localScale = directPositions[currentCanvasNum].localScale;
         }
         directPointer.transform.Rotate(0, 0, pointerRotSpeed * Time.deltaTime);
     }

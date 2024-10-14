@@ -5,6 +5,13 @@ using System.Collections.Generic;
 
 public class AGVManager : ManagerClass
 {
-    public GameObject[] mobilities;
+    [SerializeField] List<AGVControl> mobility = new List<AGVControl>();
 
+    protected override void Start()
+    {
+        basicObject = new List<object>(mobility);
+        base.Start();
+    }
+
+    
 }

@@ -47,7 +47,7 @@ public class AGVLarge : AGVControl
         }
     }
 
-    float AGVtoCartDistance()
+    float CalculateDistance()
     {
         return Vector3.Distance(transform.position, targetToMove.position);
     }
@@ -56,9 +56,11 @@ public class AGVLarge : AGVControl
     {
         if (fullSignalInput)
         {
-            AGVMove(targetToMove);
-
-            if (GetDistanceToTarget(targetToMove) < 0.01f && IsFacingTarget(targetToMove))
+            if (GetDistanceToTarget(targetToMove) > 0.01f)
+            {
+                AGVMove(targetToMove);
+            }
+            else if (GetDistanceToTarget(targetToMove) < 0.01f)
             {
                 CartConnect();
             }
