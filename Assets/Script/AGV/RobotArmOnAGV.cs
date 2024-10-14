@@ -2,10 +2,11 @@ using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 
 public class RobotArmOnAGV : RobotArmControl
 {
-    public GameObject robotArmPlate;
+    // public GameObject robotArmPlate;
     public GameObject rightGripper;
     public GameObject leftGripper;
     public bool gripperWorking;
@@ -49,7 +50,8 @@ public class RobotArmOnAGV : RobotArmControl
     private void Update()
     {
         printerSignal = robotAGV.printerSignalInput;
-
+        GripperRotate();
+        // PlateRotate();
     }
 
     private void GripperRotate()
@@ -73,20 +75,20 @@ public class RobotArmOnAGV : RobotArmControl
         }
     }
 
-    private void PlateRotate()
-    {
-        Quaternion zeroRotation = Quaternion.Euler(0, 0, 0);
-        Quaternion plateRotation = Quaternion.Euler(0, 0, 135);
+    //private void PlateRotate()
+    //{
+    //    Quaternion zeroRotation = Quaternion.Euler(0, 0, 0);
+    //    Quaternion plateRotation = Quaternion.Euler(0, 0, 135);
 
-        if (plateOn && gripperOn)
-        {
-            robotArmPlate.transform.localRotation = Quaternion.Slerp(robotArmPlate.transform.localRotation, plateRotation, plateRotSpeed * Time.deltaTime);
-        }
-        else
-        {
-            robotArmPlate.transform.localRotation = Quaternion.Slerp(robotArmPlate.transform.localRotation, zeroRotation, plateRotSpeed * Time.deltaTime);
-        }
-    }
+    //    if (plateOn && gripperOn)
+    //    {
+    //        robotArmPlate.transform.localRotation = Quaternion.Slerp(robotArmPlate.transform.localRotation, plateRotation, plateRotSpeed * Time.deltaTime);
+    //    }
+    //    else
+    //    {
+    //        robotArmPlate.transform.localRotation = Quaternion.Slerp(robotArmPlate.transform.localRotation, zeroRotation, plateRotSpeed * Time.deltaTime);
+    //    }
+    //}
 
     private void PrinterSignalStart()
     {
@@ -106,12 +108,16 @@ public class RobotArmOnAGV : RobotArmControl
         if (printerSignal && robotAGV.printerLocationArrived)
         {
             printer = robotAGV.targetPrinter;
+            isRunning = true;
 
             // Null 체크
             if (printer == null || printer.visibleObject == null) return;
 
-            // 이미 물체가 꺼내졌다면 종료
-            if (printingObject != null) return;
+
+            if (steps != null)
+            {
+                StartCoroutine(RunSteps());
+            }
 
             // 그리퍼를 작동시켜 출력물을 잡음
             gripperWorking = true; // 그리퍼 작동
@@ -121,6 +127,14 @@ public class RobotArmOnAGV : RobotArmControl
 
             // 플레이트를 회전시킴
             plateOn = true; // 플레이트를 회전시키기 위한 플래그 설정
+
+            if (printingObject != null)
+            {
+                StopCoroutine(RunSteps());
+                isRunning = false;
+                gripperOn = false;
+                plateOn = false;
+            }
         }
     }
 
@@ -137,5 +151,6 @@ public class RobotArmOnAGV : RobotArmControl
 
         rb.useGravity = false;
         rb.isKinematic = true;
+
     }
 }

@@ -9,17 +9,20 @@ public class AGVSmall : AGVControl
     public List<PrinterCode> printers; // 프린터 코드 리스트
     public List<Transform> printerLocation; // 프린터 위치 저장 리스트
     public List<Transform> hoodLocation;    // 후드 위치 저장 리스트
+    Transform initialPos;
 
     [HideInInspector]
     RobotArmOnAGV RobotArmOnAGV;
     public bool printerSignalInput;
     public bool printerLocationArrived;
+    public bool originMove;
     public PrinterCode targetPrinter;
     bool moveToHood;
     Transform targetToMove;
 
     private void Start()
     {
+        initialPos = transform;
         RobotArmOnAGV = GetComponentInChildren<RobotArmOnAGV>();
         FindPrinterObject();
         HoodLocationSetting();
@@ -56,7 +59,7 @@ public class AGVSmall : AGVControl
         }
     }
 
-    private void PathToPrinter()
+    private void PathToPrinter(Transform movePosition)
     {
         movingPositions.Clear();
         movingPositions.Add(this.transform);
@@ -70,7 +73,7 @@ public class AGVSmall : AGVControl
 
             if (GetDistanceToTarget(targetToMove) > 0.01f)
             {
-                PathToPrinter();
+                PathToPrinter(targetToMove);
                 MoveAlongPath();
             }
             else if (GetDistanceToTarget(targetToMove) < 0.01f)
@@ -87,7 +90,7 @@ public class AGVSmall : AGVControl
             }
         }
     }
-
+    
     private void FindPrinterObject()
     {
         foreach (GameObject obj in printerSet)
