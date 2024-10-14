@@ -89,7 +89,7 @@ public class EachFilamentFactory : MonoBehaviour
         UpdateStatus();
         UpdateStatusUI();
         // TankLevelCheck();
-        // NextAction();
+        NextAction();
     }
 
     private void UpdateStatusUI()
