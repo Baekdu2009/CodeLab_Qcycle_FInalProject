@@ -21,7 +21,7 @@ public class AGVControl : MonoBehaviour
     public float batteryCapacity = 100f;    // 배터리 용량
 
     public bool isMoving;                   // 움직임 여부
-
+    public bool isRotating;                // 회전 여부
     public bool isStopping;                 // 멈춤 여부
     public bool isStandby;                  // 대기 여부
     public bool isNeedtoCharge;             // 충전 필요 여부
@@ -42,7 +42,7 @@ public class AGVControl : MonoBehaviour
         if (isMoving && currentTargetIndex < movingPositions.Count)
         {
             // 목표 위치로 이동
-            AGVMove(movingPositions[currentTargetIndex]);
+            AGVMoveAndRotate(movingPositions[currentTargetIndex]);
 
             // 목표 위치에 도달했는지 확인
             if (Vector3.Distance(transform.position, movingPositions[currentTargetIndex].position) < 0.01f)
@@ -53,29 +53,78 @@ public class AGVControl : MonoBehaviour
         }
     }
 
-    public void AGVMove(Transform targetPos)
+    //public void AGVMove(Transform targetPos)
+    //{
+    //    Vector3 direction = (targetPos.position - transform.position).normalized;
+
+    //    // direction이 (0, 0, 0)이 아닌지 확인
+    //    if (direction != Vector3.zero)
+    //    {
+    //        // 목표 방향으로 회전
+    //        Quaternion lookRotation = Quaternion.LookRotation(direction);
+    //        Debug.Log(lookRotation);
+    //        transform.rotation = Quaternion.RotateTowards(transform.rotation, lookRotation, rotSpeed * Time.deltaTime);
+
+    //        // 목표 위치로 이동
+    //        transform.position = Vector3.MoveTowards(transform.position, targetPos.position, moveSpeed * Time.deltaTime);
+    //        // 목표에 도달했는지 확인
+    //        if (Vector3.Distance(transform.position, targetPos.position) < 0.01f)
+    //        {
+    //            isMoving = false; // 목표에 도달했으므로 이동 중이 아님
+    //            return; // 회전 로직을 실행하지 않음
+    //        }
+    //    }
+    //}
+
+    public void AGVMoveAndRotate(Transform targetPos)
     {
-        Vector3 direction = (targetPos.position - transform.position).normalized;
-
-        // direction이 (0, 0, 0)이 아닌지 확인
-        if (direction != Vector3.zero)
+        if (isMoving)
         {
-            // 목표 방향으로 회전
-            Quaternion lookRotation = Quaternion.LookRotation(direction);
-            Debug.Log(lookRotation);
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, lookRotation, rotSpeed * Time.deltaTime);
+            AGVMove(targetPos);
 
-            // 목표 위치로 이동
-            transform.position = Vector3.MoveTowards(transform.position, targetPos.position, moveSpeed * Time.deltaTime);
-            // 목표에 도달했는지 확인
-            if (Vector3.Distance(transform.position, targetPos.position) < 0.01f)
+            // 목표 위치에 도달했는지 확인
+            if (Vector3.Distance(transform.position, targetPos.position) < 0.1f)
             {
-                isMoving = false; // 목표에 도달했으므로 이동 중이 아님
-                return; // 회전 로직을 실행하지 않음
+                isMoving = false;
+                isRotating = true; // 이동이 완료되면 회전 시작
+            }
+        }
+
+        if (isRotating)
+        {
+            AGVRotate(targetPos);
+
+            // 목표 회전값에 도달했는지 확인
+            if (Quaternion.Angle(transform.rotation, targetPos.rotation) < 0.1f)
+            {
+                isRotating = false; // 회전 완료
             }
         }
     }
 
+
+    public void AGVMove(Transform targetPos)
+    {
+        Vector3 direction = (targetPos.position - transform.position).normalized;
+        if (direction != Vector3.zero)
+        {
+            Quaternion lookRotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, lookRotation, rotSpeed * Time.deltaTime);
+            transform.position = Vector3.MoveTowards(transform.position, targetPos.position, moveSpeed * Time.deltaTime);
+        }
+    }
+
+    public void AGVRotate(Transform targetPos)
+    {
+        Quaternion targetAngle = targetPos.rotation;
+        Quaternion currentAngle = transform.rotation;
+
+        if (currentAngle != targetAngle)
+        {
+            transform.rotation = Quaternion.RotateTowards(currentAngle, targetAngle, rotSpeed * Time.deltaTime);
+        }
+
+    }
 
     public bool IsFacingTarget(Transform target, float angleThreshold = 0.0001f)
     {
@@ -103,8 +152,6 @@ public class AGVControl : MonoBehaviour
     {
         return Vector3.Distance(transform.position, target.position);
     }
-
-
 
     public List<GameObject> FindObjectsByName(string namePattern)
     {
@@ -148,9 +195,9 @@ public class AGVControl : MonoBehaviour
         }
     }
 
-    public void AGVtoCharge()
-    {
-        if (isNeedtoCharge)
-            AGVMove(chargingPosition);
-    }
+    //public void AGVtoCharge()
+    //{
+    //    if (isNeedtoCharge)
+    //        AGVMove(chargingPosition);
+    //}
 }

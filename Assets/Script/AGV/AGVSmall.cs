@@ -59,7 +59,7 @@ public class AGVSmall : AGVControl
     {
         if (printerSignalInput)
         {
-            AGVMove(targetToMove);
+            AGVMoveAndRotate(targetToMove);
 
             if (GetDistanceToTarget(targetToMove) < 0.01f && IsFacingTarget(targetToMove))
             {

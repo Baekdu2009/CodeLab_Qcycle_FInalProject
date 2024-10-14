@@ -65,12 +65,11 @@ public class AGVLarge : AGVControl
         {
             if (GetDistanceToTarget(targetToMove) > 0.01f || !IsFacingTarget(targetToMove))
             {
-                AGVMove(targetToMove);
+                AGVMoveAndRotate(targetToMove);
             }
             else if (GetDistanceToTarget(targetToMove) < 0.01f && IsFacingTarget(targetToMove))
             {
                 CartConnect();
-                isMoving = false; // 이동 중이 아님
             }
         }
     }
@@ -126,6 +125,7 @@ public class AGVLarge : AGVControl
 
         cartTransform.SetParent(null); // 부모 관계 해제
         movingPositions.Clear(); // 이동 경로 초기화
+        
         targetToMove = null; // 목표 카트 초기화
         yield return StartCoroutine(ReturnToInitialPosition()); // 초기 위치로 돌아가기
     }
@@ -140,6 +140,8 @@ public class AGVLarge : AGVControl
         }
         transform.position = initialPosition; // 최종 위치 설정
         transform.rotation = initialrotation;
+
+        currentTargetIndex = 0;
     }
 
 
