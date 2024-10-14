@@ -27,7 +27,6 @@ public class AGVSmall : AGVControl
 
     private void Update()
     {
-        
         PrinterSignalCheck();
         AGVtoPrinterMove();
     }
@@ -38,7 +37,7 @@ public class AGVSmall : AGVControl
 
         for (int i = 0; i < printers.Count; i++)
         {
-            if (printers[i].isFinished)
+            if (printers[i].isFinished && !printerLocationArrived)
             {
                 targetPrinter = printers[i];
                 printerSignalInput = true;
@@ -57,24 +56,34 @@ public class AGVSmall : AGVControl
         }
     }
 
-
-    float CalculateDistance()
+    private void PathToPrinter()
     {
-        return Vector3.Distance(transform.position, targetToMove.position);
+        movingPositions.Clear();
+        movingPositions.Add(this.transform);
+        movingPositions.Add(targetToMove);
     }
 
     private void AGVtoPrinterMove()
     {
         if (printerSignalInput)
         {
-            if (GetDistanceToTarget(targetToMove) > 0.01f || !IsFacingTarget(targetToMove))
+
+            if (GetDistanceToTarget(targetToMove) > 0.01f)
             {
-                AGVMove(targetToMove);
+                PathToPrinter();
+                MoveAlongPath();
             }
-            else if (GetDistanceToTarget(targetToMove) < 0.01f && IsFacingTarget(targetToMove))
+            else if (GetDistanceToTarget(targetToMove) < 0.01f)
             {
+                print("µµÂø");
                 printerLocationArrived = true;
-                // Ãß°¡: ·Îº¿ ÆÈ¿¡ ¹°Ã¼ ²¨³»±â ¿äÃ»
+
+                if (targetPrinter != null)
+                {
+                    targetPrinter.isFinished = false;
+                }
+                printerSignalInput = false;
+                
                 RobotArmOnAGV.PullOutPrintingObject();
             }
         }

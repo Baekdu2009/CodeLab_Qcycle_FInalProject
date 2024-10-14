@@ -42,9 +42,10 @@ public class AGVControl : MonoBehaviour
     {
         MakePathForAGV();
 
+        DetectObstacles();
+
         if (isMoving)
         {
-            DetectObstacles();
 
             if (currentTargetIndex < movingPositions.Count)
             {
@@ -64,6 +65,7 @@ public class AGVControl : MonoBehaviour
                 // 모든 목표 위치에 도달한 경우
                 isStandby = true;
                 currentTargetIndex = 0;
+                movingPositions.Clear();
             }
         }
     }
@@ -82,8 +84,8 @@ public class AGVControl : MonoBehaviour
         }
         else
         {
-            // 목표 위치에 도달한 것으로 간주
             isMoving = false;
+            
         }
     }
 

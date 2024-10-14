@@ -52,7 +52,7 @@ public class RobotArmOnAGV : RobotArmControl
 
         GripperRotate();
         PlateRotate();
-        PullOutPrintingObject();
+        // PullOutPrintingObject();
     }
 
     private void GripperRotate()
