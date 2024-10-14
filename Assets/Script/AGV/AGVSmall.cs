@@ -32,6 +32,7 @@ public class AGVSmall : AGVControl
     {
         PrinterSignalCheck();
         AGVtoPrinterMove();
+        MoveToHood();
     }
 
     private void PrinterSignalCheck()
@@ -59,7 +60,7 @@ public class AGVSmall : AGVControl
         }
     }
 
-    private void PathToPrinter(Transform movePosition)
+    private void PathToTarget(Transform movePosition)
     {
         movingPositions.Clear();
         movingPositions.Add(this.transform);
@@ -73,7 +74,7 @@ public class AGVSmall : AGVControl
 
             if (GetDistanceToTarget(targetToMove) > 0.01f)
             {
-                PathToPrinter(targetToMove);
+                PathToTarget(targetToMove);
                 MoveAlongPath();
             }
             else if (GetDistanceToTarget(targetToMove) < 0.01f)
@@ -91,6 +92,17 @@ public class AGVSmall : AGVControl
         }
     }
     
+    private void MoveToHood()
+    {
+        if (RobotArmOnAGV.printingObject != null)
+        {
+            targetToMove = hoodLocation[0];
+
+            PathToTarget(targetToMove);
+            MoveAlongPath();
+        }
+    }
+
     private void FindPrinterObject()
     {
         foreach (GameObject obj in printerSet)

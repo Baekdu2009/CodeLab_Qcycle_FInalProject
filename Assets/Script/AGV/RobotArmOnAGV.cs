@@ -12,9 +12,10 @@ public class RobotArmOnAGV : RobotArmControl
     public bool gripperWorking;
     public Transform plateLocation;
 
+    // [HideInInspector]
     AGVSmall robotAGV;
     PrinterCode printer;
-    GameObject printingObject;
+    public GameObject printingObject;
     bool gripperOn;
     bool plateOn;
     public bool printerSignal;
