@@ -22,10 +22,10 @@ public class AGVMoving : MonoBehaviour
     void Update()
     {
         AGVMoveByKey(); // 키 입력에 따른 이동
-        RouteCreate();
+        //RouteCreate();
         PositionCheck();
-        MoveAuto();
-        MoveOrigin();
+        //MoveAuto();
+        //MoveOrigin();
     }
 
     void AGVMoveByKey()
@@ -144,6 +144,7 @@ public class AGVMoving : MonoBehaviour
                 {
                     Quaternion lookRotation = Quaternion.LookRotation(direction);
                     transform.rotation = Quaternion.RotateTowards(transform.rotation, lookRotation, rotationSpeed * Time.deltaTime);
+                    print(Quaternion.Angle(transform.rotation, lookRotation));
 
                     // 회전이 완료되면 이동 시작
                     if (Quaternion.Angle(transform.rotation, lookRotation) < 1f)

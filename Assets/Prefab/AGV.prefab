@@ -981,7 +981,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5883822083686329416}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: AGVMoving, Assembly-CSharp
         m_MethodName: MoveOrigin
         m_Mode: 1
@@ -1114,7 +1114,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5883822083686329416}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: AGVMoving, Assembly-CSharp
         m_MethodName: RouteCreate
         m_Mode: 1
@@ -1427,7 +1427,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1278337023145200623}
-  - component: {fileID: 5883822083686329416}
   - component: {fileID: 2197089114194412411}
   m_Layer: 0
   m_Name: AGV
@@ -1453,21 +1452,6 @@ Transform:
   - {fileID: 9191373221431610669}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
---- !u!114 &5883822083686329416
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1983196921937539628}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 488c500abd9219d4d9988a39b4704326, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 1
-  rotationSpeed: 100
-  savingPosition: []
 --- !u!65 &2197089114194412411
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2126,7 +2110,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5883822083686329416}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: AGVMoving, Assembly-CSharp
         m_MethodName: MoveAuto
         m_Mode: 1
