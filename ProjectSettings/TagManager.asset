@@ -9,6 +9,12 @@ TagManager:
   - Material
   - Plastic
   - Plastic1
+  - cuttingMachine1
+  - cuttingMachine2
+  - Material2
+  - Plastic2
+  - Plastic3
+  - Plastic4
   layers:
   - Default
   - TransparentFX

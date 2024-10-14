@@ -1,16 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class CuttingPlastic : MonoBehaviour
 {
     [SerializeField] GameObject cuttingPrefab;
-    [SerializeField] List<Transform> spawnPositions; // 여러 개의 위치를 저장하는 리스트
-
+    [SerializeField] List<Transform> spawnPositions;
 
     private void OnCollisionEnter(Collision collision)
     {
+        // 자신과 같은 태그를 가진 경우만 작동
         if (collision.gameObject.CompareTag("Material"))
         {
             StartCoroutine(shatterAfterDelay(collision.gameObject));

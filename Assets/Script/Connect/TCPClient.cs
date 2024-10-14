@@ -203,7 +203,7 @@ public class TCPClient : MonoBehaviour
             }
 
             //전원
-            int processStart = pointX[0][2];    
+            //int processStart = pointX[0][2];    
             
             //센서
 
@@ -236,8 +236,11 @@ public class TCPClient : MonoBehaviour
             }
             if (runExtruder1 == 1)
             {
+                if (pressureSensor[0].isPressing == true)
+                { 
                 linemanagers[0].isWorking = true;
                 linemanagers[0].isOn = true;
+                }
             }
             else if (runExtruder1 != 1)
             {
@@ -254,9 +257,12 @@ public class TCPClient : MonoBehaviour
             }
             if (runCuttingMachine == 1)
             {
-                wireCutting.isWorking = true;
-                plasticSpawn[1].isOn = true;
-                
+                if (linemanagers[0].LastPointArrive() ==  true)
+                {
+                    wireCutting.isWorking = true;
+                    plasticSpawn[1].isOn = true;
+                }
+   
             }
             else if (runCuttingMachine != 1)
             {
@@ -275,8 +281,9 @@ public class TCPClient : MonoBehaviour
 
             if (runExtruder2 == 1)
             {
-                linemanagers[1].isWorking = true;
+               
                 linemanagers[1].isOn = true;
+                
             }
             else if (runExtruder2 != 1)
             {
