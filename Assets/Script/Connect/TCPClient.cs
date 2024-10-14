@@ -12,6 +12,7 @@ using System.Linq;
 using System.IO;
 using UnityEngine.SceneManagement;
 using System.Diagnostics;
+using Unity.Collections.LowLevel.Unsafe;
 public class TCPClient : MonoBehaviour
 {
 
@@ -31,33 +32,39 @@ public class TCPClient : MonoBehaviour
     TcpClient client;
     NetworkStream stream;
 
+
     [Header("설비들을 연결합니다.")]
-
-    [SerializeField] Conveyor conveyor;
-    [SerializeField] Shredder shredder;
-    [SerializeField] LevelSensor[] sensor;
+    [SerializeField] EachFilamentFactory filamentFactory;
+    Conveyor conveyor;
+    Shredder shredder;
+    [SerializeField] LevelSensor[] tankSensor;
+    LevelSensorExtruder[] extruderSensor;
+    PressureSensor[] pressureSensor;
     [SerializeField] FilamentLine[] linemanagers;
-    [SerializeField] WireCutting wireCutting;
-    [SerializeField] ScrewBelt screwBelt;
-
+    WireCutting wireCutting;
+    ScrewBelt screwBelt;
+    PlasticSpawn[] plasticSpawn;
+   
     public bool cooling1;
     
-    //private void Awake()
-    //{
-    //    ServerConnect serverConnect = GetComponent<ServerConnect>();
+    private void Awake()
+    {
+        //ServerConnect serverConnect = GetComponent<ServerConnect>();
 
-    //    if (serverConnect != null)
-    //    {
-    //        serverConnect.RunTCPServer();
-    //    }
-    //    else
-    //    {
-    //        UnityEngine.Debug.LogError("ServerConnect 인스턴스를 찾을 수 없습니다.");
-    //    }
-    //}
+        //if (serverConnect != null)
+        //{
+        //    serverConnect.RunTCPServer();
+        //}
+        //else
+        //{
+        //    UnityEngine.Debug.LogError("ServerConnect 인스턴스를 찾을 수 없습니다.");
+        //}
+    }
     private void Start()
     {
+        
         // 로컬호스트: 로컬 컴퓨터의 디폴트 IP
+        FactoryMachineStart();
 
         try
         {
@@ -72,13 +79,27 @@ public class TCPClient : MonoBehaviour
         }
     }
 
+    private void FactoryMachineStart()
+    {
+        conveyor = filamentFactory.conveyor;
+        shredder = filamentFactory.shredder;
+        wireCutting = filamentFactory.wireCutting;
+        screwBelt = filamentFactory.screwBelt;
+
+        linemanagers = filamentFactory.linemanagers; // 배열을 직접 할당
+        tankSensor = filamentFactory.levelSensors; // 배열을 직접 할당
+        plasticSpawn = filamentFactory.plasticSpawn; // 배열을 직접 할당
+        extruderSensor = filamentFactory.extruder; // 배열을 직접 할당
+        pressureSensor = filamentFactory.pressureSensor; // 배열을 직접 할당
+    }
+
     private int[][] ReadDeviceBlock(string dataFromServer)
     {
-        print("1. ReadDeviceBlock dataFromServer: " + dataFromServer);
+        //print("1. ReadDeviceBlock dataFromServer: " + dataFromServer);
 
         // 문자열을 분리
         string[] strSplited = dataFromServer.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-        print("2. ReadDeviceBlock newData: " + string.Join(",", strSplited));
+        //print("2. ReadDeviceBlock newData: " + string.Join(",", strSplited));
 
         // 배열의 크기를 strSplited의 길이에 맞추기
         int[] values = new int[strSplited.Length];
@@ -131,11 +152,16 @@ public class TCPClient : MonoBehaviour
 
     public string WriteDeivceBlock()
     {
-        int sensorAValue = (sensor[0].isDetected == true) ? 1 : 0;
-        // int sensorBValue = (sensor[1].isDetected == true) ? 1 : 0;
+        int tank1SensorValue = (tankSensor[0].isDetected == true) ? 1 : 0;
+        int tank2SensorValue = (tankSensor[1].isDetected == true) ? 1 : 0;
+        int extruder1SensorValue = (extruderSensor[0].isSensing == true) ? 1 : 0;
+        int extruder2SensorValue = (extruderSensor[1].isSensing == true) ? 1 : 0;
+        int pressure1SensorValue = (pressureSensor[0].isPressing == true) ? 1 : 0;
+        int pressure2SensorValue = (pressureSensor[1].isPressing == true) ? 1 : 0;
+        int ls1value = (tankSensor[0].isDetected == true) ? 1 : 0;
 
-        int sensorNum = /*sensorCValue * 4 + sensorBValue * 2 + */sensorAValue * 1;
-        int lsNum = sensorAValue * 1;
+        int sensorNum = pressure2SensorValue * 32 + pressure1SensorValue*16 +extruder2SensorValue*8 +extruder1SensorValue * 4 + tank2SensorValue*2 + tank1SensorValue * 1;
+        int lsNum = ls1value * 1;
 
         string sensorData = sensorNum.ToString() +"," + lsNum.ToString();
 
@@ -156,10 +182,7 @@ public class TCPClient : MonoBehaviour
             pointY = ReadDeviceBlock(dataFromServerY);
             pointX = ReadDeviceBlock(dataFromServerX);
             
-            //탱크 제어
-           /* int Tank1 = pointY[0][5];
-            int Tank2 = pointY[0][6];*/
-
+          
             //장비
             int runConveyor = pointY[0][1];
             int runShreder = pointY[2][0];
@@ -167,20 +190,38 @@ public class TCPClient : MonoBehaviour
             int runCooler1 = pointY[2][2];
             int runCuttingMachine = pointY[2][3];
             int runScrewBelt = pointY[2][4];
-            /*int runExtruder2 = pointY[2][5];
+            int runExtruder2 = pointY[2][5];
             int runCooler2 = pointY[2][6];
-            int runPullyMachine = pointY[2][7];*/
+            int runPullyMachine = pointY[2][7];
 
+            for (int i = 0; i < pointY.Length; i++)
+            {
+                for (int j = 0; j < pointY[i].Length; j++)
+                {
+                    print($"PointY[{i}][{j}]값 : {pointY[i][j]}");
+                }
+            }
+
+            //전원
+            int processStart = pointX[0][2];    
+            
             //센서
 
-            int Level1 = pointX[5][0];
-           // int Level2 = pointX[5][1];
-           //int LimitSwitch = pointX[5][2];
+            int tank1Level = pointX[5][0];
+            int tank2Level = pointX[5][1];
+            int Extruder1Level = pointX[5][2];
+            int Extruder2Level = pointX[5][3];
+            int Extruder1Pressure = pointX[5][4];
+            int Extruder2Pressure = pointX[5][5];
+       
+            //리미트
+            int limitSwitch1 = pointX[6][0];
 
             if (runConveyor == 1)
             {
                 conveyor.conveyorRunning = true;
             }
+
             else if (runConveyor != 1)
             {
                 conveyor.conveyorRunning = false;
@@ -196,10 +237,12 @@ public class TCPClient : MonoBehaviour
             if (runExtruder1 == 1)
             {
                 linemanagers[0].isWorking = true;
+                linemanagers[0].isOn = true;
             }
             else if (runExtruder1 != 1)
             {
                 linemanagers[0].isWorking = false;
+              
             }
             if (runCooler1 == 1)
             {
@@ -212,10 +255,14 @@ public class TCPClient : MonoBehaviour
             if (runCuttingMachine == 1)
             {
                 wireCutting.isWorking = true;
+                plasticSpawn[1].isOn = true;
+                
             }
             else if (runCuttingMachine != 1)
             {
                 wireCutting.isWorking = false;
+                plasticSpawn[1].isOn = false;
+
             }
             if (runScrewBelt == 1)
             {
@@ -225,6 +272,72 @@ public class TCPClient : MonoBehaviour
             {
                 screwBelt.isWorking = false;
             }
+
+            if (runExtruder2 == 1)
+            {
+                linemanagers[1].isWorking = true;
+                linemanagers[1].isOn = true;
+            }
+            else if (runExtruder2 != 1)
+            {
+                linemanagers[1].isWorking = false;
+            }
+
+ 
+
+
+            //X제어
+
+            if (tankSensor[0].isDetected == true)
+            {
+                tank1Level = 1;
+            }
+            else if (tankSensor[0].isDetected == false)
+            {
+                tank1Level = 0;
+            }
+            if (tankSensor[1].isDetected == true)
+            {
+                tank2Level = 1;
+            }
+            else if (tankSensor[1].isDetected == false)
+            {
+                tank2Level = 0;
+            }
+           if( extruderSensor[0].isSensing == true)
+            {
+                Extruder1Level = 1;
+            }
+            else if( extruderSensor[0].isSensing == false)
+            {
+                Extruder1Level = 0;
+            }
+            if (extruderSensor[1].isSensing == true)
+            {
+                Extruder2Level = 1;
+            }
+            else if (extruderSensor[1].isSensing == false)
+            {
+                Extruder2Level = 0;
+            }
+
+            if (pressureSensor[0].isPressing == true)
+            {
+                Extruder1Pressure = 1;
+            }
+            else if (pressureSensor[0].isPressing == false)
+            {
+                Extruder1Pressure = 0;
+            }
+            if (pressureSensor[1].isPressing == true)
+            {
+                Extruder2Pressure = 1;
+            }
+            else if (pressureSensor[1].isPressing == false)
+            {
+                Extruder2Pressure = 0;
+            }
+
         }
 
         catch (Exception ex)
