@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public class ScrewBelt : MonoBehaviour
 {
-    public Transform filletPosition;
+    // public Transform filletPosition;
 
 
     [HideInInspector]
