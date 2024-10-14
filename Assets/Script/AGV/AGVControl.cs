@@ -26,6 +26,12 @@ public class AGVControl : MonoBehaviour
     public bool isStandby;                  // 대기 여부
     public bool isNeedtoCharge;             // 충전 필요 여부
 
+    [Header ("AGV Road")]
+    public List<Transform> PrinterPosition;
+    public List<Transform> originalPosition;
+    public List<Transform> storagePosition;
+    public List<Transform> boxPosition;
+
     private LineRendererMake lineMake = new LineRendererMake();
     public int currentTargetIndex = 0;     // 현재 목표 포지션 인덱스
 
@@ -41,6 +47,7 @@ public class AGVControl : MonoBehaviour
     {
         if (isMoving && currentTargetIndex < movingPositions.Count)
         {
+            
             // 목표 위치로 이동
             AGVMoveAndRotate(movingPositions[currentTargetIndex]);
 

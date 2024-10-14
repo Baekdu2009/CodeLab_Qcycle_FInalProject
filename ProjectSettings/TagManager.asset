@@ -8,6 +8,7 @@ TagManager:
   - Box
   - Material
   - Plastic
+  - PrintCart
   layers:
   - Default
   - TransparentFX

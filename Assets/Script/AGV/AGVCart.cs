@@ -16,7 +16,7 @@ public class AGVCart : MonoBehaviour
     bool plateIsFull;
     int boxFullNum = 19;
     int colliderCount = 0;
-    public List<Transform> PrinterPositions; // AGVRoute에서 가져온 PrinterPosition 리스트
+   
 
     //public List<Transform> routePoints;
 
@@ -27,12 +27,6 @@ public class AGVCart : MonoBehaviour
         Collider plateCollider = PlateCollider.GetComponent<Collider>();
         plateCollider.isTrigger = true;
         callAGVBtn.SetActive(false);
-
-        AGVRoute route = GetComponent<AGVRoute>();
-        if (route != null)
-        {
-            PrinterPositions = route.PrinterPosition; // PrinterPosition 저장
-        }
     }
 
 
@@ -74,14 +68,14 @@ public class AGVCart : MonoBehaviour
         transform.rotation = initialRotation;
     }
 
-   /* public List<Vector3> GetRoute()
-    {
-        List<Vector3> route = new List<Vector3>();
-        foreach(Transform point in routePoints)
-        {
-            route.Add(point.position);
-        }
-        return route;
-    }
-*/
+    /* public List<Vector3> GetRoute()
+     {
+         List<Vector3> route = new List<Vector3>();
+         foreach(Transform point in routePoints)
+         {
+             route.Add(point.position);
+         }
+         return route;
+     }
+ */
 }
