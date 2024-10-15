@@ -117,7 +117,7 @@ public class AGVLarge : AGVControl
 
         while (currentTargetIndex < movingPositions.Count)
         {
-            MoveAlongPath(); // 경로를 따라 이동
+            MoveByPoint(); // 경로를 따라 이동
 
            yield return null; // 다음 프레임까지 대기
 
@@ -142,7 +142,7 @@ public class AGVLarge : AGVControl
 
         while (currentTargetIndex < movingPositions.Count)
         {
-            MoveAlongPath(); // 경로를 따라 이동
+            MoveByPoint(); // 경로를 따라 이동
             yield return null; // 다음 프레임까지 대기
         }
 
@@ -206,7 +206,7 @@ public class AGVLarge : AGVControl
             
             // Debug.Log("이동");
             // Debug.Log("Current Target Index: " + currentTargetIndex); // 현재 인덱스 확인
-            MoveAlongPath();
+            MoveByPoint();
             // isRotating = true;
 
             // Debug.Log("Current Position: " + transform.position);

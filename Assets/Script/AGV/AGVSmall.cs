@@ -84,7 +84,7 @@ public class AGVSmall : AGVControl
             {
                 isMoving = true;
                 PathToTarget(targetToMove);
-                MoveAlongPath();
+                MovebyPath();
             }
             else if (GetDistanceToTarget(targetToMove) < 0.01f)
             {
@@ -114,7 +114,7 @@ public class AGVSmall : AGVControl
             printerLocationArrived = false;
             targetToMove = hoodLocation[0];
             PathToTarget(targetToMove);
-            MoveAlongPath();
+            MovebyPath();
         }
 
         // 거리 체크로 도착 여부 확인
