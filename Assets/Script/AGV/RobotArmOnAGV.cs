@@ -55,6 +55,7 @@ public class RobotArmOnAGV : RobotArmControl
     private void Update()
     {
         printerSignal = robotAGV.printerSignalInput;
+        RobotArmUIUpdate();
         GripperRotate();
         // PlateRotate();
     }
@@ -158,9 +159,25 @@ public class RobotArmOnAGV : RobotArmControl
         rb.isKinematic = true;
     }
 
-    //public void PickDownPrintingObject()
-    //{
-    //    printingObject.transform.SetParent(null);
-    //    Destroy(printingObject);
-    //}
+    private void RobotArmUIUpdate()
+    {
+        if (isRunning)
+        {
+            pickingCheck.color = Color.green;
+            pickngTxt.text = "Pick Object";
+            pickngTxt.color = Color.green;
+        }
+        else
+        {
+            pickingCheck.color = Color.yellow;
+            pickngTxt.text = "No Object";
+            pickngTxt.color = Color.yellow;
+        }
+    }
+
+    public void PickDownPrintingObject()
+    {
+        printingObject.transform.SetParent(null);
+        Destroy(printingObject);
+    }
 }

@@ -12,15 +12,17 @@ public class AGVCart : MonoBehaviour
     public Image FullCheck;
     public TMP_Text BoxFullTxt;
     public GameObject callAGVBtn;
-    
-    public bool isAGVCallOn;
+    public GameObject Canvas;
+
     bool plateIsFull;
     int boxFullNum = 19;
     int colliderCount = 0;
-
-    public Vector3 initialSpawnposition;
-    public Quaternion initialSpawnrotation;
    //private Quaternion initialRotationValue;
+
+    [HideInInspector]
+    public bool isAGVCallOn;
+    // Vector3 initialSpawnposition;
+    // Quaternion initialSpawnrotation;
 
     private void Start()
     {

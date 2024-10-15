@@ -2,23 +2,37 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
 using Unity.VisualScripting;
+using TMPro;
+using UnityEngine.UI;
 
 public class AGVLarge : AGVControl
 {
     public AGVCart[] movingCarts; // AGV가 이동할 카트 배열
     public bool fullSignalInput;   // 신호 상태를 나타내는 변수
     public GameObject[] pinObject; // PIN 오브젝트 배열
+    public Image movingCheck;
+    public TMP_Text movingTxt;
+    public Image carryingCheck;
+    public TMP_Text carryingTxt;
+
+    [Header("AGV Road")]
+    public List<Transform> originalPosition;
+    public List<Transform> storagePosition;
+    public List<Transform> boxPosition;
+
+    [Header("Carts")]
+    public GameObject boxCartPrefab;
+    public GameObject storageCartPrefab;
 
     public Transform targetToMove;
     bool isAGVLocateToCart;
     float pinMoveSpeed = 1f;
     bool speedControl;
-    bool pinDown;
+    bool pinConnected;
 
     private void Start()
     {
         FindPinObjects();
-
     }
 
     private void Update()
@@ -29,8 +43,8 @@ public class AGVLarge : AGVControl
         }
 
         CartSignalCheck();
-
         AGVtoCartMove();
+        LargeAGVUIUpdate();
     }
 
     private void CartSignalCheck()
@@ -67,7 +81,6 @@ public class AGVLarge : AGVControl
             else if (GetDistanceToTarget(targetToMove) < 0.01f && IsFacingTarget(targetToMove))
             {
                 CartConnect();
-
             }
         }
     }
@@ -79,7 +92,6 @@ public class AGVLarge : AGVControl
         {
 
             targetToMove.SetParent(transform); // targetToMove를 AGVLarge의 자식으로 설정
-            
 
             if (targetToMove.CompareTag("storageCart"))
             {
@@ -99,8 +111,6 @@ public class AGVLarge : AGVControl
                 }
             }
         }
-
-
     }
 
     private IEnumerator MoveTostoragePosition()
@@ -112,7 +122,7 @@ public class AGVLarge : AGVControl
 
         foreach (var position in storagePosition)
         {
-            movingPositions.Add(position); // PrinterPosition을 이동 경로에 추가
+            movingPositions.Add(position);
         }
 
         while (currentTargetIndex < movingPositions.Count)
@@ -120,24 +130,22 @@ public class AGVLarge : AGVControl
             MoveByPoint(); // 경로를 따라 이동
 
            yield return null; // 다음 프레임까지 대기
-
         }
 
         if (targetToMove != null)
         {
             yield return StartCoroutine(UnparentAndPinDown(targetToMove)); // 카트와의 부모 관계 해제
-
         }
     }
+
     private IEnumerator MoveToBoxPosition()
     {
-
         PinMove(true);
         movingPositions.Clear();
 
         foreach (var position in boxPosition)
         {
-            movingPositions.Add(position); // PrinterPosition을 이동 경로에 추가
+            movingPositions.Add(position);
         }
 
         while (currentTargetIndex < movingPositions.Count)
@@ -150,12 +158,8 @@ public class AGVLarge : AGVControl
         {
 
             yield return StartCoroutine(UnparentAndPinDown(targetToMove)); // 카트와의 부모 관계 해제
-
         }
     }
-
-
-
 
     private IEnumerator UnparentAndPinDown(Transform cartTransform)
     {
@@ -181,7 +185,9 @@ public class AGVLarge : AGVControl
         speedControl = false;
         currentTargetIndex = 0;
         movingPositions.Clear();
-        yield return null; // StartCoroutine(ReturnToInitialPosition()); // 초기 위치로 돌아가기
+        yield return null;
+        
+        StartCoroutine(ReturnToInitialPosition()); // 초기 위치로 돌아가기
        
 
         if (cart.isAGVCallOn) // 카트가 다시 AGV 호출 상태인지 확인
@@ -217,25 +223,25 @@ public class AGVLarge : AGVControl
         isRotating = false;
         isMoving = false;
         targetToMove = null; // 목표 카트 초기화
-       
-        
+
+        transform.rotation = Quaternion.identity;
     }
-
-
 
     private void PinMove(bool isCartConnected)
     {
         foreach (var obj in pinObject)
         {
             float originalY = obj.transform.position.y;
-            print("PinMove" + isCartConnected);
+            // print("PinMove" + isCartConnected);
             if (isCartConnected)
             {
                 obj.transform.localPosition += Vector3.up * 0.19f;
+                pinConnected = true;
             }
             else
             {
                 obj.transform.position -= Vector3.up * 0.19f;
+                pinConnected = false;
             }
         }
     }
@@ -244,5 +250,34 @@ public class AGVLarge : AGVControl
     {
         var pinObjects = FindObjectsByName("PIN");
         pinObject = pinObjects.ToArray(); // 배열로 변환하여 저장
+    }
+
+    private void LargeAGVUIUpdate()
+    {
+        if (isMoving)
+        {
+            movingCheck.color = Color.green;
+            movingTxt.text = "Moving";
+            movingTxt.color = Color.green;
+        }
+        else
+        {
+            movingCheck.color = Color.yellow;
+            movingTxt.text = "Stand By";
+            movingTxt.color = Color.yellow;
+        }
+
+        if (pinConnected)
+        {
+            carryingCheck.color = Color.green;
+            carryingTxt.text = "Cart Carrying";
+            carryingTxt.color = Color.green;
+        }
+        else
+        {
+            carryingCheck.color = Color.yellow;
+            carryingTxt.text = "No Cart";
+            carryingTxt.color = Color.yellow;
+        }
     }
 }

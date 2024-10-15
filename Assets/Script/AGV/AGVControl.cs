@@ -12,7 +12,8 @@ public class AGVControl : MonoBehaviour
 {
     [Header("AGV 제어")]
     public List<Transform> movingPositions = new List<Transform>();
-    public Transform chargingPosition;      // 충전 위치 포지션
+    public GameObject Canvas;
+    // public Transform chargingPosition;      // 충전 위치 포지션
 
     public float moveSpeed = 2f;            // 이동속도
     public float rotSpeed = 200f;           // 회전속도
@@ -25,17 +26,6 @@ public class AGVControl : MonoBehaviour
 
     private LineRendererMake lineMake = new LineRendererMake();
     public int currentTargetIndex = 0;     // 현재 목표 포지션 인덱스
-
-
-    [Header("AGV Road")]
-    public List<Transform> originalPosition;
-    public List<Transform> storagePosition;
-    public List<Transform> boxPosition;
-
-    [Header("Carts")]
-    public GameObject boxCartPrefab;
-    public GameObject storageCartPrefab;
-
 
     private void Start()
     {

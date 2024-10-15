@@ -7,8 +7,8 @@ using TMPro;
 public class BoxingManager : ManagerClass
 {
     [SerializeField] List<BoxingMachine> BoxingMachines = new List<BoxingMachine>();
-    public GameObject Canvas;
-    public GameObject robotArmCanvas;
+    [SerializeField] GameObject Canvas;
+    [SerializeField] GameObject robotArmCanvas;
     public TMP_Text robotArmOnOff;
     bool robotArmCanvasOn = false;
 
@@ -20,8 +20,8 @@ public class BoxingManager : ManagerClass
 
     protected override void Update()
     {
+        base.Update();
         RobotArmCanvas();
-        PointerControl();
     }
 
     protected override GameObject GetCanvasProperty(object obj)
