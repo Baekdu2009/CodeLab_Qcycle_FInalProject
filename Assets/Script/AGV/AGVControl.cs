@@ -39,7 +39,7 @@ public class AGVControl : MonoBehaviour
     {
         if (isMoving && currentTargetIndex < movingPositions.Count)
         {
-
+            DetectObstacles();
             // 목표 위치로 이동
             AGVMoveAndRotate(movingPositions[currentTargetIndex]);
 

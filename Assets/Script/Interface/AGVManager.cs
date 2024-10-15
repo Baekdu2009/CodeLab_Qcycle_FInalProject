@@ -35,12 +35,12 @@ public class AGVManager : ManagerClass
         if (cartCanvasOn)
         {
             cartCanvas.SetActive(true);
-            cartOnOff.text = "OFF";
+            cartOnOff.text = "Cart\nOFF";
         }
         else
         {
             cartCanvas.SetActive(false);
-            cartOnOff.text = "ON";
+            cartOnOff.text = "Cart\nON";
         }
     }
 
