@@ -6569,6 +6569,7 @@ MonoBehaviour:
   leftGripper: {fileID: 5469148551333296591}
   gripperWorking: 0
   plateLocation: {fileID: 3250231360282484017}
+  printingObject: {fileID: 0}
   printerSignal: 0
 --- !u!1 &7860630889223339315
 GameObject:
@@ -6757,13 +6758,13 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 2967870631857616950}
   - {fileID: 3830280231458028274}
   - {fileID: 5162440575067078473}
   - {fileID: 7549659109807900417}
   - {fileID: 7718859626225526689}
   - {fileID: 6684457013271320610}
   - {fileID: 2556222528076365540}
-  - {fileID: 2967870631857616950}
   - {fileID: 8562053186716446374}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -6787,10 +6788,16 @@ MonoBehaviour:
   avoidanceDistance: 0.2
   batteryCapacity: 100
   isMoving: 0
+  isRotating: 0
   isStopping: 0
   isStandby: 0
   isNeedtoCharge: 0
   currentTargetIndex: 0
+  originalPosition: []
+  storagePosition: []
+  boxPosition: []
+  boxCartPrefab: {fileID: 0}
+  storageCartPrefab: {fileID: 0}
   printerSet:
   - {fileID: 0}
   - {fileID: 0}

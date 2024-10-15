@@ -8,16 +8,21 @@ public class BoxingMachine : MonoBehaviour
     public GameObject[] flatBox;
     public Transform initialBoxPlate;
 
+    ObjectDestroy ObjectDestroy;
+    GameObject newBox;
     int boxCnt;
 
     private void Start()
     {
-        
+        ObjectDestroy = FindAnyObjectByType<ObjectDestroy>();
     }
 
     private void Update()
     {
-        if (boxCnt < 10)
+        if (newBox == null)
+            boxCnt = 0;
+
+        if (boxCnt == 0)
         {
             StartCoroutine(FlatBoxCreate());
         }
@@ -25,12 +30,10 @@ public class BoxingMachine : MonoBehaviour
 
     private IEnumerator FlatBoxCreate()
     {
-        Instantiate(flatBox[0]);
-        Instantiate(flatBox[1]);
-        flatBox[0].transform.position = initialBoxPlate.transform.position;
-        flatBox[1].transform.position = initialBoxPlate.transform.position;
-
-        boxCnt += 2;
+        int rand = UnityEngine.Random.Range(0, flatBox.Length);
+        
+        newBox = Instantiate(flatBox[rand], initialBoxPlate.position, Quaternion.Euler(0, 0, 90));
+        boxCnt++;
 
         yield return new WaitForSeconds(1f);
     }

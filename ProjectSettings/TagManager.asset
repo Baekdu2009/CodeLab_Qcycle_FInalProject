@@ -17,6 +17,7 @@ TagManager:
   - Plastic4
   - BoxCart
   - storageCart
+  - Filament
   layers:
   - Default
   - TransparentFX
