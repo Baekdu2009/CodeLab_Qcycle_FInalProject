@@ -33,7 +33,13 @@ public class RobotArmControl : MonoBehaviour
     protected bool isRunning = false;
     protected bool isIncreasing;
     protected bool isDecreasing;
+    public RobotArmFunction robotWork;
 
+    public enum RobotArmFunction
+    {
+        Boxing,
+        AGV
+    }
 
     public enum RotationAxis
     {

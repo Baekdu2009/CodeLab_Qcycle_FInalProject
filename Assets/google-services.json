@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "427995320469",
+    "firebase_url": "https://robot-finalproject-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "robot-finalproject",
+    "storage_bucket": "robot-finalproject.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:427995320469:android:d233562fac6b9e55ff0b9c",
+        "android_client_info": {
+          "package_name": "com.SmartFactory.Finalproject"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCDJqMuH3efYEkTlp0tXhQE-rR7QAEG7kA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
