@@ -102,7 +102,6 @@ public class AGVSmall : AGVControl
         }
     }
 
-
     private void MoveToHood()
     {
         if (RobotArmOnAGV.printingObject != null)
@@ -123,9 +122,6 @@ public class AGVSmall : AGVControl
             isMoving = false;
         }
     }
-
-
-
 
     private void FindPrinterObject()
     {

@@ -492,6 +492,7 @@ public class PrinterCode : MonoBehaviour
         printingStatus.color = Color.red;
         machineLight.material.color = Color.yellow;
         isFinished = true;
+        visibleObject.transform.localScale = new Vector3(1, 1, 1);
 
         if (finishCoroutine == null)
         {
@@ -506,21 +507,26 @@ public class PrinterCode : MonoBehaviour
 
     public void BtnResetPrinter()
     {
-        // 초기화 작업 수행
-        workingTime = 0f; // 작업 시간 초기화
-        expectedTime = totalExpectedTime; // 예상 시간 초기화
-        UpdateExpectTimeText(); // 예상 작업 시간 텍스트 초기화
-        printingStatus.text = "Printing Status\n00%"; // 프린팅 상태 초기화
-        printerExpectTime.text = $"Expect Time\n00:00:00";
-        printerWorkingTime.text = "Working Time\n00:00:00";
+        if (visibleObject == null)
+        {
+            // 초기화 작업 수행
+            workingTime = 0f; // 작업 시간 초기화
+            expectedTime = totalExpectedTime; // 예상 시간 초기화
+            UpdateExpectTimeText(); // 예상 작업 시간 텍스트 초기화
+            printingStatus.text = "Printing Status\n00%"; // 프린팅 상태 초기화
+            printerExpectTime.text = $"Expect Time\n00:00:00";
+            printerWorkingTime.text = "Working Time\n00:00:00";
         
-        objectDropdown.interactable = true;
-        isPrinting = false; // 인쇄 중지 상태로 설정
-        isFinished = false;
-        resetBtn.SetActive(false);
-        printingStatus.color = Color.black;
-        printerExpectTime.color = Color.black;
-        printerWorkingTime.color = Color.black;
+            objectDropdown.interactable = true;
+            isPrinting = false; // 인쇄 중지 상태로 설정
+            isFinished = false;
+            resetBtn.SetActive(false);
+            printingStatus.color = Color.black;
+            printerExpectTime.color = Color.black;
+            printerWorkingTime.color = Color.black;
+        }
+        else
+            return;
     }
 
     private void FilamentStatusUpdate()
