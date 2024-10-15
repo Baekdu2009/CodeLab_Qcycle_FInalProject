@@ -3,6 +3,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEngine.UI;
+using TMPro;
 
 public class RobotArmOnAGV : RobotArmControl
 {
@@ -11,6 +13,8 @@ public class RobotArmOnAGV : RobotArmControl
     public GameObject leftGripper;
     public bool gripperWorking;
     public Transform plateLocation;
+    public Image pickingCheck;
+    public TMP_Text pickngTxt;
 
     // [HideInInspector]
     AGVSmall robotAGV;

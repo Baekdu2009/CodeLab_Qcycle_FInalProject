@@ -18,12 +18,18 @@ public class SuckingAction : MonoBehaviour
     {
         ActionBoolUpdate();
 
-        if (!isSuctionOn && isAttached)
+        if (!isSuctionOn && isAttached && rb != null)
         {
             rb.useGravity = true;
             rb.isKinematic = false;
         }
+
+        if (rb == null)
+        {
+            isAttached = false;
+        }
     }
+
 
     private void OnTriggerStay(Collider other)
     {

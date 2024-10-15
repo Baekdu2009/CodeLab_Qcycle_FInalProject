@@ -97,7 +97,6 @@ public class AGVControl : MonoBehaviour
         }
     }
 
-
     public void AGVMove(Transform targetPos)
     {
         Vector3 direction = (targetPos.position - transform.position).normalized;
@@ -118,7 +117,6 @@ public class AGVControl : MonoBehaviour
         {
             transform.rotation = Quaternion.RotateTowards(currentAngle, targetAngle, rotSpeed * Time.deltaTime);
         }
-
     }
 
     public bool IsFacingTarget(Transform target, float angleThreshold = 0.0001f)
@@ -134,7 +132,6 @@ public class AGVControl : MonoBehaviour
             transform.Rotate(Vector3.up, rotSpeed * Time.deltaTime);
         else
             transform.Rotate(Vector3.up, -rotSpeed * Time.deltaTime);
-
     }
 
     public float GetDistanceToTarget(Transform target)

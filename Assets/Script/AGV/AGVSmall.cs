@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class AGVSmall : AGVControl
 {
@@ -9,6 +11,8 @@ public class AGVSmall : AGVControl
     public List<PrinterCode> printers; // 프린터 코드 리스트
     public List<Transform> printerLocation; // 프린터 위치 저장 리스트
     public List<Transform> hoodLocation;    // 후드 위치 저장 리스트
+    public Image movingCheck;
+    public TMP_Text movingTxt;
     Transform initialPos;
 
     [HideInInspector]
@@ -32,6 +36,7 @@ public class AGVSmall : AGVControl
     {
         PrinterSignalCheck();
         AGVtoPrinterMove();
+        AGVRobotUIUpdate();
     }
 
     private void PrinterSignalCheck()
@@ -98,7 +103,6 @@ public class AGVSmall : AGVControl
         else if (moveToHood) // 후드로 이동해야 하는 경우
         {
             MoveToHood();
-            
         }
     }
 
@@ -120,6 +124,22 @@ public class AGVSmall : AGVControl
             targetToMove = null;
             moveToHood = false; // 후드 이동 완료
             isMoving = false;
+        }
+    }
+
+    private void AGVRobotUIUpdate()
+    {
+        if (isMoving)
+        {
+            movingCheck.color = Color.green;
+            movingTxt.text = "Moving";
+            movingTxt.color = Color.green;
+        }
+        else
+        {
+            movingCheck.color = Color.yellow;
+            movingTxt.text = "Stand By";
+            movingTxt.color = Color.yellow;
         }
     }
 
