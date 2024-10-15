@@ -38,7 +38,7 @@ public class EachFilamentFactory : MonoBehaviour
     public Image extruder2Status;
     public Image rollingStatus;
     public Image spoolerStatus;
-    public GameObject filamentTakeOut;
+    // public GameObject filamentTakeOut;
     public Image[] tankStatus;
 
     // private
@@ -51,10 +51,7 @@ public class EachFilamentFactory : MonoBehaviour
     Vector3 initialScale;
     float currentRotation = 0f;
     float scaleFactor;
-
     bool isfilamentOnRotate;
-
-    
 
     // 저장탱크 변수
     // public bool[] tankLevelbool;
@@ -157,7 +154,7 @@ public class EachFilamentFactory : MonoBehaviour
     {
         if (filamentObject == null)
         {
-            filamentTakeOut.SetActive(false);
+            // filamentTakeOut.SetActive(false);
             filamentLineObj = Instantiate(filamentLinePrefab);
             filamentCoverObj = Instantiate(filamentCoverPrefab);
             isfilamentOnRotate = true;
@@ -190,9 +187,9 @@ public class EachFilamentFactory : MonoBehaviour
             if (filamentLineObj.transform.localScale.x >= 0.96f || filamentLineObj.transform.localScale.y >= 0.96f)
             {
                 rotSpeed = 0;
-                filamentTakeOut.SetActive(true);
-
+                //filamentTakeOut.SetActive(true);
                 isfilamentOnRotate = false;
+                FilamentShift();
             }
         }
     }
@@ -205,7 +202,7 @@ public class EachFilamentFactory : MonoBehaviour
         }
     }
 
-    public void BtnFilamentShift()
+    public void FilamentShift()
     {
         if (Vector3.Distance(filamentObject.transform.position, filamentRotPosition.position) < 0.1f)
         {
