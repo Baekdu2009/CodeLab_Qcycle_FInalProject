@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
+using Unity.VisualScripting;
 
 public class AGVLarge : AGVControl
 {
@@ -9,13 +11,14 @@ public class AGVLarge : AGVControl
 
     public Transform targetToMove;
     bool isAGVLocateToCart;
-    public bool isCartConnected;
     float pinMoveSpeed = 1f;
+    bool speedControl;
+    bool pinDown;
 
     private void Start()
     {
-        movingPositions.Add(transform);
         FindPinObjects();
+
     }
 
     private void Update()
@@ -26,6 +29,7 @@ public class AGVLarge : AGVControl
         }
 
         CartSignalCheck();
+
         AGVtoCartMove();
     }
 
@@ -47,7 +51,7 @@ public class AGVLarge : AGVControl
         }
     }
 
-    float CalculateDistance()
+    float AGVtoCartDistance()
     {
         return Vector3.Distance(transform.position, targetToMove.position);
     }
@@ -56,13 +60,14 @@ public class AGVLarge : AGVControl
     {
         if (fullSignalInput)
         {
-            if (GetDistanceToTarget(targetToMove) > 0.01f)
+            if (GetDistanceToTarget(targetToMove) > 0.01f || !IsFacingTarget(targetToMove))
             {
-                AGVMove(targetToMove);
+                AGVMoveAndRotate(targetToMove);
             }
-            else if (GetDistanceToTarget(targetToMove) < 0.01f)
+            else if (GetDistanceToTarget(targetToMove) < 0.01f && IsFacingTarget(targetToMove))
             {
                 CartConnect();
+
             }
         }
     }
@@ -70,31 +75,167 @@ public class AGVLarge : AGVControl
     private void CartConnect()
     {
         // 카트를 AGVLarge의 자식으로 설정
-        PinMove();
         if (targetToMove != null)
         {
+
             targetToMove.SetParent(transform); // targetToMove를 AGVLarge의 자식으로 설정
+            
+
+            if (targetToMove.CompareTag("storageCart"))
+            {
+                if (!speedControl)
+                {
+                    speedControl = true;
+                    StartCoroutine(MoveTostoragePosition());
+                }
+            }
+            if (targetToMove.CompareTag("BoxCart"))
+            {
+                if (!speedControl)
+                {
+                    speedControl = true;
+
+                    StartCoroutine(MoveToBoxPosition());
+                }
+            }
+        }
+
+
+    }
+
+    private IEnumerator MoveTostoragePosition()
+    {
+        PinMove(true);
+
+        // 이동 경로 초기화
+        movingPositions.Clear();
+
+        foreach (var position in storagePosition)
+        {
+            movingPositions.Add(position); // PrinterPosition을 이동 경로에 추가
+        }
+
+        while (currentTargetIndex < movingPositions.Count)
+        {
+            MoveAlongPath(); // 경로를 따라 이동
+
+           yield return null; // 다음 프레임까지 대기
+
+        }
+
+        if (targetToMove != null)
+        {
+            yield return StartCoroutine(UnparentAndPinDown(targetToMove)); // 카트와의 부모 관계 해제
+
+        }
+    }
+    private IEnumerator MoveToBoxPosition()
+    {
+
+        PinMove(true);
+        movingPositions.Clear();
+
+        foreach (var position in boxPosition)
+        {
+            movingPositions.Add(position); // PrinterPosition을 이동 경로에 추가
+        }
+
+        while (currentTargetIndex < movingPositions.Count)
+        {
+            MoveAlongPath(); // 경로를 따라 이동
+            yield return null; // 다음 프레임까지 대기
+        }
+
+        if (targetToMove != null)
+        {
+
+            yield return StartCoroutine(UnparentAndPinDown(targetToMove)); // 카트와의 부모 관계 해제
+
+        }
+    }
+
+
+
+
+    private IEnumerator UnparentAndPinDown(Transform cartTransform)
+    {
+        // 카트가 연결된 상태로 핀을 내림
+      
+        PinMove(false);
+       
+        // 핀이 내려가는 동안 대기
+        yield return new WaitForSeconds(0.5f); // 핀 내리는 시간을 기다림 (시간 조정 필요)
+
+
+        cartTransform.SetParent(null); // 부모 관계 해제
+        AGVCart cart = cartTransform.GetComponent<AGVCart>();
+        // AGVControl agvControl = GetComponent<AGVControl>();
+        if (cart != null)
+        {
+            cart.SetAGVCallState(false); // AGVCall 상태를 false로 설정
+                                         // isRotating = false;
+        }
+
+        isMoving = false;
+        isRotating = false;
+        speedControl = false;
+        currentTargetIndex = 0;
+        movingPositions.Clear();
+        yield return null; // StartCoroutine(ReturnToInitialPosition()); // 초기 위치로 돌아가기
+       
+
+        if (cart.isAGVCallOn) // 카트가 다시 AGV 호출 상태인지 확인
+        {
+            
+            AGVtoCartMove(); // AGV를 움직이게 함
         }
 
     }
 
-    private void PinMove()
+    private IEnumerator ReturnToInitialPosition()
+    {
+        foreach (var position in originalPosition)
+        {
+            movingPositions.Add(position);
+        }
+        // Debug.Log("Moving Positions Count: " + movingPositions.Count); // 추가된 로그
+
+        while (currentTargetIndex < movingPositions.Count)
+        {
+            isMoving = true;
+            
+            // Debug.Log("이동");
+            // Debug.Log("Current Target Index: " + currentTargetIndex); // 현재 인덱스 확인
+            MoveAlongPath();
+            // isRotating = true;
+
+            // Debug.Log("Current Position: " + transform.position);
+            // Debug.Log("Target Position: " + movingPositions[currentTargetIndex].position);
+            yield return null;// transform.rotation = Quaternion.Euler(0, 0, 0); // 다음 프레임까지 대기
+        }
+        movingPositions.Clear();
+        isRotating = false;
+        isMoving = false;
+        targetToMove = null; // 목표 카트 초기화
+       
+        
+    }
+
+
+
+    private void PinMove(bool isCartConnected)
     {
         foreach (var obj in pinObject)
         {
             float originalY = obj.transform.position.y;
-            float movingY = isCartConnected ? -0.18f : 0;
-
-            Vector3 currentPos = obj.transform.position;
-            
-            if (Mathf.Abs(currentPos.y - movingY) > 0.01f)
+            print("PinMove" + isCartConnected);
+            if (isCartConnected)
             {
-                Vector3 pinTargetPos = new Vector3(currentPos.x, movingY, currentPos.z);
-                obj.transform.position = Vector3.MoveTowards(currentPos, pinTargetPos, pinMoveSpeed * Time.deltaTime);
+                obj.transform.localPosition += Vector3.up * 0.19f;
             }
             else
             {
-                obj.transform.position = new Vector3(currentPos.x, movingY, currentPos.z);
+                obj.transform.position -= Vector3.up * 0.19f;
             }
         }
     }

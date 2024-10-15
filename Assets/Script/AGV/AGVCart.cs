@@ -12,12 +12,15 @@ public class AGVCart : MonoBehaviour
     public Image FullCheck;
     public TMP_Text BoxFullTxt;
     public GameObject callAGVBtn;
+    
     public bool isAGVCallOn;
     bool plateIsFull;
     int boxFullNum = 19;
     int colliderCount = 0;
 
-    private Quaternion initialRotationValue;
+    public Vector3 initialSpawnposition;
+    public Quaternion initialSpawnrotation;
+   //private Quaternion initialRotationValue;
 
     private void Start()
     {
@@ -25,7 +28,7 @@ public class AGVCart : MonoBehaviour
         plateCollider.isTrigger = true;
         callAGVBtn.SetActive(false);
 
-        initialRotationValue = transform.rotation;
+        //initialRotationValue = transform.rotation;
     }
 
     private void Update()
@@ -54,8 +57,13 @@ public class AGVCart : MonoBehaviour
         }
     }
 
-    public void OnAGVCall()
+    public void SetAGVCallState(bool state)
     {
-        isAGVCallOn = true;
+        isAGVCallOn = state;
     }
+    /*public void ResetRotatior()
+    {
+        transform.rotation = initialRotationValue;
+    }
+*/
 }

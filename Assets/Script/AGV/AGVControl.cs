@@ -6,13 +6,14 @@ using UnityEngine.UI;
 using UnityEngine.Rendering;
 using UnityEditor.SceneManagement;
 using UnityEditor;
+using UnityEngine.UIElements;
 
 public class AGVControl : MonoBehaviour
 {
     [Header("AGV 제어")]
     public List<Transform> movingPositions = new List<Transform>();
     public Transform chargingPosition;      // 충전 위치 포지션
-    
+
     public float moveSpeed = 2f;            // 이동속도
     public float rotSpeed = 200f;           // 회전속도
     public float rayDistance = 5f;          // Raycast 거리
@@ -20,99 +21,110 @@ public class AGVControl : MonoBehaviour
     public float batteryCapacity = 100f;    // 배터리 용량
 
     public bool isMoving;                   // 움직임 여부
+    public bool isRotating;                // 회전 여부
     public bool isStopping;                 // 멈춤 여부
     public bool isStandby;                  // 대기 여부
     public bool isNeedtoCharge;             // 충전 필요 여부
 
+
     private LineRendererMake lineMake = new LineRendererMake();
     public int currentTargetIndex = 0;     // 현재 목표 포지션 인덱스
+
+
+    [Header("AGV Road")]
+    public List<Transform> originalPosition;
+    public List<Transform> storagePosition;
+    public List<Transform> boxPosition;
+
+    [Header("Carts")]
+    public GameObject boxCartPrefab;
+    public GameObject storageCartPrefab;
+
 
     private void Start()
     {
         lineMake = GetComponent<LineRendererMake>();
-    }
 
-    private void MakePathForAGV()
-    {
         if (lineMake != null)
             lineMake.UpdateLine(movingPositions);
     }
 
     public void MoveAlongPath()
     {
-        if (movingPositions != null)
+        if (isMoving && currentTargetIndex < movingPositions.Count)
         {
-            MakePathForAGV();
 
-            DetectObstacles();
+            // 목표 위치로 이동
+            AGVMoveAndRotate(movingPositions[currentTargetIndex]);
 
-            if (isMoving)
+            // 목표 위치에 도달했는지 확인
+            if (Vector3.Distance(transform.position, movingPositions[currentTargetIndex].position) < 0.01f)
             {
+                currentTargetIndex++; // 다음 목표로 이동
 
-                if (currentTargetIndex < movingPositions.Count)
+                if (currentTargetIndex >= movingPositions.Count)
                 {
-                    // 목표 위치로 이동
-                    AGVMove(movingPositions[currentTargetIndex]);
-
-                    // 목표 위치에 도달했는지 확인
-                    if (Vector3.Distance(transform.position, movingPositions[currentTargetIndex].position) < 0.01f)
-                    {
-                        currentTargetIndex++; // 다음 목표로 이동
-                    }
-
-                    isStandby = false;
+                    isMoving = false; // 마지막 목표에 도달했으므로 비활성화
                 }
-                else
-                {
-                    // 모든 목표 위치에 도달한 경우
-                    isStandby = true;
-                    currentTargetIndex = 0;
-                    movingPositions.Clear();
-                }
+            }
+
+        }
+    }
+
+    public void AGVMoveAndRotate(Transform targetPos)
+    {
+        if (isMoving)
+        {
+            AGVMove(targetPos);
+
+            // 목표 위치에 도달했는지 확인
+            if (Vector3.Distance(transform.position, targetPos.position) < 0.1f)
+            {
+                isMoving = false;
+                isRotating = true; // 이동이 완료되면 회전 시작
+            }
+        }
+
+        if (isRotating)
+        {
+            AGVRotate(targetPos);
+
+            // 목표 회전값에 도달했는지 확인
+            if (Quaternion.Angle(transform.rotation, targetPos.rotation) < 0.1f)
+            {
+                isRotating = false; // 회전 완료
             }
         }
     }
 
+
     public void AGVMove(Transform targetPos)
     {
         Vector3 direction = (targetPos.position - transform.position).normalized;
-
-        // 방향 벡터가 유효한 경우에만 회전 및 이동 수행
-        if (targetPos != null)
+        if (direction != Vector3.zero)
         {
             Quaternion lookRotation = Quaternion.LookRotation(direction);
             transform.rotation = Quaternion.RotateTowards(transform.rotation, lookRotation, rotSpeed * Time.deltaTime);
             transform.position = Vector3.MoveTowards(transform.position, targetPos.position, moveSpeed * Time.deltaTime);
-            isMoving = true;
         }
-        else
-        {
-            isMoving = false;
-        }
-    }
-
-    public void AGVMove()
-    {
-        transform.Translate(Vector3.forward * moveSpeed * Time.deltaTime);
-        isMoving = true;
     }
 
     public void AGVRotate(Transform targetPos)
     {
-        Quaternion rotationOfTarget = targetPos.rotation;
-        float angle = GetAngleToTarget(targetPos);
-        
-        float rotateSpeed;
+        Quaternion targetAngle = targetPos.rotation;
+        Quaternion currentAngle = transform.rotation;
 
-        if (transform.rotation != rotationOfTarget)
+        if (currentAngle != targetAngle)
         {
-            rotateSpeed = 200f;
+            transform.rotation = Quaternion.RotateTowards(currentAngle, targetAngle, rotSpeed * Time.deltaTime);
         }
-        else
-        {
-            rotateSpeed = 0f;
-        }
-        transform.Rotate(Vector3.up, rotateSpeed * Time.deltaTime);
+
+    }
+
+    public bool IsFacingTarget(Transform target, float angleThreshold = 0.0001f)
+    {
+        float angleDifference = Quaternion.Angle(transform.rotation, target.rotation);
+        return angleDifference < angleThreshold;
     }
 
     public void AGVRotate(bool isRight)
@@ -128,17 +140,6 @@ public class AGVControl : MonoBehaviour
     public float GetDistanceToTarget(Transform target)
     {
         return Vector3.Distance(transform.position, target.position);
-    }
-
-    public float GetAngleToTarget(Transform target)
-    {
-        return Quaternion.Angle(transform.rotation, target.rotation);
-    }
-
-    public bool IsFacingTarget(Transform target, float angleThreshold = 1f)
-    {
-        float angleDifference = Quaternion.Angle(transform.rotation, target.rotation);
-        return angleDifference < angleThreshold;
     }
 
     public List<GameObject> FindObjectsByName(string namePattern)
@@ -168,24 +169,10 @@ public class AGVControl : MonoBehaviour
             {
                 isMoving = false;
             }
-            else
-            {
-                isMoving = true;
-            }
         }
-    }
-
-    public void AGVStandBy()
-    {
-        if (isStandby)
+        else
         {
-            isMoving = false;
+            isMoving = true;
         }
-    }
-
-    public void AGVtoCharge()
-    {
-        if (isNeedtoCharge)
-            AGVMove(chargingPosition);
     }
 }
