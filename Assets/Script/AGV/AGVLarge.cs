@@ -111,6 +111,7 @@ public class AGVLarge : AGVControl
         if (targetToMove != null)
         {
             yield return UnparentAndPinDown(targetToMove); // 카트와의 부모 관계 해제
+            
         }
     }
 
@@ -132,24 +133,39 @@ public class AGVLarge : AGVControl
         if (cart != null)
         {
             cart.SetAGVCallState(false); // AGVCall 상태를 false로 설정
+            isRotating = false;
+
+            yield return StartCoroutine(ReturnToInitialPosition()); // 초기 위치로 돌아가기
         }
-        yield return StartCoroutine(ReturnToInitialPosition()); // 초기 위치로 돌아가기
+       
     }
 
     private IEnumerator ReturnToInitialPosition()
     {
+       
+        currentTargetIndex = 0;
         movingPositions.Clear();
 
         foreach (var position in originalPosition)
         {
             movingPositions.Add(position);
         }
+        Debug.Log("Moving Positions Count: " + movingPositions.Count); // 추가된 로그
+
 
         while (currentTargetIndex < movingPositions.Count)
         {
+           // Debug.Log("이동");
+           // Debug.Log("Current Target Index: " + currentTargetIndex); // 현재 인덱스 확인
             MoveAlongPath();
+            isMoving = true; // 이동 시작 시 활성화
+
+           // Debug.Log("Current Position: " + transform.position);
+           // Debug.Log("Target Position: " + movingPositions[currentTargetIndex].position);
+            yield return null; // 다음 프레임까지 대기
         }
-        yield return null; // 다음 프레임까지 대기
+        movingPositions.Clear();
+        isMoving = false;
     }
 
 

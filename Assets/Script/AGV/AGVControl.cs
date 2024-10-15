@@ -55,6 +55,10 @@ public class AGVControl : MonoBehaviour
             if (Vector3.Distance(transform.position, movingPositions[currentTargetIndex].position) < 0.01f)
             {
                 currentTargetIndex++; // 다음 목표로 이동
+                if (currentTargetIndex >= movingPositions.Count)
+            {
+                isMoving = false; // 마지막 목표에 도달했으므로 비활성화
+            }
             }
 
         }
