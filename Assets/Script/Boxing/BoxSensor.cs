@@ -10,6 +10,8 @@ public class BoxSensor : MonoBehaviour
     [SerializeField] GameObject UpLeft; // UpLeft 오브젝트
     [SerializeField] GameObject UpFront; // UpFront 오브젝트
     [SerializeField] GameObject UpBack; // UpBack 오브젝트
+ 
+
 
     private bool hasRotated = false; // 회전 여부를 추적하는 변수
     private Quaternion initialRotation; // 초기 회전 값 저장
