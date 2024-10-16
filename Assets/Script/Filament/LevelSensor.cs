@@ -25,7 +25,7 @@ public class LevelSensor : MonoBehaviour
 
     private void Update()
     {
-        if (collisionCount >= 150 && !isDetected)
+        if (collisionCount >= 3000 && !isDetected)
         {
             isDetected = true;
         }

@@ -52,6 +52,7 @@ public class EachFilamentFactory : MonoBehaviour
     float currentRotation = 0f;
     float scaleFactor;
     bool isfilamentOnRotate;
+    public bool limiting;
 
     // 저장탱크 변수
     // public bool[] tankLevelbool;
@@ -87,6 +88,7 @@ public class EachFilamentFactory : MonoBehaviour
         UpdateStatusUI();
         // TankLevelCheck();
         NextAction();
+       
     }
 
     private void UpdateStatusUI()
@@ -170,11 +172,10 @@ public class EachFilamentFactory : MonoBehaviour
     {
         if (filamentObject == null)
         {
-            // filamentTakeOut.SetActive(false);
+            // 초기화 코드
             filamentLineObj = Instantiate(filamentLinePrefab);
             filamentCoverObj = Instantiate(filamentCoverPrefab);
-            isfilamentOnRotate = true;
-            
+
             filamentObject = new GameObject("FilamentObject");
             filamentLineObj.transform.parent = filamentObject.transform;
             filamentCoverObj.transform.parent = filamentObject.transform;
@@ -187,10 +188,10 @@ public class EachFilamentFactory : MonoBehaviour
         }
         else if (filamentObject != null && isfilamentOnRotate)
         {
+            // 회전 코드
             rotSpeed = 200f;
             float rotationThisFrame = rotSpeed * Time.deltaTime;
             filamentObject.transform.Rotate(0, 0, rotationThisFrame);
-
             currentRotation += rotationThisFrame;
 
             if (currentRotation >= 360f)
@@ -198,14 +199,14 @@ public class EachFilamentFactory : MonoBehaviour
                 currentRotation = 0;
                 scaleFactor = 0.1f;
                 filamentLineObj.transform.localScale += new Vector3(scaleFactor, scaleFactor, 0);
-            }
 
-            if (filamentLineObj.transform.localScale.x >= 0.96f || filamentLineObj.transform.localScale.y >= 0.96f)
-            {
-                rotSpeed = 0;
-                //filamentTakeOut.SetActive(true);
-                isfilamentOnRotate = false;
-                FilamentShift();
+                // 스케일이 최대치에 도달한 경우
+                if (filamentLineObj.transform.localScale.x >= 0.96f || filamentLineObj.transform.localScale.y >= 0.96f)
+                {
+                    rotSpeed = 0;
+                    limiting = true; // 스케일 증가가 완료되면 true로 설정
+                    FilamentShift(); // 여기서 FilamentShift 호출
+                }
             }
         }
     }
@@ -214,22 +215,37 @@ public class EachFilamentFactory : MonoBehaviour
     {
         if (linemanagers[1].LastPointArrive())
         {
-            HandleFilament();
+            // limiting이 false일 때만 true로 변경
+            if (!limiting)
+            {
+                isfilamentOnRotate = true; // 여기서 회전 시작
+                HandleFilament(); // HandleFilament 호출
+            }
         }
     }
 
+    private IEnumerator WaitAndSetLimitingFalse(float waitTime)
+    {
+        yield return new WaitForSeconds(waitTime);
+        limiting = false;
+    }
+
+    // FilamentShift() 내에서
     public void FilamentShift()
     {
-        if (Vector3.Distance(filamentObject.transform.position, filamentRotPosition.position) < 0.1f)
+        if (limiting)
         {
-            Destroy(filamentObject);
-            Instantiate(filamentFullObject);
-            filamentFullObject.transform.position = shiftToConveyor.position;
-            // filamentFullObject.transform.rotation = Quaternion.Euler(0, 0, 0);
+            if (Vector3.Distance(filamentObject.transform.position, filamentRotPosition.position) < 0.1f)
+            {
+                Destroy(filamentObject);
+                Instantiate(filamentFullObject);
+                filamentFullObject.transform.position = shiftToConveyor.position;
 
-            isfilamentOnRotate = true;
+                // Coroutine을 통해 limiting을 false로 변경
+                StartCoroutine(WaitAndSetLimitingFalse(2f)); // 2초 후 false로 설정
+                isfilamentOnRotate = false;
+            }
         }
-        else
-            return;
     }
+
 }
