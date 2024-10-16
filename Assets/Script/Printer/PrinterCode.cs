@@ -194,6 +194,7 @@ public class PrinterCode : MonoBehaviour
     private void PauseProcess()
     {
         isPrinting = false; // 인쇄 중지
+        isFinished = false;
         machineLight.material.color = Color.yellow; // 색상 변경
 
         StopCoroutine(PrintProcess());
@@ -206,6 +207,7 @@ public class PrinterCode : MonoBehaviour
     private void ResumeProcess()
     {
         isPrinting = true; // 인쇄 재개
+        isFinished = false ;
         machineLight.material.color = Color.green; // 색상 변경
 
         StartCoroutine(PrintProcess()); // 인쇄 프로세스 재개
@@ -517,6 +519,7 @@ public class PrinterCode : MonoBehaviour
         objectDropdown.interactable = true;
         isProblem = true;
         isPrinting = false;
+        isFinished = false;
 
         if (finishCoroutine == null)
         {
