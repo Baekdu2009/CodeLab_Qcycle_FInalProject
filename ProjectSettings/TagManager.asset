@@ -18,6 +18,12 @@ TagManager:
   - BoxCart
   - storageCart
   - Filament
+  - Tape
+  - BoxFoldGuid
+  - BoxSensor1
+  - BoxSensor2
+  - BoxSensor3
+  - BoxHander
   layers:
   - Default
   - TransparentFX
