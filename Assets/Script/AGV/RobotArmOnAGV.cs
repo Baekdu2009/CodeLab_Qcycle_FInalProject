@@ -138,7 +138,7 @@ public class RobotArmOnAGV : RobotArmControl
             {
                 StopCoroutine(RunSteps());
                 isRunning = false;
-                gripperOn = false;
+                gripperWorking = false;
                 plateOn = false;
             }
         }
@@ -161,7 +161,7 @@ public class RobotArmOnAGV : RobotArmControl
 
     private void RobotArmUIUpdate()
     {
-        if (isRunning)
+        if (printingObject != null)
         {
             pickingCheck.color = Color.green;
             pickngTxt.text = "Pick Object";
@@ -179,5 +179,6 @@ public class RobotArmOnAGV : RobotArmControl
     {
         printingObject.transform.SetParent(null);
         Destroy(printingObject);
+        printingObject= null;
     }
 }
