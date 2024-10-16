@@ -15,7 +15,7 @@ public class BoxSensor : MonoBehaviour
 
     private bool hasRotated = false; // 회전 여부를 추적하는 변수
     private Quaternion initialRotation; // 초기 회전 값 저장
-    private bool hasTaping = false; // 테이핑 여부를 추적하는 변수
+   
     private void OnTriggerEnter(Collider other)
     {
         if (!hasRotated && other.CompareTag("Box"))
