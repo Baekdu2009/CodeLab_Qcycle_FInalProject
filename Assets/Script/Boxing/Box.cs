@@ -33,19 +33,19 @@ public class Box : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
 
-        if (!hasTriggered1 && other.CompareTag("BoxSensor1"))
+        if (!hasTriggered1 && other.CompareTag("Guide1"))
         {
             hasTriggered1 = true; // 충돌 발생 시 true로 설정
             RotateDownLRColliding();
         }
 
-        if (!hasTriggered2 && other.CompareTag("BoxSensor2"))
+        if (!hasTriggered2 && other.CompareTag("Guide2"))
         {
             hasTriggered2 = true; // 충돌 발생 시 true로 설정
             RotateDownFBColliding();
         }
 
-        if(!hasTriggered3 && other.CompareTag("BoxSensor3"))
+        if(!hasTriggered3 && other.CompareTag("Guide3"))
         {
             hasTriggered3 = true;
             RotateUpRFBCilliding();

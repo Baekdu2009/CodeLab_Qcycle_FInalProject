@@ -4,28 +4,20 @@ public class BoxChange : MonoBehaviour
 {
     public GameObject ChangeBox;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log($"충돌 {other.gameObject.name}");
-        if (other.CompareTag("Box") && other.gameObject.name.Contains("Box1_Flat"))
+        // Debug.Log($"충돌 {other.gameObject.name}");
+        if (other.gameObject.name.Contains("Flat"))
         {
-
             Destroy(other.gameObject);
-
-            BoxChanging();
-
-
+            BoxChanging(other.transform);
         }
     }
 
-    private void BoxChanging()
+    private void BoxChanging(Transform Location)
     {
         Quaternion BoxSqawnRotate = Quaternion.Euler(-90, 180, 0);
-        Instantiate(ChangeBox, transform.position, BoxSqawnRotate);
-
+        Instantiate(ChangeBox, Location.position, BoxSqawnRotate);
     }
-
     // -121.914 168.596 189.716
 }
