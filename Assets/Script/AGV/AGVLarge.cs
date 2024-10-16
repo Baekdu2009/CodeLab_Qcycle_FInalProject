@@ -151,6 +151,7 @@ public class AGVLarge : AGVControl
         while (currentTargetIndex < movingPositions.Count)
         {
             MoveByPoint(); // 경로를 따라 이동
+            isRotating = false;
             yield return null; // 다음 프레임까지 대기
         }
 
