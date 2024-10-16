@@ -1,62 +1,27 @@
-/*using UnityEngine;
-
-public class BoxSqawn : MonoBehaviour
-{
-    [Header("Boxing")]
-    [SerializeField] GameObject DownLeft;
-    [SerializeField] GameObject DownRight;
-    [SerializeField] GameObject DownFront;
-    [SerializeField] GameObject DownBack;
-
-
-    [Header("BoxSqwan")]
-    [SerializeField] GameObject BoxSqawnprefab;
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        DownRight = transform.GetChild(4).gameObject;
-        DownLeft = transform.GetChild(5).gameObject;
-        DownBack = transform.GetChild(6).gameObject;
-        DownFront = transform.GetChild(7).gameObject;
-
-
-    }
-
-
-    private void BoxSqawn()
-    {
-        Quaternion BoxSqawnRotate = Quaternion.Euler(-90, 180, 0);
-
-        GameObject Box = Instantiate(BoxSqawnprefab, transform.position, BoxSqawnRotate);
-
-    }
-
-}*/
-
+using System.Collections;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class BoxSqawn : MonoBehaviour
 {
+    public GameObject SqawnBox; // 생성할 박스 프리팹
+    private float delayTime = 5f; // 박스 생성 간격
+    private bool isSpawning = false; // 생성 중인지 여부
 
-    [Header("BoxSqawn")]
-    [SerializeField] GameObject BoxSqawnprefab;
-
-    void Start()
+    private void Start()
     {
-        BoxSqawnPrefab();
+        StartCoroutine(BoxSpawnCoroutine()); // 코루틴 시작
     }
 
-    private void BoxSqawnPrefab()
+    private IEnumerator BoxSpawnCoroutine()
     {
-        Quaternion BoxSqawnRotate = Quaternion.Euler(-90, 180, 0);
-        Instantiate(BoxSqawnprefab, transform.position, BoxSqawnRotate);
-
-        // 자식 오브젝트를 찾아서 할당
-      
+        while (true) // 무한 루프
+        {
+            Quaternion BoxSqawnRotate = Quaternion.Euler(-90, 0, 180);
+            // 박스를 생성
+            Instantiate(SqawnBox, transform.position, BoxSqawnRotate);
+            // 대기 시간
+            yield return new WaitForSeconds(delayTime);
+        }
     }
-
-    
 }
-
-
