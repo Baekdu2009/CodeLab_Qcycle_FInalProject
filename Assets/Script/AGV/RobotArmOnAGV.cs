@@ -116,7 +116,6 @@ public class RobotArmOnAGV : RobotArmControl
             printer = robotAGV.targetPrinter;
             isRunning = true;
 
-            // Null 체크
             if (printer == null || printer.visibleObject == null) return;
 
 
@@ -125,14 +124,11 @@ public class RobotArmOnAGV : RobotArmControl
                 StartCoroutine(RunSteps());
             }
 
-            // 그리퍼를 작동시켜 출력물을 잡음
-            gripperWorking = true; // 그리퍼 작동
+            gripperWorking = true;
 
-            // 출력물 분리
             PIckUpPrintingObject();
 
-            // 플레이트를 회전시킴
-            plateOn = true; // 플레이트를 회전시키기 위한 플래그 설정
+            plateOn = true;
 
             if (printingObject != null)
             {
@@ -146,11 +142,9 @@ public class RobotArmOnAGV : RobotArmControl
 
     private void PIckUpPrintingObject()
     {
-        // 출력 물체 분리
         printer.visibleObject.transform.SetParent(null);
         printingObject = printer.visibleObject;
 
-        // 물체 위치 설정
         printingObject.transform.position = plateLocation.position;
         printingObject.transform.SetParent(plateLocation.transform);
         Rigidbody rb = printingObject.GetComponent<Rigidbody>();
