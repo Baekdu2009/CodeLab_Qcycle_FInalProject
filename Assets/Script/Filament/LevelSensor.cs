@@ -25,7 +25,7 @@ public class LevelSensor : MonoBehaviour
 
     private void Update()
     {
-        if (collisionCount >= 3000 && !isDetected)
+        if (collisionCount >= 1000 && !isDetected)
         {
             isDetected = true;
         }
@@ -54,7 +54,7 @@ public class LevelSensor : MonoBehaviour
             }
         }
 
-        if (sensingChangeCount >= 4)
+        if (sensingChangeCount >= 1)
         {
             ResetDetection();
         }

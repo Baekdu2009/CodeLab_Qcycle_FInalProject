@@ -247,7 +247,7 @@ public class TCPClient : MonoBehaviour
             else if (runExtruder1 != 1)
             {
                 linemanagers[0].isWorking = false;
-              
+                linemanagers[0].isOn = false;
             }
             if (runCooler1 == 1)
             {
@@ -283,7 +283,7 @@ public class TCPClient : MonoBehaviour
 
             if (runExtruder2 == 1)
             {
-               
+                linemanagers[1].isWorking = true;
                 linemanagers[1].isOn = true;
 
 
@@ -292,9 +292,10 @@ public class TCPClient : MonoBehaviour
             else if (runExtruder2 != 1)
             {
                 linemanagers[1].isWorking = false;
+                linemanagers[1].isOn = false;
             }
 
- 
+
 
 
             //XÁ¦¾î
