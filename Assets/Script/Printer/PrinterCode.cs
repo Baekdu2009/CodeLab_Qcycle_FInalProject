@@ -48,8 +48,8 @@ public class PrinterCode : MonoBehaviour
     public Transform printingObjectLocate;  // 출력되는 오브젝트의 위치
 
     // 안보이는 목록
-    [HideInInspector]
     private GameObject printingObj;     // 선택된 오브젝트
+    [HideInInspector]
     public GameObject visibleObject;   // 실제 출력 오브젝트
 
     private Queue<string> nozzleQueue = new Queue<string>();
@@ -65,7 +65,10 @@ public class PrinterCode : MonoBehaviour
     bool isPrinting;                // 인쇄 중 여부
     bool isObjSelect = false;       // 인쇄할 오브젝트 선택 여부
     bool isPaused = false;         // 일시정지 여부
+    bool isProblem = false;
+    [HideInInspector]
     public bool isFinished;
+    
 
     private float rotSpeed = 200;                // 필라멘트 회전 속도
     private float filamentUsingPercent = 100f;   // 필라멘트 남은량
@@ -78,18 +81,17 @@ public class PrinterCode : MonoBehaviour
 
     private void Start()
     {
-        PrinterInformationNotice();
-        SetExpectedTime(); // 예상 작업 시간 설정
-        resetBtn.SetActive(false); // 초기화 버튼 비활성화
-        filamentCCW = new bool[filaments.Length];
+        PrinterInformationNotice();                                     // 프린터 정보 초기화
+        SetExpectedTime();                                              // 예상 작업 시간 설정
+        resetBtn.SetActive(false);                                      // 초기화 버튼 비활성화
+        objectDropdown.onValueChanged.AddListener(OnObjectSelected);    // 이벤트 리스너 추가
+        PopulateObjectDictionary();                                     // 오브젝트 예시 리스너 추가
 
+        filamentCCW = new bool[filaments.Length];
         plateOrigin = plate.transform.localPosition;
         rodOrigin = rod.transform.localPosition;
         nozzleOrigin = nozzle.transform.localPosition;
         machineLight.material.color = Color.yellow;
-
-        objectDropdown.onValueChanged.AddListener(OnObjectSelected); // 이벤트 리스너 추가
-        PopulateObjectDictionary();
     }
 
     private void Update()
@@ -99,7 +101,6 @@ public class PrinterCode : MonoBehaviour
         {
             PrintingObjectControl();
         }
-
     }
 
     public void BtnOriginEvent()
@@ -115,6 +116,7 @@ public class PrinterCode : MonoBehaviour
             originCoroutine = null;
         }
         isOriginLocate = true;
+        isProblem = false;
     }
 
     private IEnumerator OriginPosition()
@@ -141,10 +143,10 @@ public class PrinterCode : MonoBehaviour
 
     public void BtnStartProcess()
     {
-        if (isOriginLocate && isObjSelect && filamentUsingPercent != 0)
+        if (isOriginLocate && isObjSelect && filamentUsingPercent != 0 && !isPaused)
         {
-            isPrinting = true; // 인쇄 시작
-            workingTime = 0f; // 작업 시간 초기화
+            isPrinting = true;
+            workingTime = 0f;
             objectDropdown.interactable = false;
             machineLight.material.color = Color.green;
             isFinished = false;
@@ -164,12 +166,17 @@ public class PrinterCode : MonoBehaviour
             {
                 print("프린팅 오브젝트를 선택하시기 바랍니다.");
             }
+            else if (isPaused)
+            {
+                print("일시정지해제(Pause)버튼을 누르시기 바랍니다.");
+            }
             else if (filamentUsingPercent == 0)
             {
                 print("필라멘트를 교체하시기 바랍니다.");
             }
         }
     }
+
     public void BtnTogglePauseProcess()
     {
         isPaused = !isPaused; // 현재 일시정지 상태를 반전
@@ -211,14 +218,9 @@ public class PrinterCode : MonoBehaviour
     
     public void BtnStopProcess()
     {
-        
         StopAllCoroutines();
         UpdateExpectedTime();
-        resetBtn.SetActive(true);
-
-        isPrinting = false;
-        machineLight.material.color = Color.red;
-        print("강제 종료되었습니다.");
+        PrinterForcedStop();
     }
 
     private IEnumerator PrintProcess()
@@ -453,7 +455,7 @@ public class PrinterCode : MonoBehaviour
     {
         if (size == PrinterSize.Large)
         {
-            expectedTime = 600;
+            expectedTime = 30;
         }
         else if (size == PrinterSize.Small)
         {
@@ -503,6 +505,29 @@ public class PrinterCode : MonoBehaviour
             StopCoroutine(finishCoroutine);
             finishCoroutine = null;
         }
+    }
+
+    private void PrinterForcedStop()
+    {
+        StopAllCoroutines();
+        printerExpectTime.text = "Expected Time \n 00:00:00";
+        printingStatus.text = "Warning!!"; // 완료 메시지 표시
+        printingStatus.color = Color.red;
+        machineLight.material.color = Color.red;
+        objectDropdown.interactable = true;
+        isProblem = true;
+        isPrinting = false;
+
+        if (finishCoroutine == null)
+        {
+            finishCoroutine = StartCoroutine(FinishPosition());
+        }
+        else
+        {
+            StopCoroutine(finishCoroutine);
+            finishCoroutine = null;
+        }
+        Debug.Log("강제종료합니다.");
     }
 
     public void BtnResetPrinter()
