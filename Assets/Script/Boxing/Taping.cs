@@ -22,4 +22,6 @@ public class Taping : MonoBehaviour
             tape.transform.localRotation = Quaternion.Euler(180, 0, -90);
         }
     }
+
+
 }
