@@ -100,9 +100,9 @@ public class EachFilamentFactory : MonoBehaviour
         StatusNoticeUI(rollingStatus, rollingWorkWell, rollingStop);
         StatusNoticeUI(spoolerStatus, spoolerWorkWell, spoolerStop);
 
-        for (int i = 0; i < levelSensors.Length; i++)
+        for (int i = 0; i < plasticSpawn.Length; i++)
         {
-            TankLevelNoticeUI(tankStatus[i], levelSensors[i]);
+            TankLevelNoticeUI(tankStatus[i], plasticSpawn[i].isOn);
         }
     }
 
@@ -123,6 +123,22 @@ public class EachFilamentFactory : MonoBehaviour
         // 커팅기
         wirecuttingWorkWell = !wireCutting.isProblem;
         wirecuttingStop = !wireCutting.isWorking;
+
+        // 스크류벨트
+        screwconveyorWorkWell = !screwBelt.isProblem;
+        screwconveyorStop = !screwBelt.isWorking;
+
+        // 압출기2
+        extruder2WorkWell = !linemanagers[1].isProblem;
+        extruder2Stop = !linemanagers[1].isWorking;
+
+        // 롤링
+        rollingWorkWell = !linemanagers[1].isProblem;
+        rollingStop = !linemanagers[1].isWorking;
+
+        // 스풀러
+        spoolerWorkWell = !linemanagers[1].isProblem;
+        spoolerStop = !isfilamentOnRotate;
     }
 
     private void StatusNoticeUI(Image image, bool work, bool stop)

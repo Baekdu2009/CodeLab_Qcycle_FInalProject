@@ -10,6 +10,7 @@ public class ScrewBelt : MonoBehaviour
 
     [HideInInspector]
     public bool isWorking;
+    public bool isProblem;
     float rotSpeed;
 
     private void Update()
