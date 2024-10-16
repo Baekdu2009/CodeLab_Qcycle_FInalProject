@@ -99,7 +99,7 @@ public class TCPClient : MonoBehaviour
 
         // 문자열을 분리
         string[] strSplited = dataFromServer.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-        //print("2. ReadDeviceBlock newData: " + string.Join(",", strSplited));
+       print("2. ReadDeviceBlock newData: " + string.Join(",", strSplited));
 
         // 배열의 크기를 strSplited의 길이에 맞추기
         int[] values = new int[strSplited.Length];
@@ -158,7 +158,7 @@ public class TCPClient : MonoBehaviour
         int extruder2SensorValue = (extruderSensor[1].isSensing == true) ? 1 : 0;
         int pressure1SensorValue = (pressureSensor[0].isPressing == true) ? 1 : 0;
         int pressure2SensorValue = (pressureSensor[1].isPressing == true) ? 1 : 0;
-        int ls1value = (tankSensor[0].isDetected == true) ? 1 : 0;
+        int ls1value = (filamentFactory.limiting == true) ? 1 : 0;
 
         int sensorNum = pressure2SensorValue * 32 + pressure1SensorValue*16 +extruder2SensorValue*8 +extruder1SensorValue * 4 + tank2SensorValue*2 + tank1SensorValue * 1;
         int lsNum = ls1value * 1;
@@ -198,7 +198,7 @@ public class TCPClient : MonoBehaviour
             {
                 for (int j = 0; j < pointY[i].Length; j++)
                 {
-                    print($"PointY[{i}][{j}]값 : {pointY[i][j]}");
+                   // print($"PointY[{i}][{j}]값 : {pointY[i][j]}");
                 }
             }
 
@@ -247,7 +247,7 @@ public class TCPClient : MonoBehaviour
             else if (runExtruder1 != 1)
             {
                 linemanagers[0].isWorking = false;
-              
+                linemanagers[0].isOn = false;
             }
             if (runCooler1 == 1)
             {
@@ -283,16 +283,19 @@ public class TCPClient : MonoBehaviour
 
             if (runExtruder2 == 1)
             {
-               
+                linemanagers[1].isWorking = true;
                 linemanagers[1].isOn = true;
+
+
                 
             }
             else if (runExtruder2 != 1)
             {
                 linemanagers[1].isWorking = false;
+                linemanagers[1].isOn = false;
             }
 
- 
+
 
 
             //X제어
@@ -345,6 +348,14 @@ public class TCPClient : MonoBehaviour
             else if (pressureSensor[1].isPressing == false)
             {
                 Extruder2Pressure = 0;
+            }
+            if(filamentFactory.limiting == true)
+            {
+                limitSwitch1 = 1;
+            }
+            else if (filamentFactory.limiting == false)
+            {
+                limitSwitch1 = 0;
             }
 
         }

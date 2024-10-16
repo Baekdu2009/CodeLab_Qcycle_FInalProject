@@ -16,7 +16,7 @@ public class FilamentLine : MonoBehaviour
     public bool isProblem = false;
 
     private Coroutine drawCoroutine;
-
+  
     void Start()
     {
         lineRenderer = gameObject.AddComponent<LineRenderer>();
@@ -27,11 +27,12 @@ public class FilamentLine : MonoBehaviour
 
     void Update()
     {
-        // isOn의 상태가 변경되면 선 그리기를 시작하거나 중단
+        // isOn이 true이고 drawCoroutine이 null일 때만 선 그리기를 시작
         if (isOn && drawCoroutine == null)
         {
             StartDrawing();
         }
+        // isOn이 false일 때 StopDrawing 호출
         else if (!isOn && drawCoroutine != null)
         {
             StopDrawing();
@@ -57,13 +58,18 @@ public class FilamentLine : MonoBehaviour
             StopCoroutine(drawCoroutine);
             drawCoroutine = null;
         }
-        lineRenderer.positionCount = 0; // 선을 초기화
+        // 이 줄을 주석 처리하여 선을 초기화하지 않음
+        // lineRenderer.positionCount = 0; // 이 줄은 주석 처리하세요
     }
+
 
     private IEnumerator DrawLine(Transform[] transforms)
     {
         for (int i = 0; i < transforms.Length - 1; i++)
         {
+            // isOn이 false가 되면 그리기를 중단
+            if (!isOn) yield break;
+
             lineRenderer.positionCount = i + 2; // 현재 위치와 다음 위치를 포함
             lineRenderer.SetPosition(i, transforms[i].position);
             lineRenderer.SetPosition(i + 1, transforms[i + 1].position);
@@ -71,15 +77,16 @@ public class FilamentLine : MonoBehaviour
             yield return StartCoroutine(DrawSegment(i, i + 1));
         }
 
-        // 마지막 점에 도착하면 isOn을 false로 설정
-        isOn = false;
-        drawCoroutine = null; // 그리기가 완료된 후 코루틴 초기화
+      
     }
 
     private IEnumerator DrawLine(Vector3[] vectors)
     {
         for (int i = 0; i < vectors.Length - 1; i++)
         {
+            // isOn이 false가 되면 그리기를 중단
+            if (!isOn) yield break;
+
             lineRenderer.positionCount = i + 2; // 현재 위치와 다음 위치를 포함
             lineRenderer.SetPosition(i, vectors[i]);
             lineRenderer.SetPosition(i + 1, vectors[i + 1]);
@@ -87,11 +94,8 @@ public class FilamentLine : MonoBehaviour
             yield return StartCoroutine(DrawSegment(i, i + 1));
         }
 
-        // 마지막 점에 도착하면 isOn을 false로 설정
-        isOn = false;
         drawCoroutine = null; // 그리기가 완료된 후 코루틴 초기화
     }
-
     private IEnumerator DrawSegment(int startIndex, int endIndex)
     {
         Vector3 startPos = lineRenderer.GetPosition(startIndex);
@@ -118,6 +122,7 @@ public class FilamentLine : MonoBehaviour
             Vector3 lastPoint = lineRenderer.GetPosition(lineRenderer.positionCount - 1);
 
             distance = Vector3.Distance(lastPoint, transformPos[transformPos.Length - 1].position);
+          
         }
         return distance < 0.01f;
     }

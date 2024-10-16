@@ -28,7 +28,7 @@ public class LevelSensorExtruder : MonoBehaviour
         {
             collisionCount++;
 
-            if (collisionCount >= 30 && !isSensing)
+            if (collisionCount >= 100 && !isSensing)
             {
                 StartSensing();
             }
