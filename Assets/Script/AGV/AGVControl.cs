@@ -40,19 +40,15 @@ public class AGVControl : MonoBehaviour
         if (isMoving && currentTargetIndex < movingPositions.Count)
         {
             DetectObstacles();
-            // 목표 위치로 이동
             AGVMoveAndRotate(movingPositions[currentTargetIndex]);
 
-            // 목표 위치에 도달했는지 확인
             if (Vector3.Distance(transform.position, movingPositions[currentTargetIndex].position) < 0.01f)
             {
                 currentTargetIndex++; // 다음 목표로 이동
-                
 
                 if (currentTargetIndex >= movingPositions.Count)
                 {
                     isMoving = false; // 마지막 목표에 도달했으므로 비활성화
-                   
                 }
             }
         }
@@ -69,30 +65,23 @@ public class AGVControl : MonoBehaviour
         if (movingPositions != null)
         {
             MakePathForAGV();
-
             DetectObstacles();
 
             if (isMoving)
             {
-
                 if (currentTargetIndex < movingPositions.Count)
                 {
-                    // 목표 위치로 이동
                     AGVMove(movingPositions[currentTargetIndex]);
 
-                    // 목표 위치에 도달했는지 확인
                     if (Vector3.Distance(transform.position, movingPositions[currentTargetIndex].position) < 0.01f)
                     {
                         currentTargetIndex++; // 다음 목표로 이동
-                        
                     }
                 }
                 else
                 {
-                    // 모든 목표 위치에 도달한 경우
                     currentTargetIndex = 0;
                     movingPositions.Clear();
-                    
                 }
             }
         }
