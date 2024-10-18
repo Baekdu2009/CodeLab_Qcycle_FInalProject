@@ -4956,6 +4956,7 @@ GameObject:
   - component: {fileID: 3953477423819777323}
   - component: {fileID: 3529174127723888387}
   - component: {fileID: 7199805906129980600}
+  - component: {fileID: 7607348432886678165}
   m_Layer: 0
   m_Name: glass-plate\glass-plate:1
   m_TagString: Untagged
@@ -5032,6 +5033,27 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &7607348432886678165
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 841941428667485219}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.3500001, y: 0.004000001, z: 0.35000002}
+  m_Center: {x: 0, y: 0.0019998814, z: -2.842174e-17}
 --- !u!1 &849368535623634866
 GameObject:
   m_ObjectHideFlags: 0
@@ -41023,10 +41045,10 @@ MonoBehaviour:
   Xmax: 0.18
   Ymax: 0.45
   Zmax: 0.54
-  moveSpeed: 0.2
-  printingResolutionx: 0.02
-  printingResolutiony: 0.02
-  printingResolutionz: 0.02
+  moveSpeed: 0.5
+  printingResolutionx: 0.04
+  printingResolutiony: 0.04
+  printingResolutionz: 0.04
   printerInformation: {fileID: 3928525675020052802}
   printerWorkingTime: {fileID: 2347486927325468826}
   printerExpectTime: {fileID: 8463176251886049863}

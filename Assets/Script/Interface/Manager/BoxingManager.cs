@@ -36,15 +36,14 @@ public class BoxingManager : ManagerClass
 
     private void RobotArmCanvas()
     {
-        if (robotArmCanvasOn)
-        {
-            robotArmCanvas.SetActive(true);
-            robotArmOnOff.text = "OFF";
-        }
-        else
-        {
-            robotArmCanvas.SetActive(false);
-            robotArmOnOff.text = "ON";
-        }
+        robotArmCanvas.SetActive(robotArmCanvasOn);
+        robotArmOnOff.text = robotArmCanvasOn ? "OFF" : "ON";
+    }
+
+    public void BtnPanel()
+    {
+        BtnSelectPanelEvent();
+        robotArmCanvasOn = false;
+        RobotArmCanvas();
     }
 }

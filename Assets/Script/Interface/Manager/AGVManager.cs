@@ -53,4 +53,11 @@ public class AGVManager : ManagerClass
     {
         cartCanvasOn = !cartCanvasOn;
     }
+
+    public void BtnPanel()
+    {
+        BtnSelectPanelEvent();
+        cartCanvasOn = false;
+        CartCanvasOnOff();
+    }
 }

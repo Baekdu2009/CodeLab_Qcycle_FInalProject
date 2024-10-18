@@ -22677,8 +22677,8 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
       - m_Target: {fileID: 926493298}
-        m_TargetAssemblyTypeName: ManagerClass, Assembly-CSharp
-        m_MethodName: BtnSelectPanelEvent
+        m_TargetAssemblyTypeName: AGVManager, Assembly-CSharp
+        m_MethodName: BtnPanel
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -26186,8 +26186,8 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
       - m_Target: {fileID: 1139417741}
-        m_TargetAssemblyTypeName: ManagerClass, Assembly-CSharp
-        m_MethodName: BtnSelectPanelEvent
+        m_TargetAssemblyTypeName: BoxingManager, Assembly-CSharp
+        m_MethodName: BtnPanel
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -33475,7 +33475,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 4a3d26dd49f8572429f8ab39d5c6dd1b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 3.79
+      value: -0.64
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4a3d26dd49f8572429f8ab39d5c6dd1b, type: 3}
       propertyPath: m_LocalPosition.y
@@ -33483,7 +33483,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4a3d26dd49f8572429f8ab39d5c6dd1b, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -6.21
+      value: -6.29
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4a3d26dd49f8572429f8ab39d5c6dd1b, type: 3}
       propertyPath: m_LocalRotation.w
